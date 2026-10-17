@@ -91,6 +91,16 @@ def modo_extraccion() -> str:
     return "fijo"
 
 
+def _es_llamada_real(mensaje: MensajeCrudo) -> bool:
+    """La transcripción de una llamada real (llamadas.py guarda mensaje_id antes de procesarla).
+    Las simuladas usan los datos de la demo, así que ahí el fixture sí coincide."""
+    if mensaje.canal != "llamada":
+        return False
+    return any(
+        ll.get("mensaje_id") == mensaje.id and ll.get("modo") == "real" for ll in store.valores("llamadas")
+    )
+
+
 async def extraer_crudo(mensaje: MensajeCrudo) -> tuple[dict[str, Any], str]:
     """Devuelve (salida cruda del extractor, origen 'llm'|'cache'|'fijo')."""
     modo = modo_extraccion()
@@ -114,7 +124,11 @@ async def extraer_crudo(mensaje: MensajeCrudo) -> tuple[dict[str, Any], str]:
                 catalogo=catalogo(),
             )
         except Exception as exc:  # noqa: BLE001 — en "auto" caemos al fixture, no rompemos la demo
-            if config.settings.extraccion_mode == "llm" or not _crudo_fijo(mensaje.proveedor_id):
+            if (
+                config.settings.extraccion_mode == "llm"
+                or not _crudo_fijo(mensaje.proveedor_id)
+                or _es_llamada_real(mensaje)  # el fixture tiene los precios del audio, no lo que se dijo
+            ):
                 raise
             log.warning("Extracción LLM falló para %s (%s); uso fixture", mensaje.id, exc)
             return _crudo_fijo(mensaje.proveedor_id), "fijo"  # type: ignore[return-value]

@@ -341,3 +341,49 @@ def test_el_whatsapp_no_llega_encima_de_una_llamada_en_curso(client, monkeypatch
     de_papelera = [m for m in store.valores("mensajes") if m["proveedor_id"] == "papelera_del_sur"]
     assert [m["canal"] for m in de_papelera] == ["llamada"]
     assert len(consultas) == 2
+
+
+def _extraccion_llm_que_falla(monkeypatch):
+    from app import pipeline
+
+    async def falla(**_):
+        raise RuntimeError("API caída")
+
+    _ajustes(monkeypatch, extraccion_mode="auto")
+    monkeypatch.setattr(pipeline, "modo_extraccion", lambda: "llm")
+    monkeypatch.setattr(pipeline, "_extractor_llm", lambda: falla)
+    return pipeline
+
+
+def _mensaje_de_llamada(modo: str):
+    from datetime import datetime
+
+    from app.models import Llamada, MensajeCrudo
+
+    m = MensajeCrudo(
+        id=f"msg_llamada_{modo}", pedido_id=PEDIDO, proveedor_id="papelera_del_sur", canal="llamada",
+        contenido_texto="Papelera del Sur: la resma la tengo a 255", recibido_en=datetime.now(), estado="pendiente",
+    )
+    store.guardar("llamadas", Llamada(
+        id=f"ll_{modo}", pedido_id=PEDIDO, proveedor_id="papelera_del_sur", tipo="cotizacion", modo=modo,
+        estado="terminada", iniciada_en=datetime.now(), mensaje_id=m.id,
+    ))
+    return m
+
+
+def test_si_falla_el_llm_una_llamada_real_no_usa_los_precios_fijos(client, monkeypatch):
+    """Con EXTRACCION_MODE=auto el fixture de la papelera tiene los precios de su audio:
+    para una llamada real serían inventados, así que el error se propaga."""
+    import asyncio
+
+    pipeline = _extraccion_llm_que_falla(monkeypatch)
+    with pytest.raises(RuntimeError, match="API caída"):
+        asyncio.run(pipeline.extraer_crudo(_mensaje_de_llamada("real")))
+
+
+def test_si_falla_el_llm_una_llamada_simulada_sigue_usando_el_fixture(client, monkeypatch):
+    import asyncio
+
+    pipeline = _extraccion_llm_que_falla(monkeypatch)
+    _, origen = asyncio.run(pipeline.extraer_crudo(_mensaje_de_llamada("simulada")))
+    assert origen == "fijo"
