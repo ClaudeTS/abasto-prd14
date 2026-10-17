@@ -152,6 +152,7 @@ export default function PlanPage({
   const oportunidad = plan.oportunidad_negociacion;
   const brecha = oportunidad ? (plan.brecha_oportunidad ?? brechaProveedor(oportunidad, plan, cots)) : 0;
   const excluidas = cots.filter((c) => plan.cotizaciones_excluidas?.includes(c.id));
+  const otros = usados.filter((id) => id !== oportunidad);
 
   return (
     <div className="space-y-6">
@@ -304,7 +305,7 @@ export default function PlanPage({
         </div>
       )}
 
-      {oportunidad && (
+      {oportunidad ? (
         <Card>
           <CardHeader>
             <div className="flex items-center gap-3">
@@ -326,6 +327,38 @@ export default function PlanPage({
           <CardContent className="text-muted-foreground">
             Antes de escribirle, Abasto ensaya la negociación contra un gemelo digital del proveedor y te propone el mensaje.
           </CardContent>
+          {otros.length > 0 && (
+            <CardFooter className="flex-wrap gap-2 border-t">
+              <span className="mr-1 text-muted-foreground">O con otro proveedor del plan:</span>
+              {otros.map((id) => (
+                <Button key={id} variant="outline" size="sm" onClick={() => negociar(id)}>
+                  {nombreProveedor(id)}
+                </Button>
+              ))}
+            </CardFooter>
+          )}
+        </Card>
+      ) : (
+        // Sin sugerencia del plan igual se puede negociar con cualquiera: el backend acepta cualquier proveedor.
+        <Card>
+          <CardHeader>
+            <CardDescription>Negociación</CardDescription>
+            <CardTitle className="text-lg">Ningún proveedor del plan queda lejos del mejor precio</CardTitle>
+          </CardHeader>
+          <CardContent className="text-muted-foreground">
+            Igual podés ensayar la negociación con cualquiera: Abasto simula 3 estrategias contra su gemelo digital y te
+            propone el mensaje.
+          </CardContent>
+          <CardFooter className="flex-wrap gap-2">
+            {usados.map((id) => (
+              <Button key={id} variant="outline" onClick={() => negociar(id)}>
+                <HandshakeIcon /> Negociar con {nombreProveedor(id)}
+              </Button>
+            ))}
+            <Button variant="ghost" onClick={() => navigate("/negociacion")}>
+              Ver todos los proveedores
+            </Button>
+          </CardFooter>
         </Card>
       )}
     </div>

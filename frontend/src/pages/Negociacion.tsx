@@ -15,7 +15,7 @@ import * as api from "@/api";
 import type { EnCurso } from "@/App";
 import { mensajeError } from "@/lib/errores";
 import { aPorcentaje, monedaOriginal, pesos, porcentaje, precioUnitario } from "@/lib/format";
-import { nombreProveedor } from "@/lib/proveedores";
+import { nombreProveedor, proveedor } from "@/lib/proveedores";
 import { useReloj } from "@/lib/usePolling";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -60,19 +60,22 @@ export default function NegociacionPage({
   const corriendo = !!curso && !curso.error;
   const ahora = useReloj(1000, corriendo);
 
-  const [cotizacion, setCotizacion] = useState<Cotizacion | null>(null);
+  const [cotizaciones, setCotizaciones] = useState<Cotizacion[] | null>(null);
   const [mensaje, setMensaje] = useState("");
   const [aprobando, setAprobando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!proveedorId) return;
     api
       .getCotizaciones(demo.pedido.id)
-      .then((cs) => setCotizacion(cs.find((c) => c.proveedor_id === proveedorId) ?? null))
+      .then(setCotizaciones)
       .catch((e) => setError(mensajeError(e)));
-  }, [demo.pedido.id, proveedorId]);
+  }, [demo.pedido.id]);
+
+  const cotizacion = cotizaciones?.find((c) => c.proveedor_id === proveedorId) ?? null;
+  const opciones = opcionesNegociacion(cotizaciones ?? [], plan);
+  const elegir = (id: string) => navigate(`/negociacion/${id}`);
 
   useEffect(() => {
     setMensaje(neg?.mensaje_propuesto ?? "");
@@ -85,21 +88,46 @@ export default function NegociacionPage({
   }, [aviso]);
 
   if (!proveedorId) {
-    const sugerido = plan?.oportunidad_negociacion ?? Object.keys(negociaciones)[0];
+    // Si el plan sugiere con quién negociar se va directo; si no, se elige de la lista (que marca los ya ensayados).
+    const sugerido = plan?.oportunidad_negociacion;
     if (sugerido) return <Navigate to={`/negociacion/${sugerido}`} replace />;
+    if (cotizaciones === null) {
+      return error ? (
+        <ErrorBanner mensaje={error} />
+      ) : (
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <Spinner /> Cargando proveedores…
+        </div>
+      );
+    }
+    if (opciones.length === 0) {
+      return (
+        <Empty className="border">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <HandshakeIcon />
+            </EmptyMedia>
+            <EmptyTitle>Todavía no hay con quién negociar</EmptyTitle>
+            <EmptyDescription>Se puede ensayar la negociación con cualquier proveedor que haya cotizado.</EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
+            <Button onClick={() => navigate("/pedido")}>Ir al pedido</Button>
+          </EmptyContent>
+        </Empty>
+      );
+    }
     return (
-      <Empty className="border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <HandshakeIcon />
-          </EmptyMedia>
-          <EmptyTitle>Primero armá el plan de compra</EmptyTitle>
-          <EmptyDescription>Abasto sugiere con qué proveedor conviene negociar según dónde hay más margen.</EmptyDescription>
-        </EmptyHeader>
-        <EmptyContent>
-          <Button onClick={() => navigate("/plan")}>Ir al plan</Button>
-        </EmptyContent>
-      </Empty>
+      <div className="space-y-6">
+        <Encabezado
+          titulo="Negociación"
+          bajada={
+            plan
+              ? "El plan no marca una brecha clara con ningún proveedor. Igual podés ensayar la negociación con cualquiera que haya cotizado."
+              : "Elegí con qué proveedor ensayar la negociación. Con el plan armado, Abasto sugiere dónde hay más margen."
+          }
+        />
+        <ElegirProveedor opciones={opciones} negociaciones={negociaciones} negociando={negociando} onElegir={elegir} />
+      </div>
     );
   }
 
@@ -165,12 +193,20 @@ export default function NegociacionPage({
         </Card>
       )}
 
+      {cotizaciones !== null && !cotizacion && (
+        <ErrorBanner mensaje={`${nombre} no tiene una cotización para este pedido. Elegí otro proveedor.`} />
+      )}
+
+      {opciones.length > 1 && (
+        <OtrosProveedores opciones={opciones} actual={proveedorId} negociaciones={negociaciones} onElegir={elegir} />
+      )}
+
       <ErrorBanner mensaje={error} />
       {curso?.error && (
         <ErrorBanner mensaje={`La simulación falló: ${curso.error}`} onReintentar={() => iniciarNegociacion(proveedorId)} />
       )}
 
-      {!neg && !curso && (
+      {!neg && !curso && cotizacion && (
         <Empty className="border">
           <EmptyHeader>
             <EmptyMedia variant="icon">
@@ -358,5 +394,114 @@ function ColumnaEstrategia({ e, elegida }: { e: EstrategiaNegociacion; elegida: 
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+interface OpcionNegociacion {
+  id: string;
+  sugerido: boolean;
+  enPlan: number | null; // lo que se le compra en el plan; null si no entra
+}
+
+/** Cualquier proveedor que cotizó: primero el que sugiere el plan, después los del plan, después el resto. */
+function opcionesNegociacion(cotizaciones: Cotizacion[], plan: Plan | null): OpcionNegociacion[] {
+  const ids = [...new Set(cotizaciones.map((c) => c.proveedor_id))];
+  return ids
+    .map((id) => {
+      const asignadas = plan?.asignaciones.filter((a) => a.proveedor_id === id) ?? [];
+      return {
+        id,
+        sugerido: plan?.oportunidad_negociacion === id,
+        enPlan: asignadas.length ? asignadas.reduce((s, a) => s + a.subtotal, 0) : null,
+      };
+    })
+    .sort((a, b) => Number(b.sugerido) - Number(a.sugerido) || (b.enPlan ?? -1) - (a.enPlan ?? -1));
+}
+
+function EstadoNegociacion({ neg, curso }: { neg?: Negociacion; curso?: EnCurso }) {
+  if (curso && !curso.error)
+    return (
+      <Etiqueta>
+        <Spinner className="size-3" /> Ensayando
+      </Etiqueta>
+    );
+  if (neg?.estado === "enviada_simulada" || neg?.estado === "aprobada")
+    return (
+      <Etiqueta tono="verde">
+        <CheckIcon /> Enviado
+      </Etiqueta>
+    );
+  if (neg) return <Etiqueta>Ensayada</Etiqueta>;
+  return null;
+}
+
+function ElegirProveedor({
+  opciones,
+  negociaciones,
+  negociando,
+  onElegir,
+}: {
+  opciones: OpcionNegociacion[];
+  negociaciones: Record<string, Negociacion>;
+  negociando: Record<string, EnCurso>;
+  onElegir: (id: string) => void;
+}) {
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {opciones.map((o) => (
+        <Card key={o.id} size="sm">
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <Avatar proveedorId={o.id} />
+              <div className="min-w-0 space-y-0.5">
+                <CardTitle>{nombreProveedor(o.id)}</CardTitle>
+                <CardDescription className="truncate">{proveedor(o.id).rubro}</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="flex-row flex-wrap gap-1.5">
+            {o.sugerido && (
+              <Etiqueta tono="verde">
+                <StarIcon /> Sugerido por el plan
+              </Etiqueta>
+            )}
+            <Etiqueta>{o.enPlan !== null ? `En el plan · ${pesos(o.enPlan)}` : "Fuera del plan"}</Etiqueta>
+            <EstadoNegociacion neg={negociaciones[o.id]} curso={negociando[o.id]} />
+          </CardContent>
+          <CardFooter>
+            <Button variant="outline" className="w-full" onClick={() => onElegir(o.id)}>
+              Negociar con {nombreProveedor(o.id)}
+            </Button>
+          </CardFooter>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
+function OtrosProveedores({
+  opciones,
+  actual,
+  negociaciones,
+  onElegir,
+}: {
+  opciones: OpcionNegociacion[];
+  actual: string;
+  negociaciones: Record<string, Negociacion>;
+  onElegir: (id: string) => void;
+}) {
+  return (
+    <div className="flex flex-wrap items-center gap-2 text-sm">
+      <span className="text-muted-foreground">Ensayar con otro proveedor:</span>
+      {opciones
+        .filter((o) => o.id !== actual)
+        .map((o) => (
+          <Button key={o.id} variant="outline" size="sm" onClick={() => onElegir(o.id)} title={o.sugerido ? "Sugerido por el plan" : undefined}>
+            {o.sugerido && <StarIcon className="fill-current" />}
+            {nombreProveedor(o.id)}
+            {negociaciones[o.id] && <CheckIcon className="text-muted-foreground" />}
+          </Button>
+        ))}
+    </div>
   );
 }
