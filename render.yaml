@@ -13,6 +13,8 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.10
+      - key: TZ  # los timestamps del backend son hora local (datetime.now())
+        value: America/Montevideo
       - key: SIM_MODE
         value: fijo
       - key: EXTRACCION_MODE

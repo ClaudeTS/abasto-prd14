@@ -3,7 +3,8 @@
 
 export type Moneda = "UYU" | "USD";
 export type UnidadCanonica = "unidad" | "l" | "kg";
-export type Canal = "whatsapp_texto" | "whatsapp_audio" | "pdf" | "foto";
+/** "llamada": la transcripción de una llamada del agente viene en contenido_texto ("Abasto: …" / "<Proveedor>: …"). */
+export type Canal = "whatsapp_texto" | "whatsapp_audio" | "pdf" | "foto" | "llamada";
 
 export interface Producto {
   id: string;
@@ -75,6 +76,7 @@ export interface MensajeCrudo {
   recibido_en: string; // ISO
   estado: EstadoMensaje;
   error?: string | null;
+  cotizacion_id?: string | null; // al llegar a "extraido"
 }
 
 export interface ItemCotizado {
@@ -169,4 +171,56 @@ export interface Negociacion {
   elegida: NombreEstrategia;
   mensaje_propuesto: string;
   estado: "simulada" | "aprobada" | "enviada_simulada";
+  /** Si se aprobó para negociar por teléfono ("Aprobar y llamar"). */
+  llamada_id?: string | null;
+}
+
+// ─────────── Llamadas telefónicas del agente (ElevenLabs + Twilio, o simuladas) ───────────
+
+export interface ConfigLlamadas {
+  modo: "real" | "simulada";
+  /** En modo real: si está todo configurado para llamar. */
+  lista: boolean;
+  /** Variables de entorno que faltan (modo real). */
+  faltan: string[];
+  proveedores_con_telefono: string[];
+}
+
+export interface TurnoLlamada {
+  rol: "abasto" | "proveedor";
+  texto: string;
+  segundo: number | null;
+}
+
+export interface ResultadoLlamada {
+  resumen: string | null;
+  acuerdo: boolean | null;
+  /** Por unidad canónica, sin IVA. */
+  precio_acordado: number | null;
+  condicion: string | null;
+}
+
+export type EstadoLlamada = "iniciando" | "sonando" | "en_curso" | "procesando" | "terminada" | "fallida";
+
+export interface Llamada {
+  id: string;
+  pedido_id: string;
+  proveedor_id: string;
+  tipo: "cotizacion" | "negociacion";
+  negociacion_id: string | null;
+  modo: "real" | "simulada";
+  estado: EstadoLlamada;
+  /** Ya enmascarado por el backend: "+598 99• ••• 222". */
+  telefono: string | null;
+  conversation_id: string | null;
+  call_sid: string | null;
+  /** Crece durante la llamada. */
+  transcripcion: TurnoLlamada[];
+  /** Al terminar. */
+  resultado: ResultadoLlamada | null;
+  duracion_segundos: number | null;
+  /** Tipo cotización: el mensaje que entró al feed. */
+  mensaje_id: string | null;
+  error: string | null;
+  iniciada_en: string;
 }

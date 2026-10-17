@@ -150,6 +150,12 @@ def _guardar_archivo(canal: str, contenido: str, mensaje_id: str) -> str | None:
 async def _responder(pedido_id: str, prov: dict[str, Any], demora: float) -> None:
     pub = prov["publico"]
     await asyncio.sleep(demora)
+    from app import llamadas  # import local: llamadas importa pipeline/pedidos, evita ciclos
+
+    # Si Abasto lo está llamando, no mandar el WhatsApp encima de la llamada: esperar a que
+    # termine. Si la llamada trajo la cotización, el chequeo de abajo lo saltea; si falló, responde.
+    while llamadas.activa(pedido_id, pub["id"]) is not None:
+        await asyncio.sleep(1)
     ya_respondio = any(
         m["pedido_id"] == pedido_id and m["proveedor_id"] == pub["id"] for m in store.valores("mensajes")
     )

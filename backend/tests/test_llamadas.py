@@ -76,7 +76,8 @@ def _esperar_mensaje_llamada(client, proveedor_id, timeout=10):
 
 
 # ---------------------------------------------------------------- configuración
-def test_config_por_defecto_simulada(client):
+def test_config_por_defecto_simulada(client, monkeypatch):
+    _ajustes(monkeypatch, llamadas_modo="simulada", telefonos_proveedores={})  # sin depender del .env local
     cfg = client.get("/llamadas/config").json()
     assert cfg == {"modo": "simulada", "lista": True, "faltan": [], "proveedores_con_telefono": []}
 
@@ -310,3 +311,33 @@ def test_reset_cancela_llamadas_en_curso(client, monkeypatch):
     client.post("/reset")
     time.sleep(0.5)
     assert client.get(f"/llamadas/{llamada['id']}").status_code == 404
+
+
+def test_el_whatsapp_no_llega_encima_de_una_llamada_en_curso(client, monkeypatch):
+    """Si el proveedor iba a contestar mientras Abasto lo llama, el simulador espera a que corte:
+    la llamada trae la cotización y el mensaje del simulador no se duplica."""
+    import asyncio
+    from datetime import datetime
+
+    from app import simulador
+    from app.models import MensajeCrudo
+
+    consultas = []
+
+    def activa_falsa(pedido_id, proveedor_id):
+        consultas.append(proveedor_id)
+        if len(consultas) == 1:  # la llamada "termina" y deja su mensaje
+            store.guardar("mensajes", MensajeCrudo(
+                id="msg_llamada_test", pedido_id=pedido_id, proveedor_id=proveedor_id, canal="llamada",
+                contenido_texto="Proveedor: resma a 290", recibido_en=datetime.now(), estado="pendiente",
+            ))
+            return object()
+        return None
+
+    monkeypatch.setattr(llamadas, "activa", activa_falsa)
+    papelera = next(p for p in simulador._proveedores_sim() if p["publico"]["id"] == "papelera_del_sur")
+    asyncio.run(simulador._responder(PEDIDO, papelera, 0))
+
+    de_papelera = [m for m in store.valores("mensajes") if m["proveedor_id"] == "papelera_del_sur"]
+    assert [m["canal"] for m in de_papelera] == ["llamada"]
+    assert len(consultas) == 2

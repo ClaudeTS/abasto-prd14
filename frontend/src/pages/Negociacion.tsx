@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeftIcon,
@@ -6,6 +6,7 @@ import {
   CheckIcon,
   HandshakeIcon,
   PackageIcon,
+  PhoneIcon,
   ScaleIcon,
   SendIcon,
   StarIcon,
@@ -26,7 +27,17 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, Encabezado, ErrorBanner, Etiqueta, type Tono } from "@/components/comunes";
-import type { Cotizacion, EstrategiaNegociacion, Negociacion, NombreEstrategia, PedidoDemo, Plan } from "@/types";
+import PanelLlamada, { BotonLlamar, ModoLlamadas, estaActiva, useConfigLlamadas, useLlamada } from "@/components/PanelLlamada";
+import type {
+  Cotizacion,
+  EstrategiaNegociacion,
+  Llamada,
+  Negociacion,
+  NombreEstrategia,
+  PedidoDemo,
+  Plan,
+  Producto,
+} from "@/types";
 
 const ESTRATEGIAS: Record<NombreEstrategia, { icono: LucideIcon; titulo: string; resumen: string }> = {
   competencia: { icono: ScaleIcon, titulo: "Competencia", resumen: "Mencionar la mejor cotización alternativa real" },
@@ -65,6 +76,25 @@ export default function NegociacionPage({
   const [aprobando, setAprobando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
+  const [llamarPedido, setLlamarPedido] = useState(false);
+
+  // "Aprobar y llamar": el clic es la aprobación; antes no se llama a nadie.
+  const config = useConfigLlamadas();
+  const tel = useLlamada("llamada_negociacion", (simulada) => api.llamarParaNegociar(neg!.id, mensaje.trim(), simulada));
+  const llamada = tel.llamada && neg && tel.llamada.negociacion_id === neg.id ? tel.llamada : null;
+  const intentoLlamar = !!llamada || tel.iniciando || (!!tel.error && !!neg && tel.llamada === null && llamarPedido);
+  const { setLlamada } = tel;
+  const panel = useRef<HTMLDivElement>(null);
+
+  // Tras un F5 (o volver a la página): la negociación recuerda su llamada_id.
+  useEffect(() => {
+    if (!neg?.llamada_id || tel.llamada?.id === neg.llamada_id) return;
+    api
+      .getLlamada(neg.llamada_id)
+      .then(setLlamada)
+      .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [neg?.llamada_id]);
 
   useEffect(() => {
     if (!proveedorId) return;
@@ -105,6 +135,7 @@ export default function NegociacionPage({
 
   const nombre = nombreProveedor(proveedorId);
   const enviada = neg?.estado === "enviada_simulada" || neg?.estado === "aprobada";
+  const porTelefono = !!neg?.llamada_id || !!llamada;
   const palabras = mensaje.trim() ? mensaje.trim().split(/\s+/).length : 0;
   const elegida = neg?.estrategias.find((e) => e.nombre === neg.elegida);
   const enPlan = plan?.asignaciones.filter((a) => a.proveedor_id === proveedorId) ?? [];
@@ -122,6 +153,18 @@ export default function NegociacionPage({
     } finally {
       setAprobando(false);
     }
+  };
+
+  const aprobarYLlamar = async () => {
+    if (!neg) return;
+    setError(null);
+    setLlamarPedido(true);
+    // El panel aparece abajo de todo: llevarlo a la vista para seguir la llamada.
+    setTimeout(() => panel.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+    const texto = mensaje.trim();
+    const l = await tel.iniciarCon((simulada) => api.llamarParaNegociar(neg.id, texto, simulada));
+    // El backend deja la negociación "aprobada" con su llamada_id.
+    if (l) onAprobada({ ...neg, mensaje_propuesto: texto, estado: "aprobada", llamada_id: l.id });
   };
 
   return (
@@ -204,7 +247,11 @@ export default function NegociacionPage({
               <CardTitle>Mensaje propuesto para {nombre}</CardTitle>
               <CardDescription>Podés editarlo antes de aprobar. El envío es simulado.</CardDescription>
               <CardAction>
-                {enviada ? (
+                {enviada && porTelefono ? (
+                  <Etiqueta tono="verde">
+                    <PhoneIcon /> Aprobado · por teléfono
+                  </Etiqueta>
+                ) : enviada ? (
                   <Etiqueta tono="verde">
                     <CheckIcon /> Enviado (simulado)
                   </Etiqueta>
@@ -229,16 +276,34 @@ export default function NegociacionPage({
                 className="text-base leading-relaxed"
               />
             </CardContent>
-            <CardFooter>
-              {enviada ? (
+            <CardFooter className="flex-wrap gap-x-3 gap-y-2">
+              {enviada && porTelefono ? (
+                <p className="text-muted-foreground">
+                  Aprobado por {demo.pedido.comprador?.split(" ")[0] ?? "quien compra"}: Abasto llamó a {nombre} para negociar
+                  con este mensaje.
+                </p>
+              ) : enviada ? (
                 <p className="text-muted-foreground">
                   Aprobado por {demo.pedido.comprador?.split(" ")[0] ?? "quien compra"} y enviado (simulado) a {nombre} por
                   WhatsApp.
                 </p>
               ) : (
-                <Button size="lg" onClick={aprobar} disabled={aprobando || !mensaje.trim()}>
-                  {aprobando ? <Spinner /> : <SendIcon />} Aprobar y enviar
-                </Button>
+                <>
+                  <Button size="lg" onClick={aprobar} disabled={aprobando || tel.iniciando || !mensaje.trim()}>
+                    {aprobando ? <Spinner /> : <SendIcon />} Aprobar y enviar
+                  </Button>
+                  <BotonLlamar
+                    config={config}
+                    proveedorId={proveedorId}
+                    size="lg"
+                    variant="outline"
+                    onClick={aprobarYLlamar}
+                    disabled={aprobando || tel.iniciando || !mensaje.trim()}
+                  >
+                    {tel.iniciando ? <Spinner /> : <PhoneIcon />} Aprobar y llamar
+                  </BotonLlamar>
+                  <ModoLlamadas config={config} className="ml-auto" />
+                </>
               )}
             </CardFooter>
           </Card>
@@ -264,6 +329,13 @@ export default function NegociacionPage({
               </CardContent>
             </Card>
           )}
+        </div>
+      )}
+
+      {neg && !corriendo && intentoLlamar && (
+        <div ref={panel} className="grid scroll-mt-20 items-start gap-4 lg:grid-cols-[1fr_22rem]">
+          <PanelLlamada proveedorId={proveedorId} tel={tel} titulo={`Llamada para negociar con ${nombre}`} />
+          <ResultadoLlamada llamada={llamada} plan={plan} proveedorId={proveedorId} catalogo={demo.catalogo} />
         </div>
       )}
 
@@ -356,6 +428,112 @@ function ColumnaEstrategia({ e, elegida }: { e: EstrategiaNegociacion; elegida: 
             </Button>
           )}
         </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+/** Resultado de la llamada de negociación: acuerdo y precio acordado frente al cotizado. */
+function ResultadoLlamada({
+  llamada,
+  plan,
+  proveedorId,
+  catalogo,
+}: {
+  llamada: Llamada | null;
+  plan: Plan | null;
+  proveedorId: string;
+  catalogo: Producto[];
+}) {
+  const r = llamada?.estado === "terminada" ? llamada.resultado : null;
+  if (!r) {
+    return (
+      <Card size="sm">
+        <CardHeader>
+          <CardDescription>Resultado de la llamada</CardDescription>
+          <CardTitle className="text-muted-foreground">
+            {llamada?.estado === "fallida"
+              ? "La llamada no se completó"
+              : estaActiva(llamada) || !llamada
+                ? "Aparece cuando termine la llamada"
+                : "Sin resultado"}
+          </CardTitle>
+        </CardHeader>
+      </Card>
+    );
+  }
+  // El precio acordado es por unidad canónica, sin IVA, del primer ítem que el plan le asigna (como el backend).
+  const asignacion = plan?.asignaciones.find((a) => a.proveedor_id === proveedorId);
+  const cotizado = asignacion?.precio_unitario_sin_iva ?? null;
+  const acordado = r.precio_acordado;
+  const diferencia = cotizado !== null && acordado !== null ? cotizado - acordado : null;
+  const pct = diferencia !== null && cotizado ? (diferencia / cotizado) * 100 : null;
+  const total = diferencia !== null && asignacion ? diferencia * asignacion.cantidad : null;
+  const producto = asignacion ? (catalogo.find((p) => p.id === asignacion.producto_id)?.nombre ?? asignacion.producto_id) : null;
+
+  return (
+    <Card size="sm" className="animate-entrar">
+      <CardHeader>
+        <CardDescription>Resultado de la llamada</CardDescription>
+        <CardTitle className="flex items-center gap-2">
+          {r.acuerdo === true ? (
+            <Etiqueta tono="verde">
+              <HandshakeIcon /> Hubo acuerdo
+            </Etiqueta>
+          ) : r.acuerdo === false ? (
+            <Etiqueta tono="ambar">Sin acuerdo</Etiqueta>
+          ) : (
+            <Etiqueta>Acuerdo sin confirmar</Etiqueta>
+          )}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="gap-4">
+        {r.resumen && <p className="leading-relaxed">{r.resumen}</p>}
+
+        {acordado !== null ? (
+          <div className="space-y-2 rounded-lg border p-3">
+            {producto && <p className="text-xs text-muted-foreground">{producto} · por unidad, sin IVA</p>}
+            <div className="flex items-end justify-between gap-3">
+              <div>
+                <p className="text-xs text-muted-foreground">Acordado</p>
+                <p className="text-2xl font-semibold tracking-tight tabular-nums">{precioUnitario(acordado)}</p>
+              </div>
+              {cotizado !== null && (
+                <div className="text-right">
+                  <p className="text-xs text-muted-foreground">Cotizado</p>
+                  <p className="text-muted-foreground tabular-nums line-through">{precioUnitario(cotizado)}</p>
+                </div>
+              )}
+            </div>
+            {diferencia !== null && pct !== null && (
+              <p
+                className={cn(
+                  "text-sm font-medium tabular-nums",
+                  diferencia > 0 ? "text-emerald-700 dark:text-emerald-400" : "text-muted-foreground",
+                )}
+              >
+                {diferencia > 0 ? "−" : diferencia < 0 ? "+" : ""}
+                {porcentaje(Math.abs(pct))}
+                {total !== null && asignacion && (
+                  <>
+                    {" "}
+                    · {diferencia > 0 ? "ahorro de " : diferencia < 0 ? "costo extra de " : ""}
+                    {pesos(Math.abs(total))} en las {asignacion.cantidad} del plan
+                  </>
+                )}
+              </p>
+            )}
+          </div>
+        ) : (
+          <p className="text-muted-foreground">El proveedor no dijo un precio concreto en la llamada.</p>
+        )}
+
+        {r.condicion && (
+          <p className="text-sm">
+            <span className="text-muted-foreground">Condición: </span>
+            {r.condicion}
+          </p>
+        )}
       </CardContent>
     </Card>
   );

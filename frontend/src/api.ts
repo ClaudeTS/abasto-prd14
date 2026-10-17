@@ -4,10 +4,12 @@ import { ApiError } from "./lib/errores";
 import * as mock from "./mock/servidor";
 import type {
   ConfigCompra,
+  ConfigLlamadas,
   Conversion,
   Cotizacion,
   EstrategiaNegociacion,
   ItemCotizado,
+  Llamada,
   MensajeCrudo,
   Negociacion,
   Pedido,
@@ -151,6 +153,15 @@ function normNegociacion(n: Negociacion): Negociacion {
   };
 }
 
+function normLlamada(l: Llamada): Llamada {
+  return {
+    ...l,
+    transcripcion: l.transcripcion ?? [],
+    resultado: l.resultado ? { ...l.resultado, precio_acordado: numONull(l.resultado.precio_acordado) } : null,
+    duracion_segundos: numONull(l.duracion_segundos),
+  };
+}
+
 /** Acepta el PedidoCompleto del backend (plano, con tipo_cambio_usd e iva) o {pedido, catalogo, config, conversiones}. */
 function normPedidoDemo(raw: unknown): PedidoDemo {
   const r = raw as Partial<PedidoDemo> & Partial<Pedido> & Record<string, unknown>;
@@ -221,6 +232,34 @@ export async function negociar(pedidoId: string, proveedorId: string): Promise<N
 export async function aprobar(negociacionId: string, mensaje: string): Promise<Negociacion> {
   if (MOCK) return mock.aprobar(negociacionId, mensaje);
   return normNegociacion(await http("POST", `/negociaciones/${negociacionId}/aprobar`, { mensaje }));
+}
+
+// ─────────── Llamadas del agente (docs/LLAMADAS.md) ───────────
+
+export async function getConfigLlamadas(): Promise<ConfigLlamadas> {
+  if (MOCK) return mock.configLlamadas();
+  return http("GET", "/llamadas/config");
+}
+
+/** Llama al proveedor que no respondió para pedirle la cotización. `simulada`: respaldo sin red. */
+export async function llamarParaCotizar(pedidoId: string, proveedorId: string, simulada = false): Promise<Llamada> {
+  if (MOCK) return mock.llamarParaCotizar(proveedorId);
+  return normLlamada(
+    await http("POST", `/pedidos/${pedidoId}/llamar/${proveedorId}${simulada ? "?simulada=true" : ""}`),
+  );
+}
+
+/** "Aprobar y llamar": el clic es la aprobación; el agente negocia con el mensaje (editado). */
+export async function llamarParaNegociar(negociacionId: string, mensaje: string, simulada = false): Promise<Llamada> {
+  if (MOCK) return mock.llamarParaNegociar(negociacionId, mensaje);
+  return normLlamada(
+    await http("POST", `/negociaciones/${negociacionId}/llamar${simulada ? "?simulada=true" : ""}`, { mensaje }),
+  );
+}
+
+export async function getLlamada(id: string): Promise<Llamada> {
+  if (MOCK) return mock.llamada(id);
+  return normLlamada(await http("GET", `/llamadas/${id}`));
 }
 
 export async function reset(): Promise<void> {
