@@ -1,0 +1,27 @@
+# Backend de Abasto en Render (Blueprint). Render → New → Blueprint → este repo.
+# Las variables con `sync: false` se cargan a mano en el dashboard (nunca en el repo).
+services:
+  - type: web
+    name: abasto-backend
+    runtime: python
+    plan: free
+    region: oregon # la misma que Supabase (us-west-2): cada consulta va y viene
+    buildCommand: pip install -r backend/requirements.txt
+    # un solo proceso: el simulador corre tareas en memoria
+    startCommand: uvicorn app.main:app --app-dir backend --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.10
+      - key: SIM_MODE
+        value: fijo
+      - key: EXTRACCION_MODE
+        value: auto
+      - key: DATABASE_URL # Supabase → Connect → Session pooler (puerto 5432)
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: ANTHROPIC_CUSTOM_HEADERS # anthropic-workspace-id: …
+        sync: false
+      - key: CORS_ORIGINS # la URL de Vercel, ej. https://abasto.vercel.app
+        sync: false

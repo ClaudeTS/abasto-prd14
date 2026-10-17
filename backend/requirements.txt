@@ -9,6 +9,7 @@ pillow
 httpx
 pytest
 python-dotenv
+psycopg[binary]==3.2.*   # solo si hay DATABASE_URL (Supabase)
 reportlab          # PDFs de presupuestos simulados (fixtures y simulador)
 # opcionales
 # openai            # solo si ENABLE_AUDIO=1 (Whisper / TTS)

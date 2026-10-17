@@ -136,10 +136,12 @@ def _guardar_archivo(canal: str, contenido: str, mensaje_id: str) -> str | None:
     if canal == "pdf":
         nombre = f"{mensaje_id}.pdf"
         archivos.generar_pdf_presupuesto(contenido, config.settings.archivos_dir / nombre)
+        store.subir_archivo(nombre)
         return nombre
     if canal == "foto":
         nombre = f"{mensaje_id}.jpg"
         archivos.generar_foto_presupuesto(contenido, config.settings.archivos_dir / nombre)
+        store.subir_archivo(nombre)
         return nombre
     return None
 

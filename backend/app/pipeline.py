@@ -51,6 +51,8 @@ def perfil_privado(proveedor_id: str) -> dict[str, Any]:
 # ---------------------------------------------------------------- texto de entrada
 def obtener_texto(mensaje: MensajeCrudo) -> tuple[str | None, Path | None]:
     """Devuelve (texto, imagen) para el extractor según el canal."""
+    if mensaje.archivo:
+        store.asegurar_archivo(mensaje.archivo)  # con Postgres, el server pudo reiniciarse
     archivo = config.settings.archivos_dir / mensaje.archivo if mensaje.archivo else None
     if mensaje.canal == "pdf" and archivo:
         from app.archivos import extraer_texto_pdf

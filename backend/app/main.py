@@ -230,6 +230,7 @@ async def extraer(
         destino = config.settings.archivos_dir / nombre_archivo
         destino.parent.mkdir(parents=True, exist_ok=True)
         destino.write_bytes(await archivo.read())
+        store.subir_archivo(nombre_archivo)
     mensaje = MensajeCrudo(
         id=mensaje_id,
         pedido_id=pedido_id,
@@ -254,7 +255,7 @@ async def extraer(
 async def archivo(nombre: str) -> FileResponse:
     base = config.settings.archivos_dir.resolve()
     ruta = (base / nombre).resolve()
-    if ruta.parent != base or not ruta.is_file():
+    if ruta.parent != base or not store.asegurar_archivo(nombre):  # con Postgres, lo baja si falta
         raise ErrorAbasto(404, f"No existe el archivo '{nombre}'")
     return FileResponse(ruta)
 

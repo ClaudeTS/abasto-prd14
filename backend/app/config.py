@@ -44,6 +44,7 @@ class Settings:
     data_dir: Path  # backend/data: seed + runtime + cache
     seed_dir: Path  # de dónde se seedea: backend/data si `make seed` corrió, si no data/
     cors_origins: list[str]
+    database_url: str  # Postgres (Supabase); vacío: archivos JSON en data_dir
 
     @property
     def runtime_dir(self) -> Path:
@@ -72,6 +73,7 @@ def cargar_settings() -> Settings:
         data_dir=data_dir,
         seed_dir=seed_dir,
         cors_origins=[o.strip() for o in origins.split(",") if o.strip()],
+        database_url=os.environ.get("DATABASE_URL", "").strip(),
     )
 
 

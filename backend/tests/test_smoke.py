@@ -313,6 +313,7 @@ def test_reanuda_si_el_server_se_reinicia_cotizando(monkeypatch):
         c.post("/reset")
 
 
+@pytest.mark.skipif(bool(config.settings.database_url), reason="con Postgres el runtime es la base")
 def test_runtime_borrado_con_server_vivo(client, monkeypatch):
     _con_demora(monkeypatch, 4)
     client.post(f"/pedidos/{PEDIDO}/cotizar")
