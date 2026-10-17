@@ -7,3 +7,5 @@ dist/
 __pycache__/
 *.pyc
 .DS_Store
+backend/data/*.json
+.pytest_cache/

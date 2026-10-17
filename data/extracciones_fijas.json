@@ -1,0 +1,89 @@
+{
+  "_nota": "Salida cruda esperada del prompt `extractor` (docs/PROMPTS.md §1) para cada mensaje de respuestas_fijas.json, ANTES de las reglas post-LLM (moneda, IVA y unidades sin convertir). Usos: (1) fallback del pipeline cuando la Capa 1 con LLM no está o no hay API key (EXTRACCION_MODE=fijo|auto), (2) referencia para que el rol A valide su extractor. Cada 'evidencia' es un fragmento literal del mensaje (para el PDF, del texto del HTML).",
+  "extracciones": {
+    "distribuidora_oriental": {
+      "items": [
+        {"producto_id": "resma_a4", "descripcion_original": "Resma A4 75g", "precio": 235, "moneda": "UYU", "unidad_original": "unidad", "incluye_iva_original": false, "cantidad_minima": null, "evidencia": "Resma A4 75g $235"},
+        {"producto_id": "toner", "descripcion_original": "Tóner HP 85A original", "precio": 4600, "moneda": "UYU", "unidad_original": "unidad", "incluye_iva_original": false, "cantidad_minima": null, "evidencia": "Tóner HP 85A original $4.600"},
+        {"producto_id": "desinfectante", "descripcion_original": "Desinfectante de pisos bidón 5L", "precio": 790, "moneda": "UYU", "unidad_original": "bidón de 5 L", "incluye_iva_original": false, "cantidad_minima": null, "evidencia": "Desinfectante de pisos bidón 5L $790"},
+        {"producto_id": "silla", "descripcion_original": "Silla ergonómica", "precio": 12400, "moneda": "UYU", "unidad_original": "unidad", "incluye_iva_original": false, "cantidad_minima": null, "evidencia": "Silla ergonómica $12.400"}
+      ],
+      "costo_envio": 0,
+      "pedido_minimo_total": 8000,
+      "plazo_pago_dias": 30,
+      "lead_time_dias": 2,
+      "validez_dias": null,
+      "observaciones": ["No vende notebooks"],
+      "confianza": 0.92,
+      "campos_dudosos": []
+    },
+    "compuservice": {
+      "items": [
+        {"producto_id": "notebook", "descripcion_original": "Notebook 15 i5 16gb 512", "precio": 33500, "moneda": "UYU", "unidad_original": "unidad", "incluye_iva_original": false, "cantidad_minima": 5, "evidencia": "Notebook 15 i5 16gb 512 33500"},
+        {"producto_id": "toner", "descripcion_original": "Toner 85a", "precio": 3900, "moneda": "UYU", "unidad_original": "unidad", "incluye_iva_original": false, "cantidad_minima": null, "evidencia": "Toner 85a 3900"}
+      ],
+      "costo_envio": 0,
+      "pedido_minimo_total": null,
+      "plazo_pago_dias": 0,
+      "lead_time_dias": 3,
+      "validez_dias": null,
+      "observaciones": ["No aclara si los precios incluyen IVA", "Mínimo 5 notebooks"],
+      "confianza": 0.55,
+      "campos_dudosos": ["iva"]
+    },
+    "ofisillas": {
+      "items": [
+        {"producto_id": "silla", "descripcion_original": "Silla ergonómica mod. Prime, respaldo mesh, apoyabrazos regulables", "precio": 10900, "moneda": "UYU", "unidad_original": "unidad", "incluye_iva_original": false, "cantidad_minima": null, "evidencia": "$10.900 + IVA c/u"}
+      ],
+      "costo_envio": 1200,
+      "pedido_minimo_total": null,
+      "plazo_pago_dias": 30,
+      "lead_time_dias": 7,
+      "validez_dias": null,
+      "observaciones": ["Entrega en 7 días hábiles"],
+      "confianza": 0.93,
+      "campos_dudosos": []
+    },
+    "tecnoimport": {
+      "items": [
+        {"producto_id": "notebook", "descripcion_original": "Notebook 15.6\" Core i5 / 16 GB RAM / 512 GB SSD / Win 11 Pro", "precio": 780, "moneda": "USD", "unidad_original": "unidad", "incluye_iva_original": false, "cantidad_minima": null, "evidencia": "Notebook 15.6\" Core i5 / 16 GB RAM / 512 GB SSD / Win 11 Pro 10 780,00"},
+        {"producto_id": "toner", "descripcion_original": "Tóner HP 85A original (CE285A)", "precio": 95, "moneda": "USD", "unidad_original": "unidad", "incluye_iva_original": false, "cantidad_minima": null, "evidencia": "Tóner HP 85A original (CE285A) 8 95,00"}
+      ],
+      "costo_envio": 0,
+      "pedido_minimo_total": null,
+      "plazo_pago_dias": 30,
+      "lead_time_dias": 5,
+      "validez_dias": 5,
+      "observaciones": ["Precios sujetos a variación del tipo de cambio", "Pagaderos en pesos al tipo de cambio BCU del día de facturación"],
+      "confianza": 0.94,
+      "campos_dudosos": []
+    },
+    "muebleria_rivera": {
+      "items": [
+        {"producto_id": "silla", "descripcion_original": "Silla ergo mod. 2", "precio": 9800, "moneda": "UYU", "unidad_original": "unidad", "incluye_iva_original": false, "cantidad_minima": 20, "evidencia": "Silla ergo mod. 2 ... 9.800 x unidad s/iva"}
+      ],
+      "costo_envio": 0,
+      "pedido_minimo_total": null,
+      "plazo_pago_dias": 0,
+      "lead_time_dias": 10,
+      "validez_dias": null,
+      "observaciones": ["Fabrica por lote: mínimo 20 unidades", "Pide 50 % de anticipo, saldo contra entrega"],
+      "confianza": 0.85,
+      "campos_dudosos": []
+    },
+    "papelera_del_sur": {
+      "items": [
+        {"producto_id": "resma_a4", "descripcion_original": "Caja de cinco resmas", "precio": 1090, "moneda": "UYU", "unidad_original": "caja de 5 resmas", "incluye_iva_original": true, "cantidad_minima": null, "evidencia": "la caja de cinco resmas te la dejo a mil noventa"},
+        {"producto_id": "desinfectante", "descripcion_original": "Desinfectante de pisos, bidón de cinco litros", "precio": 690, "moneda": "UYU", "unidad_original": "bidón de 5 L", "incluye_iva_original": true, "cantidad_minima": null, "evidencia": "el bidón de cinco litros, seiscientos noventa"}
+      ],
+      "costo_envio": 0,
+      "pedido_minimo_total": null,
+      "plazo_pago_dias": 0,
+      "lead_time_dias": 1,
+      "validez_dias": null,
+      "observaciones": ["Avisa que el papel aumenta el mes que viene", "Envío sin cargo si el pedido supera $ 5.000", "No vende tóner"],
+      "confianza": 0.82,
+      "campos_dudosos": []
+    }
+  }
+}
