@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/table";
 import { Avatar, Encabezado, ErrorBanner, Etiqueta } from "@/components/comunes";
 import { necesitaRevision } from "@/components/TarjetaCotizacion";
-import type { Asignacion, Cotizacion, PedidoDemo, Plan } from "@/types";
+import type { Asignacion, Cotizacion, NoMasBarato, PedidoDemo, Plan } from "@/types";
 
 export default function PlanPage({
   demo,
@@ -49,11 +49,11 @@ export default function PlanPage({
       .catch((e) => setError(mensajeError(e)));
   }, [pedido.id, plan]);
 
-  const optimizar = async () => {
+  const optimizar = async (forzar = false) => {
     setOptimizando(true);
     setError(null);
     try {
-      onPlan(await api.optimizar(pedido.id));
+      onPlan(await api.optimizar(pedido.id, forzar));
     } catch (e) {
       setError(mensajeError(e));
     } finally {
@@ -76,7 +76,7 @@ export default function PlanPage({
           bajada="Un solver matemático (MILP) reparte el pedido entre proveedores: minimiza el costo total respetando mínimos de pedido, plazos de entrega, envío y riesgo. El modelo de lenguaje solo explica el resultado."
         />
         <div className="space-y-4">
-          <ErrorBanner mensaje={error} onReintentar={optimizar} />
+          <ErrorBanner mensaje={error} onReintentar={() => optimizar()} />
           <Card>
             {cotizaciones === null ? (
               <CardContent className="flex-row items-center gap-2 text-muted-foreground">
@@ -107,17 +107,29 @@ export default function PlanPage({
                       <AlertTitle>Hay datos sin confirmar</AlertTitle>
                       <AlertDescription className="text-amber-800 dark:text-amber-300">
                         <p>
-                          {paraRevisar.map((c) => nombreProveedor(c.proveedor_id)).join(", ")}: el solver va a usar la lectura tal
-                          cual. <Link to={`/cotizaciones#${paraRevisar[0].id}`}>Revisar primero</Link>
+                          {paraRevisar.map((c) => nombreProveedor(c.proveedor_id)).join(", ")}: confirmá la lectura antes de
+                          optimizar. Si optimizás igual, {paraRevisar.length === 1 ? "esa cotización queda" : "esas cotizaciones quedan"}{" "}
+                          afuera del plan. <Link to={`/cotizaciones#${paraRevisar[0].id}`}>Revisar ahora</Link>
                         </p>
                       </AlertDescription>
                     </Alert>
                   </CardContent>
                 )}
                 <CardFooter>
-                  <Button size="lg" onClick={optimizar} disabled={cotizaciones.length === 0}>
-                    Optimizar la compra
-                  </Button>
+                  {paraRevisar.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      <Button size="lg" asChild>
+                        <Link to={`/cotizaciones#${paraRevisar[0].id}`}>Revisar y confirmar</Link>
+                      </Button>
+                      <Button size="lg" variant="outline" onClick={() => optimizar(true)}>
+                        Optimizar sin {paraRevisar.length === 1 ? nombreProveedor(paraRevisar[0].proveedor_id) : "ellas"}
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button size="lg" onClick={() => optimizar()} disabled={cotizaciones.length === 0}>
+                      Optimizar la compra
+                    </Button>
+                  )}
                   {cotizaciones.length === 0 && (
                     <span className="ml-3 text-muted-foreground">Primero tienen que llegar cotizaciones.</span>
                   )}
@@ -138,12 +150,13 @@ export default function PlanPage({
     .map((id) => cots.find((c) => c.proveedor_id === id))
     .filter((c): c is Cotizacion => !!c && c.costo_envio > 0);
   const oportunidad = plan.oportunidad_negociacion;
-  const brecha = oportunidad ? brechaProveedor(oportunidad, plan, cots) : 0;
+  const brecha = oportunidad ? (plan.brecha_oportunidad ?? brechaProveedor(oportunidad, plan, cots)) : 0;
+  const excluidas = cots.filter((c) => plan.cotizaciones_excluidas?.includes(c.id));
 
   return (
     <div className="space-y-6">
       <Encabezado titulo="Plan de compra" bajada={`${pedido.negocio} · precios sin IVA, en pesos`}>
-        <Button variant="outline" onClick={optimizar}>
+        <Button variant="outline" onClick={() => optimizar()}>
           <RefreshCwIcon /> Recalcular
         </Button>
       </Encabezado>
@@ -217,7 +230,7 @@ export default function PlanPage({
           </TableHeader>
           <TableBody>
             {plan.asignaciones.map((a) => (
-              <FilaAsignacion key={`${a.producto_id}-${a.proveedor_id}`} a={a} demo={demo} cotizaciones={cots} />
+              <FilaAsignacion key={`${a.producto_id}-${a.proveedor_id}`} a={a} plan={plan} demo={demo} cotizaciones={cots} />
             ))}
             {envios.map((c) => (
               <TableRow key={`envio-${c.proveedor_id}`} className="text-muted-foreground">
@@ -244,6 +257,19 @@ export default function PlanPage({
           </TableFooter>
         </Table>
       </Card>
+
+      {excluidas.length > 0 && (
+        <Alert className="border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200">
+          <TriangleAlertIcon />
+          <AlertTitle>Quedó afuera del plan</AlertTitle>
+          <AlertDescription className="text-amber-800 dark:text-amber-300">
+            <p>
+              {excluidas.map((c) => nombreProveedor(c.proveedor_id)).join(", ")}: la lectura no está confirmada, así que el
+              solver no la usó. <Link to={`/cotizaciones#${excluidas[0].id}`}>Confirmar y recalcular</Link>
+            </p>
+          </AlertDescription>
+        </Alert>
+      )}
 
       {(plan.restricciones_activas.length > 0 || plan.relajaciones.length > 0) && (
         <div className="grid gap-4 md:grid-cols-2">
@@ -306,11 +332,29 @@ export default function PlanPage({
   );
 }
 
-function FilaAsignacion({ a, demo, cotizaciones }: { a: Asignacion; demo: PedidoDemo; cotizaciones: Cotizacion[] }) {
+function FilaAsignacion({
+  a,
+  plan,
+  demo,
+  cotizaciones,
+}: {
+  a: Asignacion;
+  plan: Plan;
+  demo: PedidoDemo;
+  cotizaciones: Cotizacion[];
+}) {
   const producto = demo.catalogo.find((p) => p.id === a.producto_id);
   const cot = cotizaciones.find((c) => c.proveedor_id === a.proveedor_id);
   const item = cot?.items.find((i) => i.producto_id === a.producto_id);
-  const motivo = porQueNoElMasBarato(a, demo, cotizaciones);
+  // El motivo lo calcula el solver (backend). Solo si el plan no lo trae (modo mock) se arma uno local,
+  // y nunca contra cotizaciones que quedaron afuera por estar sin confirmar.
+  const motivo = plan.no_mas_barato
+    ? motivoDelSolver(a, plan.no_mas_barato)
+    : porQueNoElMasBarato(
+        a,
+        demo,
+        cotizaciones.filter((c) => c.estado !== "revisar" && !plan.cotizaciones_excluidas?.includes(c.id)),
+      );
   return (
     <TableRow className={motivo ? "bg-amber-50/60 hover:bg-amber-50 dark:bg-amber-950/30" : undefined}>
       <TableCell className="py-4 pl-6 align-top whitespace-normal">
@@ -348,7 +392,16 @@ function FilaAsignacion({ a, demo, cotizaciones }: { a: Asignacion; demo: Pedido
   );
 }
 
-/** Si había un precio más barato que no se eligió, explica por qué con los datos de las cotizaciones. */
+/** "Mueblería Rivera cotiza $ 9.800, pero exige mínimo 20 unidades y se necesitan 15." */
+function motivoDelSolver(a: Asignacion, casos: NoMasBarato[]): string | null {
+  const caso = casos.find((n) => n.producto_id === a.producto_id && n.elegido_id === a.proveedor_id);
+  if (!caso) return null;
+  const nombre = nombreProveedor(caso.mas_barato_id);
+  const resto = caso.motivo.startsWith(nombre) ? caso.motivo.slice(nombre.length).trim() : caso.motivo;
+  return `${nombre} cotiza ${precioUnitario(caso.precio_mas_barato)}, pero ${resto}.`;
+}
+
+/** Respaldo para el modo mock: explica con los datos de las cotizaciones por qué no se eligió al más barato. */
 function porQueNoElMasBarato(a: Asignacion, demo: PedidoDemo, cotizaciones: Cotizacion[]): string | null {
   const linea = demo.pedido.lineas.find((l) => l.producto_id === a.producto_id);
   const candidatos = cotizaciones.flatMap((c) =>

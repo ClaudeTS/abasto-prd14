@@ -20,6 +20,9 @@ const DUDOSOS: Record<string, string> = {
 /** El backend decide qué hay que revisar (confianza baja o una duda que cambia el precio). */
 export const necesitaRevision = (c: Cotizacion) => c.estado === "revisar";
 
+/** "unidad:silla" → "la unidad en la que cotiza". */
+const textoDuda = (d: string) => DUDOSOS[d.split(":")[0]] ?? d;
+
 export default function TarjetaCotizacion({
   cotizacion: c,
   catalogo,
@@ -31,19 +34,30 @@ export default function TarjetaCotizacion({
   catalogo: Producto[];
   destacada?: boolean;
   onVerOriginal: () => void;
-  onConfirmar: (campo: string, valor: boolean) => Promise<void>;
+  /** campo null = confirmar la lectura tal cual (POST /confirmar sin cuerpo). */
+  onConfirmar: (campo: string | null, valor?: boolean) => Promise<void>;
 }) {
   const p = proveedor(c.proveedor_id);
   const canal = CANALES[p.canal_preferido];
   const revisar = necesitaRevision(c);
   const ivaDudoso = revisar && c.campos_dudosos.includes("iva");
-  const [confirmando, setConfirmando] = useState<boolean | null>(null);
+  const [confirmando, setConfirmando] = useState<boolean | "lectura" | null>(null);
   const ivas = new Set(c.items.map((i) => i.incluye_iva_original));
+  const dudas = [...new Set(c.campos_dudosos.filter((d) => d !== "iva" || ivaDudoso).map(textoDuda))];
 
   const confirmar = async (valor: boolean) => {
     setConfirmando(valor);
     try {
       await onConfirmar("iva", valor);
+    } finally {
+      setConfirmando(null);
+    }
+  };
+
+  const confirmarLectura = async () => {
+    setConfirmando("lectura");
+    try {
+      await onConfirmar(null);
     } finally {
       setConfirmando(null);
     }
@@ -82,14 +96,27 @@ export default function TarjetaCotizacion({
         </CardAction>
       </CardHeader>
 
-      {(ivaDudoso || (revisar && c.campos_dudosos.length > 0)) && (
+      {revisar && (
         <CardContent>
           <div className="space-y-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200">
             <p>
-              <span className="font-medium">Abasto no adivina:</span> el mensaje no deja claro{" "}
-              {c.campos_dudosos.map((d) => DUDOSOS[d] ?? d).join(" ni ")}. Confianza de la lectura{" "}
-              {Math.round(c.confianza * 100)} %.
+              <span className="font-medium">Abasto no adivina:</span>{" "}
+              {dudas.length > 0
+                ? `el mensaje no deja claro ${dudas.join(" ni ")}.`
+                : "la lectura de este mensaje no es segura."}{" "}
+              Confianza de la lectura {Math.round(c.confianza * 100)} %.
+              {!ivaDudoso && " Revisá los precios contra el original y confirmá; hasta entonces no entra al plan."}
             </p>
+            {!ivaDudoso && (
+              <div className="flex flex-wrap items-center gap-2">
+                <Button size="sm" disabled={confirmando !== null} onClick={confirmarLectura}>
+                  {confirmando === "lectura" && <Spinner />} Confirmar lectura
+                </Button>
+                <Button size="sm" variant="outline" onClick={onVerOriginal}>
+                  Ver original
+                </Button>
+              </div>
+            )}
             {ivaDudoso && (
               <div className="flex flex-wrap items-center gap-2">
                 <span className="font-medium">¿Incluyen IVA?</span>

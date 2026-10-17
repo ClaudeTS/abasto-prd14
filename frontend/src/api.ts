@@ -23,15 +23,18 @@ const API_URL = (import.meta.env.VITE_API_URL as string | undefined) || "/api";
  * ?modo= se guarda en sessionStorage (solo esta pestaña): una sesión nueva vuelve al default, así un
  * mock olvidado de una prueba anterior no aparece en la demo.
  */
+// Sin el prefijo "abasto_": borrarSesion() (Reiniciar) borra esas claves y el modo tiene que sobrevivir.
+const CLAVE_MODO = "modo_abasto";
+
 function resolverModo(): "mock" | "backend" {
   try {
     localStorage.removeItem("abasto_modo"); // versiones anteriores lo guardaban para siempre
     const param = new URLSearchParams(window.location.search).get("modo");
     if (param === "mock" || param === "backend") {
-      sessionStorage.setItem("abasto_modo", param);
+      sessionStorage.setItem(CLAVE_MODO, param);
       return param;
     }
-    const guardado = sessionStorage.getItem("abasto_modo");
+    const guardado = sessionStorage.getItem(CLAVE_MODO);
     if (guardado === "mock" || guardado === "backend") return guardado;
   } catch {
     /* sin storage: usar la variable de entorno */
@@ -124,6 +127,13 @@ function normPlan(p: Plan): Plan {
     ahorro_pct_comparable: numONull(p.ahorro_pct_comparable),
     restricciones_activas: p.restricciones_activas ?? [],
     relajaciones: p.relajaciones ?? [],
+    no_mas_barato: p.no_mas_barato?.map((n) => ({
+      ...n,
+      precio_mas_barato: num(n.precio_mas_barato),
+      precio_elegido: num(n.precio_elegido),
+    })),
+    cotizaciones_excluidas: p.cotizaciones_excluidas ?? [],
+    brecha_oportunidad: numONull(p.brecha_oportunidad),
   };
 }
 
@@ -191,9 +201,16 @@ export async function confirmarCampo(cotizacionId: string, campo: string, valor:
   return normCotizacion(await http("POST", `/cotizaciones/${cotizacionId}/confirmar`, { campo, valor }));
 }
 
-export async function optimizar(pedidoId: string): Promise<Plan> {
-  if (MOCK) return mock.optimizar();
-  return normPlan(await http("POST", `/pedidos/${pedidoId}/optimizar`));
+/** Quien compra confirma la lectura tal cual (duda que no es el IVA, o confianza baja). */
+export async function confirmarLectura(cotizacionId: string): Promise<Cotizacion> {
+  if (MOCK) return mock.confirmarLectura(cotizacionId);
+  return normCotizacion(await http("POST", `/cotizaciones/${cotizacionId}/confirmar`));
+}
+
+/** `forzar`: optimiza dejando afuera las cotizaciones que siguen para revisar. */
+export async function optimizar(pedidoId: string, forzar = false): Promise<Plan> {
+  if (MOCK) return mock.optimizar(forzar);
+  return normPlan(await http("POST", `/pedidos/${pedidoId}/optimizar${forzar ? "?forzar=true" : ""}`));
 }
 
 export async function negociar(pedidoId: string, proveedorId: string): Promise<Negociacion> {

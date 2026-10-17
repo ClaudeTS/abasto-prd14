@@ -131,7 +131,11 @@ async def extraer_crudo(mensaje: MensajeCrudo) -> tuple[dict[str, Any], str]:
 
 
 def _normalizar(
-    crudo: dict[str, Any], cotizacion_id: str, mensaje: MensajeCrudo, iva_forzado: bool | None
+    crudo: dict[str, Any],
+    cotizacion_id: str,
+    mensaje: MensajeCrudo,
+    iva_forzado: bool | None,
+    confirmada: bool = False,
 ) -> Cotizacion:
     datos = datos_pedido()
     return normalizar_cotizacion(
@@ -145,6 +149,7 @@ def _normalizar(
         tipo_cambio_usd=float(datos["config"]["tipo_cambio_usd"]),
         iva=float(datos["config"]["iva"]),
         incluye_iva_forzado=iva_forzado,
+        confirmada=confirmada,
     )
 
 
@@ -179,9 +184,8 @@ def confirmar(cotizacion: Cotizacion, incluye_iva: bool | None) -> Cotizacion:
     mensaje = store.obtener("mensajes", cotizacion.mensaje_id, MensajeCrudo)
     if registro is None or mensaje is None:
         raise KeyError(cotizacion.id)
-    iva = incluye_iva
-    if iva is None:  # confirmar "tal cual": se queda con lo que dijo el extractor
-        iva = any(i.incluye_iva_original for i in cotizacion.items)
-    nueva = _normalizar(registro["crudo"], cotizacion.id, mensaje, iva)
+    # Sin incluye_iva se confirma la lectura tal cual: cada ítem conserva el IVA que leyó el
+    # extractor (forzar uno solo cambiaba precios en cotizaciones que mezclan ítems con y sin IVA).
+    nueva = _normalizar(registro["crudo"], cotizacion.id, mensaje, incluye_iva, confirmada=True)
     store.guardar("cotizaciones", nueva)
     return nueva

@@ -323,3 +323,40 @@ def test_runtime_borrado_con_server_vivo(client, monkeypatch):
     r = client.post(f"/pedidos/{PEDIDO}/cotizar").json()
     assert r["ya_estaba_en_curso"] is False and r["estado"] == "cotizando"
     assert len(_esperar_cotizaciones(client)) == 6
+
+
+def test_confirmar_lectura_tal_cual_sin_duda_de_iva(client, monkeypatch):
+    """Caso de Guzmán: queda "revisar" por baja confianza (no por IVA). Confirmar sin cuerpo la deja
+    confirmada, sin tocar el IVA de cada ítem, y después se puede optimizar."""
+    import copy
+
+    from app import store
+
+    original = store.semilla
+
+    def semilla(nombre):
+        datos = original(nombre)
+        if nombre != "extracciones_fijas":
+            return datos
+        datos = copy.deepcopy(datos)
+        papelera = datos["extracciones"]["papelera_del_sur"]
+        papelera["confianza"] = 0.5  # lectura dudosa del audio
+        papelera["items"][1]["incluye_iva_original"] = False  # ítems mezclados: con y sin IVA
+        return datos
+
+    monkeypatch.setattr(store, "semilla", semilla)
+    cots = {c["proveedor_id"]: c for c in _cotizar_y_confirmar(client)}  # confirma el IVA de Compuservice
+    papelera = cots["papelera_del_sur"]
+    assert papelera["estado"] == "revisar" and "iva" not in papelera["campos_dudosos"]
+    antes = {i["producto_id"]: i["precio_unitario_sin_iva"] for i in papelera["items"]}
+    r = client.post(f"/pedidos/{PEDIDO}/optimizar")
+    assert r.status_code == 409 and "Papelera del Sur" in r.json()["error"]
+
+    confirmada = client.post(f"/cotizaciones/{papelera['id']}/confirmar")  # sin cuerpo
+    assert confirmada.status_code == 200, confirmada.text
+    c = confirmada.json()
+    assert c["estado"] == "confirmada" and c["confianza"] == 1.0
+    despues = {i["producto_id"]: i["precio_unitario_sin_iva"] for i in c["items"]}
+    assert despues == antes  # resma con IVA (178,69) y desinfectante sin IVA (138,00) intactos
+    assert despues["desinfectante"] == 138.0
+    assert client.post(f"/pedidos/{PEDIDO}/optimizar").status_code == 200

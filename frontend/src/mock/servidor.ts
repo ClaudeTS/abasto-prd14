@@ -40,6 +40,7 @@ const RESPUESTAS = respuestasJson.respuestas;
 interface EstadoMock {
   cotizarEn: number | null;
   ivaConfirmado: Record<string, boolean>;
+  lecturaConfirmada: Record<string, true>;
   plan: Plan | null;
   negociaciones: Record<string, Negociacion>;
   aprobado: boolean;
@@ -48,6 +49,7 @@ interface EstadoMock {
 const INICIAL: EstadoMock = {
   cotizarEn: null,
   ivaConfirmado: {},
+  lecturaConfirmada: {},
   plan: null,
   negociaciones: {},
   aprobado: false,
@@ -150,10 +152,15 @@ function normalizar(item: ItemExtraido, incluyeIva: boolean): ItemCotizado {
 function construirCotizacion(proveedorId: string, e: EstadoMock): Cotizacion {
   const x = EXTRACCIONES[proveedorId];
   const confirmado = e.ivaConfirmado[proveedorId];
+  const lecturaOk = e.lecturaConfirmada?.[proveedorId] === true;
   const dudosos = confirmado === undefined ? x.campos_dudosos : x.campos_dudosos.filter((c) => c !== "iva");
   // Mismo criterio que el backend (CONTRATO_BACKEND.md): confianza < 0,6 o una duda que cambia el precio.
   const estado =
-    confirmado !== undefined ? "confirmada" : x.confianza < 0.6 || dudosos.length > 0 ? "revisar" : "valida";
+    confirmado !== undefined || lecturaOk
+      ? "confirmada"
+      : x.confianza < 0.6 || dudosos.length > 0
+        ? "revisar"
+        : "valida";
   return {
     estado,
     id: `cot_${proveedorId}`,
@@ -191,6 +198,20 @@ export async function confirmar(cotizacionId: string, campo: string, valor: bool
   if (campo !== "iva") throw new ApiError(`El campo "${campo}" no se puede confirmar todavía`);
   const e = leer();
   const nuevo = { ...e, ivaConfirmado: { ...e.ivaConfirmado, [proveedorId]: valor } };
+  guardar(nuevo);
+  return construirCotizacion(proveedorId, nuevo);
+}
+
+export async function confirmarLectura(cotizacionId: string): Promise<Cotizacion> {
+  await esperar(400);
+  const proveedorId = cotizacionId.replace(/^cot_/, "");
+  if (!EXTRACCIONES[proveedorId]) throw new ApiError(`No existe la cotización ${cotizacionId}`);
+  const e = leer();
+  const x = EXTRACCIONES[proveedorId];
+  if (x.campos_dudosos.includes("iva") && e.ivaConfirmado[proveedorId] === undefined) {
+    throw new ApiError("Falta indicar si los precios incluyen IVA");
+  }
+  const nuevo = { ...e, lecturaConfirmada: { ...(e.lecturaConfirmada ?? {}), [proveedorId]: true as const } };
   guardar(nuevo);
   return construirCotizacion(proveedorId, nuevo);
 }
@@ -426,10 +447,18 @@ function resolverPlan(cots: Cotizacion[]): Plan {
   };
 }
 
-export async function optimizar(): Promise<Plan> {
+export async function optimizar(forzar = false): Promise<Plan> {
   await esperar(2500);
-  const cots = cotizaciones();
-  if (!cots.length) throw new ApiError("Todavía no llegó ninguna cotización para optimizar.");
+  const todas = cotizaciones();
+  if (!todas.length) throw new ApiError("Todavía no llegó ninguna cotización para optimizar.");
+  // Igual que el backend: lo que sigue para revisar no entra al solver (409, o afuera con forzar).
+  const aRevisar = todas.filter((c) => c.estado === "revisar");
+  if (aRevisar.length && !forzar) {
+    throw new ApiError(
+      `Hay cotizaciones para revisar antes de optimizar: ${aRevisar.map((c) => c.proveedor_id).join(", ")}`,
+    );
+  }
+  const cots = todas.filter((c) => c.estado !== "revisar");
   const plan = resolverPlan(cots);
   guardar({ ...leer(), plan });
   return plan;

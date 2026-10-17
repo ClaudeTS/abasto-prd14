@@ -53,9 +53,10 @@ export default function Cotizaciones({ demo }: { demo: PedidoDemo }) {
     document.getElementById(destacada)?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [destacada, cotizaciones.length > 0]);
 
-  const confirmar = async (cot: Cotizacion, campo: string, valor: boolean) => {
+  const confirmar = async (cot: Cotizacion, campo: string | null, valor?: boolean) => {
     try {
-      const nueva = await api.confirmarCampo(cot.id, campo, valor);
+      const nueva =
+        campo === null ? await api.confirmarLectura(cot.id) : await api.confirmarCampo(cot.id, campo, valor ?? true);
       setCotizaciones((cs) => cs.map((c) => (c.id === nueva.id ? nueva : c)));
       setError(null);
     } catch (e) {

@@ -46,7 +46,7 @@ Si el backend se reinicia a mitad de una cotización (por ejemplo `--reload` al 
 | GET | `/pedidos/{id}/mensajes` | `MensajeCrudo[]` | Polling cada 1,5 s. Orden de llegada. |
 | GET | `/pedidos/{id}/proveedores/estado` | `EstadoProveedor[]` | **Nuevo.** `esperando` + `responde_en_segundos`, `respondio`. Para "Papelera del Sur no respondió todavía". |
 | GET | `/pedidos/{id}/cotizaciones` | `Cotizacion[]` | |
-| POST | `/cotizaciones/{id}/confirmar` | `Cotizacion` | **Nuevo.** Body JSON `{"incluye_iva": true}` o `{"campo": "iva", "valor": true}` (con `Content-Type: application/json`). El "un clic" de Lucía: re-normaliza y queda `estado: "confirmada"`. Sin `incluye_iva` cuando la duda es el IVA, o con claves desconocidas → 422. Si había plan, se invalida (hay que volver a optimizar). |
+| POST | `/cotizaciones/{id}/confirmar` | `Cotizacion` | **Nuevo.** Body JSON `{"incluye_iva": true}` o `{"campo": "iva", "valor": true}` (con `Content-Type: application/json`). El "un clic" de Lucía: re-normaliza y queda `estado: "confirmada"`. Sin cuerpo confirma la lectura tal cual (dudas que no son el IVA o confianza baja): cada ítem conserva el IVA que leyó el extractor. Sin `incluye_iva` cuando la duda es el IVA, o con claves desconocidas → 422. Si había plan, se invalida (hay que volver a optimizar). |
 | POST | `/extraer` | `Cotizacion` | Form: `proveedor_id`, `canal`, `texto` y/o `archivo`. Texto libre requiere la Capa 1 de A (si no, 503). No toca el feed de la demo. |
 | GET | `/archivos/{nombre}` | archivo | PDF y foto de los mensajes (`MensajeCrudo.archivo_url`). |
 | POST | `/pedidos/{id}/optimizar` | `Plan` | 409 si faltan respuestas o hay cotizaciones para revisar (ver abajo). `?forzar=true` optimiza igual excluyéndolas. |

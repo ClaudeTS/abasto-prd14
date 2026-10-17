@@ -115,6 +115,16 @@ export interface Asignacion {
   subtotal: number;
 }
 
+/** Caso donde el solver no eligió al más barato, con el motivo que calculó el backend. */
+export interface NoMasBarato {
+  producto_id: string;
+  mas_barato_id: string;
+  precio_mas_barato: number;
+  elegido_id: string;
+  precio_elegido: number;
+  motivo: string;
+}
+
 export interface Plan {
   pedido_id: string;
   asignaciones: Asignacion[];
@@ -129,6 +139,10 @@ export interface Plan {
   relajaciones: string[];
   explicacion: string;
   oportunidad_negociacion: string | null;
+  /** Del backend (el solver decide). El modo mock no los manda: la UI calcula un respaldo. */
+  no_mas_barato?: NoMasBarato[];
+  cotizaciones_excluidas?: string[];
+  brecha_oportunidad?: number | null;
 }
 
 export type NombreEstrategia = "competencia" | "volumen" | "plazo";

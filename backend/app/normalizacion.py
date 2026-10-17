@@ -150,6 +150,7 @@ def normalizar_cotizacion(
     tipo_cambio_usd: float,
     iva: float,
     incluye_iva_forzado: bool | None = None,
+    confirmada: bool = False,
 ) -> Cotizacion:
     """Aplica las reglas post-LLM a la salida cruda del prompt `extractor`."""
     items: list[ItemCotizado] = []
@@ -175,7 +176,7 @@ def normalizar_cotizacion(
         dudas.extend(d for d in dudas_item if d not in dudas)
 
     confianza = float(crudo.get("confianza") or 0)
-    if incluye_iva_forzado is not None:
+    if confirmada or incluye_iva_forzado is not None:
         estado = "confirmada"
         confianza = 1.0  # lo confirmó una persona: deja de ser una lectura dudosa
     elif requiere_revision(confianza, dudas):
