@@ -49,6 +49,11 @@ npm install && npm run dev      # abre http://localhost:5173
 
 Con `make dev` se levantan los dos. `make reset` vuelve al estado inicial de la demo.
 
+**Frontend sin backend (modo mock):** por defecto la UI corre sola con `data/*.json` (badge "Mock" en
+la barra). Simula las demoras del simulador, la extracción con evidencia, el solver y la negociación.
+Para usar el backend real: `VITE_MOCK=0` en `frontend/.env` o abrir `http://localhost:5173/?modo=backend`
+(`?modo=mock` vuelve atrás; queda guardado en el navegador). Ver `frontend/.env.example`.
+
 ## Recorrido de la demo
 
 1. **Pedido** → Tecnova carga su compra de octubre (precargada, 5 líneas).
@@ -73,7 +78,7 @@ Guion completo y preguntas del jurado en [`docs/PITCH_Y_DEMO.md`](docs/PITCH_Y_D
 
 ## Stack
 
-FastAPI + Python 3.11 · SDK de Anthropic · PuLP (MILP) · pdfplumber · React + Vite + Tailwind.
+FastAPI + Python 3.11 · SDK de Anthropic · PuLP (MILP) · pdfplumber · React + Vite + Tailwind + shadcn/ui.
 Detalle en `AGENTS.md`.
 
 ## Equipo — Grupo 25

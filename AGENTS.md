@@ -44,7 +44,7 @@ modelar proveedores y ensayar negociaciones SÍ lo es.
 | PDF | `pdfplumber` | fallback (PDF escaneado): enviar el PDF como documento al LLM |
 | Audio (opcional) | `openai` Whisper API o `faster-whisper` local | detrás de flag `ENABLE_AUDIO` |
 | Optimización | `pulp==2.9.*` (solver CBC incluido) | no subir a 3.x: cambia la API de `LpVariable` y rompe el modelo |
-| Frontend | React 18 + Vite + TypeScript + Tailwind | `frontend/` |
+| Frontend | React 19 + Vite + TypeScript + Tailwind v4 + shadcn/ui (preset Vega, base neutral) | `frontend/`; componentes en `src/components/ui/` (agregar con `npx shadcn@latest add <componente>`) |
 | Comunicación | REST + polling cada 1,5 s para el feed | nada de WebSockets salvo que ya funcione todo |
 | Persistencia | archivos JSON en `backend/data/runtime/` | se borran con `make reset` |
 
