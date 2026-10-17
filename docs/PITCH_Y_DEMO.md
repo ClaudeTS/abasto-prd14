@@ -54,13 +54,18 @@ respaldo abierto en otra ventana. Tipo de cambio del día cargado en `config.tip
 | Paso | Qué hacés | Qué decís |
 |---|---|---|
 | 1. Pedido | Mostrar la tabla precargada (5 líneas: notebooks, sillas, resmas, tóner, desinfectante). Clic en **Cotizar**. | "La compra de octubre. Un clic." |
-| 2. Feed | Ver llegar las respuestas: texto, PDF, foto, audio. La papelera tarda. En el audio de la papelera, clic en **Ver transcripción** (es una transcripción: no hay audio que reproducir). | "Llegan como llegan de verdad. Este PDF está en dólares más IVA. Esta foto está escrita a mano. Este mensaje de Compuservice no dice si incluye IVA: Abasto lo marca para revisar en vez de adivinar. Y la papelera todavía no contestó: Abasto le va a insistir." |
+| 2. Feed | Ver llegar las respuestas: texto, PDF, foto. La papelera tarda: en su fila, clic en **Llamar**, antes de los 40 s (si llega su audio, ya no se la puede llamar). Seguir la transcripción en vivo; al cortar, su cotización entra al feed como un mensaje más. Sin llamadas, la papelera manda un audio a los 40 s: clic en **Ver transcripción** (no hay audio que reproducir). | "Llegan como llegan de verdad. Este PDF está en dólares más IVA. Esta foto está escrita a mano. Este mensaje de Compuservice no dice si incluye IVA: Abasto lo marca para revisar en vez de adivinar. Y la papelera todavía no contestó. En vez de esperar, Abasto la llama. Lo que dice por teléfono se lee igual que un WhatsApp." |
 | 3. Cotizaciones | Abrir la tarjeta de TecnoImport: mostrar la conversión USD → UYU y el bloque de **evidencia** (botón "Ver original" resalta el fragmento en el PDF). Abrir la de Papelera del Sur: caja de 5 → unidad, con IVA → sin IVA. En la tarjeta amarilla de Compuservice, clic en **Sí, IVA incluido**. | "Cada número tiene de dónde salió y qué conversión se aplicó. Esto es lo que nos separa de un chatbot: nunca inventa un precio. Y cuando no sabe, pregunta: Lucía confirma el IVA con un clic." |
 | 4. Plan | Clic en **Optimizar**. Mostrar el ahorro grande y la explicación. Señalar las sillas. | "Reparte entre tres proveedores. Ahorra 8 % del total, casi 44 mil pesos, y 16 % en lo que el habitual vende. Y fíjense las sillas: no las compra al más barato, porque el fabricante exige un lote de 20 y necesitamos 15. Eso lo decide un solver, no el modelo de lenguaje." |
-| 5. Negociar | Clic en **Negociar con Ofisillas** (el proveedor que Abasto sugiere: es donde hay más brecha con el mejor precio). Esperar las 3 columnas (mientras carga, hablar). Mostrar la elegida y el mensaje. Clic en **Aprobar**. | "Acá simula tres negociaciones contra un gemelo de Ofisillas. Competencia, volumen, plazo. Miren: mencionar que el fabricante cotiza 9.800 no funcionó, el vendedor sabe que exige 20 unidades. Pero comprometer el equipamiento de los próximos puestos consiguió 5 % menos. Abasto eligió esa, redactó el mensaje y Lucía lo aprueba. Nunca negocia sola." |
+| 5. Negociar | Clic en **Negociar con Ofisillas** (el proveedor que Abasto sugiere: es donde hay más brecha con el mejor precio). Esperar las 3 columnas (mientras carga, hablar). Mostrar la elegida y el mensaje. Clic en **Aprobar y llamar** (en modo real suena el celular de Ofisillas); al cortar, aparece el resultado (si hubo acuerdo y el precio acordado frente al cotizado). Sin llamadas: **Aprobar y enviar**. | "Acá simula tres negociaciones contra un gemelo de Ofisillas. Competencia, volumen, plazo. Miren: mencionar que el fabricante cotiza 9.800 no funcionó, el vendedor sabe que exige 20 unidades. Pero comprometer el equipamiento de los próximos puestos consiguió 5 % menos. Abasto eligió esa, redactó el mensaje y Lucía lo aprueba. Nunca negocia sola. Y en vez de mandar un WhatsApp, Abasto llama con esa estrategia y le trae el resultado." |
 | 6. Visión | Mostrar 10 segundos las pantallas de próximas capas. | "Y esto es lo que se construye con el tiempo y los datos." |
 
-Si algo falla en vivo: "Les muestro la corrida de hace un rato" y abrir el video. Sin disculpas largas.
+Las llamadas alargan la demo. En modo simulado, la de la papelera dura unos 15 s y la de Ofisillas algo más (repite
+la charla ensayada); en real, lo que dure la charla. Si no entran en el tiempo, dejar una sola. Cómo configurarlas:
+`docs/LLAMADAS.md`.
+
+Si algo falla en vivo: "Les muestro la corrida de hace un rato" y abrir el video. Sin disculpas largas. Si una
+llamada no sale o el celular no suena: **Simular llamada** (la misma llamada, simulada) y seguir.
 
 ## Slides (máximo 8)
 
@@ -89,8 +94,9 @@ validadas.
 
 **"¿Los proveedores le van a contestar a un bot?"**
 El mensaje sale desde el WhatsApp o el mail de la empresa, con el tono de quien compra, y esa persona
-aprueba cada mensaje. Para el proveedor es Lucía pidiendo precios, como siempre. A mediano plazo, el
-proveedor también gana: pedidos claros y sin idas y vueltas.
+aprueba cada mensaje. Para el proveedor es Lucía pidiendo precios, como siempre. Cuando Abasto llama por
+teléfono, se presenta de parte de Lucía y, si le preguntan, dice que es un asistente virtual: nunca lo niega. A
+mediano plazo, el proveedor también gana: pedidos claros y sin idas y vueltas.
 
 **"¿Esto no lo hace ChatGPT pegando los mensajes?"**
 Pegar un mensaje te da un resumen. No te da un solver que respeta mínimos de pedido y plazos, ni un
@@ -120,12 +126,20 @@ y agregados, y la empresa elige participar a cambio de ver el índice.
 
 **"¿Cuánto de esto funciona de verdad?"**
 Lo que vieron corre: extracción de cuatro formatos y dos monedas, el solver y la negociación simulada.
-Los proveedores son simulados porque en 24 horas nadie contesta. Las capas de predicción e índice son
-diseño, no código. Lo decimos con claridad.
+Los proveedores son simulados porque en 24 horas nadie contesta. Las llamadas salen de verdad (ElevenLabs +
+Twilio), pero solo a celulares del equipo, que hacen de proveedores (si la demo fue con llamadas simuladas,
+decirlo). Las capas de predicción e índice son diseño, no código. Lo decimos con claridad.
 
 ## Checklist de la hora previa
 
 - [ ] `make reset` ejecutado; recorrido probado una vez más.
+- [ ] Si la demo va contra el deploy: abrir https://abasto-backend.onrender.com/health para despertarlo (se duerme
+      a los 15 min) y resetear con el botón de la UI.
+- [ ] Llamadas: decidir real o simulada (`LLAMADAS_MODO`). En real: `GET /llamadas/config` responde `lista: true`,
+      hay una llamada de prueba hecha (`python -m scripts.probar_llamada papelera_del_sur`), los celulares de
+      Guzmán (papelera) y Emiliano (Ofisillas) tienen sonido, y quien atiende por la papelera dice lo mismo que su
+      audio de `data/respuestas_fijas.json` (caja de 5 resmas a 1.090 y bidón de 5 L a 690, con IVA; entrega mañana,
+      sin cargo desde $ 5.000; tóner no maneja). Si no, cambian los números del plan del paso 4.
 - [ ] Tipo de cambio del día actualizado en `config.tipo_cambio_usd`.
 - [ ] Video de respaldo en el disco, abierto y pausado.
 - [ ] Cargador enchufado, notificaciones apagadas, zoom 125 %.

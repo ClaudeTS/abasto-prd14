@@ -31,10 +31,11 @@ modelar proveedores y ensayar negociaciones SÍ lo es.
 - Envío real a WhatsApp/email. Todo es simulado. **Excepción decidida el sábado:** llamadas telefónicas reales del
   agente (ElevenLabs + Twilio) para pedir la cotización a quien no respondió y para negociar con la estrategia
   aprobada, con modo simulado por defecto y solo a los celulares del equipo. Ver `docs/LLAMADAS.md`.
-- Base de datos real. Persistencia en JSON/SQLite en `backend/data/`.
+- Base de datos con esquema propio, migraciones u ORM. Se guardan documentos JSON: en archivos de `backend/data/runtime/`
+  o, si hay `DATABASE_URL`, en Postgres (Supabase), que es lo que usa el deploy. Ver `store.py`.
 - Capas 2, 3, 6 y 7 (perfil histórico, predicción, índice de mercado, agente-a-agente): solo pantallas estáticas en `/vision`.
 - Tests exhaustivos. Solo smoke tests de los endpoints críticos.
-- Deploy. Corre en localhost.
+- Más infraestructura de deploy que la que ya hay (Vercel + Render + Supabase, ver §5).
 
 ## 3. Stack
 
@@ -48,7 +49,8 @@ modelar proveedores y ensayar negociaciones SÍ lo es.
 | Optimización | `pulp==2.9.*` (solver CBC incluido) | no subir a 3.x: cambia la API de `LpVariable` y rompe el modelo |
 | Frontend | React 19 + Vite + TypeScript + Tailwind v4 + shadcn/ui (preset Vega, base neutral) | `frontend/`; componentes en `src/components/ui/` (agregar con `npx shadcn@latest add <componente>`) |
 | Comunicación | REST + polling cada 1,5 s para el feed | nada de WebSockets salvo que ya funcione todo |
-| Persistencia | archivos JSON en `backend/data/runtime/` | se borran con `make reset` |
+| Persistencia | archivos JSON en `backend/data/runtime/`, o Postgres (Supabase) si hay `DATABASE_URL` | se borran con `make reset` o el botón de reset de la UI; el cache se conserva salvo con `make reset-hard` |
+| Deploy (demo) | Vercel (front), Render (back, `render.yaml`), Supabase (Postgres) | ver §5 |
 
 ## 4. Estructura del repo
 
@@ -57,6 +59,7 @@ abasto/
 ├── AGENTS.md                 ← este archivo
 ├── README.md
 ├── Makefile                  ← make dev / make reset / make seed
+├── render.yaml               ← backend en Render (Blueprint): servicio y variables
 ├── docs/
 │   ├── PLAN_24H.md           ← cronograma y cortes
 │   ├── ARQUITECTURA.md       ← modelo de datos, endpoints, MILP
@@ -85,7 +88,7 @@ abasto/
 │   │   ├── archivos.py       ← (C) PDF y foto de los presupuestos simulados
 │   │   ├── pedidos.py        ← (C) pedido en runtime
 │   │   ├── prompts/          ← un .md por prompt, cargados por nombre
-│   │   └── store.py          ← (C) lectura/escritura JSON
+│   │   └── store.py          ← (C) lectura/escritura JSON (archivos, o Postgres si hay DATABASE_URL)
 │   ├── tests/test_smoke.py
 │   ├── requirements.txt
 │   └── .env.example
@@ -123,7 +126,19 @@ ENABLE_AUDIO=0
 SIM_DELAY_SECONDS=4      # base 4 = demoras del guion (la papelera a los 40 s); 0 = instantáneo
 SIM_MODE=fijo            # fijo = respuestas de data/; llm = las genera el LLM y se cachean
 EXTRACCION_MODE=auto     # auto = LLM si está la Capa 1 y hay key, si no fixtures; fijo; llm
+DATABASE_URL=            # Postgres (Supabase, Session pooler, puerto 5432); vacía = archivos JSON
+LLAMADAS_MODO=simulada   # simulada | real (ElevenLabs + Twilio); el resto de las variables, en docs/LLAMADAS.md
 ```
+
+Deploy de la demo (para desarrollar no hace falta):
+- **Front:** https://hacktaon.vercel.app (Vercel). `VITE_API_URL` apunta al back y se fija al compilar: después de
+  cambiarla hay que volver a publicar.
+- **Back:** https://abasto-backend.onrender.com (Render, plan Free), definido en `render.yaml`. Las variables secretas
+  se cargan en el dashboard, y `CORS_ORIGINS` tiene que incluir la URL del front. Se duerme a los 15 min sin uso:
+  abrir `/health` antes de la demo.
+- **Base:** Postgres en Supabase, con `DATABASE_URL` (Session pooler, puerto 5432). La red de la oficina bloquea los
+  puertos 5432 y 6543: ahí, correr el back local con `DATABASE_URL` vacía.
+- Pushear a `main` no publica: el deploy sale de una copia privada del repo que actualiza A.
 
 ## 6. Reglas para trabajar con el LLM
 
