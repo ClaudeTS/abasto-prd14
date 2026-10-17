@@ -95,9 +95,10 @@ async def extraer_crudo(mensaje: MensajeCrudo) -> tuple[dict[str, Any], str]:
     """Devuelve (salida cruda del extractor, origen 'llm'|'cache'|'fijo')."""
     modo = modo_extraccion()
     # /extraer (pedido "pruebas") no cachea: A prueba distintos textos para el mismo proveedor.
+    # Una llamada tampoco: cada una dice otra cosa, y con esta clave leería lo cacheado del audio.
     clave_cache = (
         f"extraccion_{mensaje.pedido_id}_{mensaje.proveedor_id}"
-        if mensaje.pedido_id != "pruebas"
+        if mensaje.pedido_id != "pruebas" and mensaje.canal != "llamada"
         else None
     )
     if modo == "llm":
