@@ -41,7 +41,7 @@ modelar proveedores y ensayar negociaciones SÍ lo es.
 | Backend | Python 3.11, FastAPI, Uvicorn | `backend/` |
 | LLM | SDK de Anthropic (`anthropic`), modelo por env `LLM_MODEL` | default `claude-sonnet-5-5`; nunca hardcodear el modelo |
 | Visión (fotos de presupuestos) | Mismo LLM, input de imagen | |
-| PDF | `pdfplumber` | fallback: enviar la página como imagen al LLM |
+| PDF | `pdfplumber` | fallback (PDF escaneado): enviar el PDF como documento al LLM |
 | Audio (opcional) | `openai` Whisper API o `faster-whisper` local | detrás de flag `ENABLE_AUDIO` |
 | Optimización | `pulp==2.9.*` (solver CBC incluido) | no subir a 3.x: cambia la API de `LpVariable` y rompe el modelo |
 | Frontend | React 18 + Vite + TypeScript + Tailwind | `frontend/` |
@@ -130,7 +130,7 @@ EXTRACCION_MODE=auto     # auto = LLM si está la Capa 1 y hay key, si no fixtur
 3. **Salida estructurada siempre:** pedir JSON con el esquema explícito en el prompt y validar con Pydantic. Si falla el parseo, reintentar **una** vez pidiendo "solo JSON válido". Si vuelve a fallar, devolver error claro, no inventar datos.
 4. **Trazabilidad obligatoria:** toda cotización extraída guarda `fuente_id` (id del mensaje crudo) y `evidencia` (fragmento textual de donde salió cada número). La UI muestra la evidencia. **Nunca** un precio sin fuente.
 5. **El solver decide, el LLM explica.** La explicación del plan se genera a partir del resultado de PuLP; el LLM no elige proveedores.
-6. **Temperatura baja** (0–0.2) para extracción y scoring; media (0.7) para personas de proveedores y negociador.
+6. **Sin `temperature`:** `claude-sonnet-5-5` no acepta parámetros de muestreo (devuelve error). `llm.py` usa `effort` `low`; la variedad de las personas sale del prompt.
 7. **Límite de costo:** la negociación ensayada corre máximo 3 estrategias × 2 corridas × 3 rondas. Paralelizar con `asyncio.gather`.
 8. **Tiempo de respuesta:** ninguna llamada al LLM sin `timeout=60`. Si una extracción tarda más de 20 s en demo, es un bug.
 
