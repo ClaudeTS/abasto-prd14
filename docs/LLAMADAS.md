@@ -42,10 +42,15 @@ geográfico de Uruguay habilitado.
 
 ## 2. ElevenLabs: el agente
 
-> **Ya creado (17/10):** agente **"Abasto compras"**, `ELEVENLABS_AGENT_ID=agent_7201m560dk4mff6s7xypjpk5rgs7`.
+> **Ya creado (17/10):** agente **"Abasto compras"** (el ID está en el `.env` del equipo, no en el repo).
 > Voz Melisa (rioplatense), LLM `claude-haiku-5-5` (temp. 0,3), zona `America/Montevideo`, End call habilitado,
 > data collection `acuerdo` / `precio_acordado` / `condicion`, resúmenes en español. Lo de abajo queda como
 > referencia para recrearlo.
+>
+> **Seguridad (el repo es público):** el agente tiene **autenticación activada** (Security → Enable authentication),
+> así que nadie puede abrir una conversación solo con el ID; las llamadas salientes del backend van con la API key.
+> Límites: 2 llamadas simultáneas y 60 por día. El número de Twilio **no tiene agente asignado**, para que una
+> llamada entrante de un desconocido no lo active (para salientes no hace falta).
 
 En ElevenLabs → **Agents** → crear un agente nuevo, por ejemplo "Abasto compras".
 
@@ -83,7 +88,9 @@ En ElevenLabs → **Agents** → crear un agente nuevo, por ejemplo "Abasto comp
 
   Si no los configurás, la llamada funciona igual: solo se muestra el resumen.
 
-- Copiá el **Agent ID** (está en la configuración del agente).
+- **Security:** activar **Enable authentication** y poner límites de llamadas (el repo es público: no publiques el
+  Agent ID, y aunque se filtre, con autenticación no sirve sin la API key).
+- Copiá el **Agent ID** (está en la configuración del agente) al `.env`, nunca a la doc ni al código.
 
 **Importar el número de Twilio:** Agents → **Phone Numbers** → Import → Twilio → número, SID y token (o API Key).
 Para llamadas salientes no hace falta asignarle el agente.
