@@ -262,7 +262,10 @@ async def optimizar(
     plan = await asyncio.to_thread(
         optimizacion.optimizar, pedido, cots, provs, tipo_cambio_usd=tc, nombres_productos=nombres
     )
-    texto_llm = await integracion_a.explicar(optimizacion.datos_para_explicar(plan, provs, nombres))
+    datos = optimizacion.datos_para_explicar(
+        plan, provs, nombres, habitual_id=pedido.proveedor_habitual_id
+    )
+    texto_llm = await integracion_a.explicar(datos)
     if texto_llm:
         plan.explicacion, plan.explicacion_origen = texto_llm, "llm"
     store.guardar_dict("planes", pedido_id, plan.model_dump(mode="json"))
