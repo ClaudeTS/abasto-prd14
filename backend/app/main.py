@@ -176,7 +176,12 @@ async def confirmar_cotizacion(
     cot = store.obtener("cotizaciones", cotizacion_id, Cotizacion)
     if cot is None:
         raise ErrorAbasto(404, f"No existe la cotización '{cotizacion_id}'")
-    incluye_iva = (cuerpo or ConfirmacionCotizacion()).incluye_iva
+    cuerpo = cuerpo or ConfirmacionCotizacion()
+    if cuerpo.campo is not None and cuerpo.campo != "iva":
+        raise ErrorAbasto(
+            422, f"Todavía no se puede confirmar el campo '{cuerpo.campo}'; solo 'iva'"
+        )
+    incluye_iva = cuerpo.iva()
     if "iva" in cot.campos_dudosos and incluye_iva is None:
         raise ErrorAbasto(
             422,
@@ -337,6 +342,10 @@ async def negociar(pedido_id: str, proveedor_id: str) -> Negociacion:
     except asyncio.TimeoutError as exc:
         pedidos.cambiar_estado(pedido_id, "optimizado")
         raise ErrorAbasto(504, f"La negociación tardó más de {TIMEOUT_NEGOCIACION_S} s") from exc
+    except Exception as exc:  # noqa: BLE001 — p. ej. LLMError de app/llm.py: mensaje legible
+        pedidos.cambiar_estado(pedido_id, "optimizado")
+        log.exception("La negociación ensayada falló")
+        raise ErrorAbasto(502, f"La negociación ensayada falló: {exc}") from exc
     store.guardar("negociaciones", neg)
     return neg
 

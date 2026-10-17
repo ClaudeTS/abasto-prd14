@@ -131,6 +131,15 @@ class ConfirmacionCotizacion(BaseModel):  # ext: el "un clic" de Lucía
     model_config = ConfigDict(extra="forbid")  # "incluyeIva" mal escrito → 422, no confirma en silencio
 
     incluye_iva: bool | None = None
+    # Forma genérica que usa el frontend: {"campo": "iva", "valor": true}
+    campo: str | None = None
+    valor: bool | None = None
+
+    def iva(self) -> bool | None:
+        """Lo que se confirmó sobre el IVA, venga en la forma que venga."""
+        if self.campo == "iva":
+            return self.valor
+        return self.incluye_iva
 
 
 # ---------------------------------------------------------------- plan

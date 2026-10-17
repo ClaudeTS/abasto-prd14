@@ -46,12 +46,12 @@ Si el backend se reinicia a mitad de una cotización (por ejemplo `--reload` al 
 | GET | `/pedidos/{id}/mensajes` | `MensajeCrudo[]` | Polling cada 1,5 s. Orden de llegada. |
 | GET | `/pedidos/{id}/proveedores/estado` | `EstadoProveedor[]` | **Nuevo.** `esperando` + `responde_en_segundos`, `respondio`. Para "Papelera del Sur no respondió todavía". |
 | GET | `/pedidos/{id}/cotizaciones` | `Cotizacion[]` | |
-| POST | `/cotizaciones/{id}/confirmar` | `Cotizacion` | **Nuevo.** Body JSON `{"incluye_iva": true}` (con `Content-Type: application/json`). El "un clic" de Lucía: re-normaliza y queda `estado: "confirmada"`. Sin `incluye_iva` cuando la duda es el IVA, o con claves desconocidas → 422. Si había plan, se invalida (hay que volver a optimizar). |
+| POST | `/cotizaciones/{id}/confirmar` | `Cotizacion` | **Nuevo.** Body JSON `{"incluye_iva": true}` o `{"campo": "iva", "valor": true}` (con `Content-Type: application/json`). El "un clic" de Lucía: re-normaliza y queda `estado: "confirmada"`. Sin `incluye_iva` cuando la duda es el IVA, o con claves desconocidas → 422. Si había plan, se invalida (hay que volver a optimizar). |
 | POST | `/extraer` | `Cotizacion` | Form: `proveedor_id`, `canal`, `texto` y/o `archivo`. Texto libre requiere la Capa 1 de A (si no, 503). No toca el feed de la demo. |
 | GET | `/archivos/{nombre}` | archivo | PDF y foto de los mensajes (`MensajeCrudo.archivo_url`). |
 | POST | `/pedidos/{id}/optimizar` | `Plan` | 409 si faltan respuestas o hay cotizaciones para revisar (ver abajo). `?forzar=true` optimiza igual excluyéndolas. |
 | GET | `/pedidos/{id}/plan` | `Plan` | El último calculado. |
-| POST | `/pedidos/{id}/negociar/{proveedor_id}` | `Negociacion` | 501 hasta que A entregue la Capa 5 (el `detalle.contexto` muestra lo que A va a recibir). Timeout 90 s → 504. |
+| POST | `/pedidos/{id}/negociar/{proveedor_id}` | `Negociacion` | Capa 5 implementada. Sin `ANTHROPIC_API_KEY` → 501 (el `detalle.contexto` muestra lo que recibe la Capa 5). Error del LLM → 502 con el motivo legible. Timeout 90 s → 504. |
 | GET | `/negociaciones/{id}` | `Negociacion` | |
 | POST | `/negociaciones/{id}/aprobar` | `Negociacion` | Body opcional `{"mensaje": "texto editado"}`. Estado → `enviada_simulada`. |
 | POST | `/reset` | `{ok}` | `?hard=true` también borra el cache. Cancela las respuestas en curso. `make reset` usa este endpoint si el backend está levantado. |
@@ -76,12 +76,27 @@ Si el backend se reinicia a mitad de una cotización (por ejemplo `--reload` al 
 5. **Plan.** Usá `ahorro`/`ahorro_pct` y `ahorro_comparable`/`ahorro_pct_comparable` (el guion pide los dos),
    `no_mas_barato` para el badge "por qué no el más barato" (las sillas), `oportunidad_negociacion` para el botón
    "Negociar con …". `explicacion_origen` dice si la explicación es del LLM o de la plantilla.
-6. **Negociación.** Mientras A no entregue, `POST /negociar` devuelve 501: mostrá el mensaje. Cuando funcione,
-   tarda hasta ~40 s: spinner en las 3 columnas.
+6. **Negociación.** Sin API key devuelve 501; con key tarda hasta ~40 s (6 simulaciones en paralelo): spinner
+   en las 3 columnas. Si el LLM falla, 502 con `error` legible ("Límite de uso de la API…", "No hay conexión…").
 
 Montos: números (no strings), en UYU sin IVA. Formato en pantalla: `$ 12.340`.
 
 ## Para A (IA)
+
+**Estado (rama `negociacion`, mergeada en `main`):** la Capa 5 (`app/negociacion.py`) y la explicación del plan
+(`app/explicacion.py`) ya están, sobre el `app/llm.py` de la rama `ia` **sin modificarlo** (mismo archivo, mismo
+`requirements.txt`: el merge de `ia` no choca ahí). Prompts nuevos en `app/prompts/` con tu convención
+`<nombre>_system.md` / `<nombre>_user.md`. Para probar con el modelo real:
+`cd backend && python -m scripts.probar_negociacion [proveedor_id]`.
+
+Dos cosas para `llm.py`:
+- **Bug:** `cargar_prompt(nombre, **variables)` choca con la variable `{{nombre}}` que usan `proveedor_gemelo` y
+  `cierre_gemelo` (`TypeError: got multiple values for argument 'nombre'`). Arreglo de una línea:
+  `def cargar_prompt(nombre: str, /, **variables)`. Mientras tanto `negociacion.py` usa un helper propio.
+- `pedir_json` no expone `temperature`; AGENTS §6.6 pide 0,7 para negociador y gemelo. Si lo agregás, se pasa en
+  `negociacion._pedir()`.
+
+Lo que falta integrar es la Capa 1 de `ia`: ver "Integración de la rama `ia`" abajo.
 
 El backend ya llama a estas funciones si existen. Implementalas con estas firmas exactas y no hace falta
 tocar nada de C. Todas `async`. El prompt, el cliente y los reintentos quedan de tu lado (`app/llm.py`).
@@ -124,6 +139,15 @@ async def ensayar(contexto: ContextoNegociacion) -> dict: ...
 # app/llm.py — solo si se usa SIM_MODE=llm
 async def completar(system: str, user: str, *, temperature: float, max_tokens: int) -> str: ...
 ```
+
+## Integración de la rama `ia`
+
+`ia` se armó en paralelo a partir de un `main` anterior al backend y trae su propio `main.py`, `models.py` y
+`store.py`. Al mergear conviene quedarse con los de `main` (son un superconjunto: mismos modelos + extensiones) y
+conectar la extracción de A en `pipeline.extraer_crudo`: hoy el backend busca `extraccion.extraer_crudo(...) -> dict`
+(salida cruda), mientras que `ia` expone `extraer_cotizacion(mensaje, ctx) -> Cotizacion` (ya normalizada). Hay que
+acordar una de las dos formas; la cruda evita duplicar las reglas de moneda/IVA/unidades, que ya están en
+`normalizacion.py`.
 
 ## Extensiones respecto de ARQUITECTURA.md
 

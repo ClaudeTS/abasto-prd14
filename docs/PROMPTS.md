@@ -132,12 +132,14 @@ La conversación terminó. Como {{nombre}}, decidí tu oferta final coherente co
 Esquema:
 {
   "acepta_negociar": boolean,
-  "precio_final_por_item": { "producto_id": number },   // precio unitario sin IVA en tus unidades canónicas
+  "precio_final_por_item": [{ "producto_id": "string", "precio": number }],   // precio unitario sin IVA en tus unidades canónicas
   "condicion": "string | null",                           // ej. "si pagan contado"
   "animo": "cordial" | "neutral" | "molesto"
 }
 Respondé solo con el JSON, sin texto antes ni después, sin bloques de código.
 ```
+
+> `precio_final_por_item` es una lista y no un mapa: la salida estructurada necesita claves fijas en el esquema y los `producto_id` cambian con cada pedido.
 
 ---
 
