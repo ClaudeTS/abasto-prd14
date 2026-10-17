@@ -8,7 +8,7 @@ import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader,
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
 import { Avatar, Etiqueta, Evidencia } from "@/components/comunes";
-import type { Cotizacion, ItemCotizado, Producto } from "@/types";
+import type { Canal, Cotizacion, ItemCotizado, Producto } from "@/types";
 
 const DUDOSOS: Record<string, string> = {
   iva: "si los precios incluyen IVA",
@@ -29,8 +29,11 @@ export default function TarjetaCotizacion({
   destacada = false,
   onVerOriginal,
   onConfirmar,
+  canalMensaje,
 }: {
   cotizacion: Cotizacion;
+  /** Canal por el que llegó esta respuesta (ej. "llamada"); si no, el preferido del proveedor. */
+  canalMensaje?: Canal;
   catalogo: Producto[];
   destacada?: boolean;
   onVerOriginal: () => void;
@@ -38,7 +41,7 @@ export default function TarjetaCotizacion({
   onConfirmar: (campo: string | null, valor?: boolean) => Promise<void>;
 }) {
   const p = proveedor(c.proveedor_id);
-  const canal = CANALES[p.canal_preferido];
+  const canal = CANALES[canalMensaje ?? p.canal_preferido];
   const revisar = necesitaRevision(c);
   const ivaDudoso = revisar && c.campos_dudosos.includes("iva");
   const [confirmando, setConfirmando] = useState<boolean | "lectura" | null>(null);

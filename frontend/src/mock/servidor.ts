@@ -8,11 +8,13 @@ import type {
   Asignacion,
   Canal,
   ConfigCompra,
+  ConfigLlamadas,
   Conversion,
   Cotizacion,
   EstadoPedido,
   ItemCotizado,
   LineaPedido,
+  Llamada,
   MensajeCrudo,
   Negociacion,
   Pedido,
@@ -44,6 +46,19 @@ interface EstadoMock {
   plan: Plan | null;
   negociaciones: Record<string, Negociacion>;
   aprobado: boolean;
+  llamadas?: Record<string, LlamadaMock>;
+}
+
+/** Llamada simulada: el guion se arma al llamar y el estado se deriva del reloj (como los mensajes). */
+interface LlamadaMock {
+  base: Llamada;
+  inicio: number; // ms epoch
+  /** Momento (ms desde inicio) en que se escucha cada turno. */
+  turnos: { rol: "abasto" | "proveedor"; texto: string; en: number }[];
+  atiende: number; // ms desde inicio: sonando → en_curso
+  corta: number; // ms desde inicio: en_curso → procesando
+  fin: number; // ms desde inicio: procesando → terminada
+  resultado: Llamada["resultado"];
 }
 
 const INICIAL: EstadoMock = {
@@ -53,6 +68,7 @@ const INICIAL: EstadoMock = {
   plan: null,
   negociaciones: {},
   aprobado: false,
+  llamadas: {},
 };
 
 const leer = (): EstadoMock => leerSesion("mock", INICIAL);
@@ -95,20 +111,30 @@ function htmlATexto(html: string): string {
 }
 
 export function mensajes(): MensajeCrudo[] {
-  const { cotizarEn } = leer();
+  const e = leer();
+  const { cotizarEn } = e;
   if (!cotizarEn) return [];
   const ahora = Date.now();
   return RESPUESTAS.flatMap((r) => {
-    const llegada = cotizarEn + r.demora_segundos * 1000 * VELOCIDAD;
+    // Si Abasto lo llamó antes de que contestara, la respuesta es la llamada (llega al cortar).
+    const llamada = llamadaDeCotizacion(e, r.proveedor_id);
+    const porWhatsapp = cotizarEn + r.demora_segundos * 1000 * VELOCIDAD;
+    const llegada = llamada ? llamada.inicio + llamada.fin : porWhatsapp;
     if (ahora < llegada) return [];
     const lectura = (EXTRACCIONES[r.proveedor_id]?.segundos_lectura ?? 3) * 1000 * VELOCIDAD;
-    const canal = r.canal as Canal;
+    const canal: Canal = llamada ? "llamada" : (r.canal as Canal);
     const mensaje: MensajeCrudo = {
       id: `msg_${r.proveedor_id}`,
       pedido_id: DEMO.pedido.id,
       proveedor_id: r.proveedor_id,
       canal,
-      contenido_texto: canal === "foto" ? null : canal === "pdf" ? htmlATexto(r.contenido) : r.contenido,
+      contenido_texto: llamada
+        ? textoTranscripcion(llamada)
+        : canal === "foto"
+          ? null
+          : canal === "pdf"
+            ? htmlATexto(r.contenido)
+            : r.contenido,
       archivo: canal === "pdf" || canal === "foto" ? `mock:${canal}:${r.proveedor_id}` : null,
       recibido_en: new Date(llegada).toISOString(),
       estado: ahora < llegada + 500 ? "pendiente" : ahora < llegada + 500 + lectura ? "leyendo" : "extraido",
@@ -529,6 +555,164 @@ export async function aprobar(negociacionId: string, mensaje: string): Promise<N
   const aprobada: Negociacion = { ...neg, mensaje_propuesto: mensaje, estado: "enviada_simulada" };
   guardar({ ...e, aprobado: true, negociaciones: { ...e.negociaciones, [neg.proveedor_id]: aprobada } });
   return aprobada;
+}
+
+// ───────────────────────── Llamadas del agente (simuladas) ─────────────────────────
+
+const COMPRADOR = (DEMO.pedido.comprador ?? "compras").split(" (")[0];
+const ACTIVAS: Llamada["estado"][] = ["iniciando", "sonando", "en_curso", "procesando"];
+
+export async function configLlamadas(): Promise<ConfigLlamadas> {
+  return { modo: "simulada", lista: true, faltan: [], proveedores_con_telefono: [] };
+}
+
+function llamadaDeCotizacion(e: EstadoMock, proveedorId: string): LlamadaMock | undefined {
+  return Object.values(e.llamadas ?? {}).find(
+    (l) => l.base.tipo === "cotizacion" && l.base.proveedor_id === proveedorId,
+  );
+}
+
+function textoTranscripcion(l: LlamadaMock): string {
+  const nombre = nombreProveedor(l.base.proveedor_id);
+  return l.turnos.map((t) => `${t.rol === "abasto" ? "Abasto" : nombre}: ${t.texto}`).join("\n");
+}
+
+/** Mismos tiempos que el modo simulado del backend (llamadas.py), escalados por VITE_MOCK_SPEED. */
+function armarLlamada(
+  base: Omit<Llamada, "estado" | "transcripcion" | "resultado" | "duracion_segundos" | "error">,
+  guion: { rol: "abasto" | "proveedor"; texto: string }[],
+  resultado: Llamada["resultado"],
+): LlamadaMock {
+  const ms = (s: number) => s * 1000 * VELOCIDAD;
+  const atiende = ms(2.5);
+  let cursor = atiende;
+  const turnos = guion.map((t) => {
+    cursor += ms(Math.max(1.4, Math.min(t.texto.length / 45, 9)));
+    return { ...t, en: cursor };
+  });
+  const corta = cursor + ms(1);
+  return {
+    base: { ...base, estado: "sonando", transcripcion: [], resultado: null, duracion_segundos: null, error: null },
+    inicio: Date.now(),
+    turnos,
+    atiende,
+    corta,
+    fin: corta + ms(1.5),
+    resultado,
+  };
+}
+
+function vistaLlamada(l: LlamadaMock): Llamada {
+  const t = Date.now() - l.inicio;
+  const estado: Llamada["estado"] = t < l.atiende ? "sonando" : t < l.corta ? "en_curso" : t < l.fin ? "procesando" : "terminada";
+  const terminada = estado === "terminada";
+  return {
+    ...l.base,
+    estado,
+    transcripcion: l.turnos
+      .filter((x) => x.en <= t)
+      .map((x) => ({ rol: x.rol, texto: x.texto, segundo: Math.round((x.en - l.atiende) / 1000 / VELOCIDAD) })),
+    resultado: terminada ? l.resultado : null,
+    duracion_segundos: t >= l.corta ? Math.round((l.corta - l.atiende) / 1000 / VELOCIDAD) : null,
+    mensaje_id: terminada && l.base.tipo === "cotizacion" ? `msg_${l.base.proveedor_id}` : null,
+  };
+}
+
+function guardarLlamada(l: LlamadaMock, cambios: Partial<EstadoMock> = {}) {
+  const e = leer();
+  guardar({ ...e, ...cambios, llamadas: { ...(e.llamadas ?? {}), [l.base.id]: l } });
+}
+
+function activaDe(proveedorId: string): Llamada | undefined {
+  return Object.values(leer().llamadas ?? {})
+    .map(vistaLlamada)
+    .find((l) => l.proveedor_id === proveedorId && ACTIVAS.includes(l.estado));
+}
+
+function baseLlamada(proveedorId: string, tipo: Llamada["tipo"], negociacionId: string | null) {
+  return {
+    id: `lla_${proveedorId}_${Math.random().toString(16).slice(2, 8)}`,
+    pedido_id: DEMO.pedido.id,
+    proveedor_id: proveedorId,
+    tipo,
+    negociacion_id: negociacionId,
+    modo: "simulada" as const,
+    telefono: "+598 99• ••• 222",
+    conversation_id: null,
+    call_sid: null,
+    mensaje_id: null,
+    iniciada_en: new Date().toISOString(),
+  };
+}
+
+export async function llamarParaCotizar(proveedorId: string): Promise<Llamada> {
+  await esperar(500);
+  const e = leer();
+  const nombre = nombreProveedor(proveedorId);
+  if (!e.cotizarEn) throw new ApiError("Primero hay que pedir la cotización");
+  const enCurso = activaDe(proveedorId);
+  if (enCurso) return enCurso;
+  if (mensajes().some((m) => m.proveedor_id === proveedorId)) throw new ApiError(`${nombre} ya respondió`);
+  const fijo = RESPUESTAS.find((r) => r.proveedor_id === proveedorId);
+  const contenido = fijo?.canal === "pdf" ? htmlATexto(fijo.contenido) : fijo?.contenido;
+  const l = armarLlamada(
+    baseLlamada(proveedorId, "cotizacion", null),
+    [
+      {
+        rol: "abasto",
+        texto: `Hola, ¿hablo con ${nombre}? Te llamo de parte de ${COMPRADOR}, de ${DEMO.pedido.negocio}, por la cotización que les pedimos por WhatsApp. ¿Tenés un minuto?`,
+      },
+      { rol: "proveedor", texto: contenido ?? "Sí, decime. Ahora te paso los precios por WhatsApp." },
+      { rol: "abasto", texto: "Perfecto, anoto todo. ¡Muchas gracias!" },
+    ],
+    { resumen: `${nombre} pasó la cotización por teléfono.`, acuerdo: null, precio_acordado: null, condicion: null },
+  );
+  guardarLlamada(l);
+  return vistaLlamada(l);
+}
+
+export async function llamarParaNegociar(negociacionId: string, mensaje: string): Promise<Llamada> {
+  await esperar(500);
+  const e = leer();
+  const neg = Object.values(e.negociaciones).find((n) => n.id === negociacionId);
+  if (!neg) throw new ApiError(`No existe la negociación ${negociacionId}`);
+  if (!e.plan) throw new ApiError("El plan cambió: volvé a optimizar y a negociar");
+  const asignado = e.plan.asignaciones.filter((a) => a.proveedor_id === neg.proveedor_id);
+  const nombre = nombreProveedor(neg.proveedor_id);
+  if (!asignado.length) throw new ApiError(`${nombre} no tiene ítems en el plan`);
+  const enCurso = activaDe(neg.proveedor_id);
+  if (enCurso) return enCurso;
+
+  const estrategia = neg.estrategias.find((s) => s.nombre === neg.elegida);
+  // El mock cierra siempre con acuerdo: la concesión de la estrategia elegida, o un 5 %.
+  const concesion = estrategia?.concesion_obtenida_pct || 5;
+  const precio = Math.round(asignado[0].precio_unitario_sin_iva * (1 - concesion / 100) * 100) / 100;
+  const l = armarLlamada(
+    baseLlamada(neg.proveedor_id, "negociacion", neg.id),
+    [
+      {
+        rol: "abasto",
+        texto: `Hola, ¿hablo con ${nombre}? Te llamo de parte de ${COMPRADOR}, de ${DEMO.pedido.negocio}, por la cotización de ${nombreProducto(asignado[0].producto_id).toLowerCase()}. ¿Tenés un minuto?`,
+      },
+      ...(estrategia?.transcripcion ?? []),
+      { rol: "abasto", texto: `Perfecto, quedamos así. ${COMPRADOR} te confirma por WhatsApp. ¡Gracias!` },
+    ],
+    {
+      resumen: `${nombre} aceptó un ${formatNumero(concesion, 1)} % de descuento con la estrategia ${neg.elegida}.`,
+      acuerdo: true,
+      precio_acordado: precio,
+      condicion: null,
+    },
+  );
+  const aprobada: Negociacion = { ...neg, mensaje_propuesto: mensaje, estado: "aprobada", llamada_id: l.base.id };
+  guardarLlamada(l, { aprobado: true, negociaciones: { ...e.negociaciones, [neg.proveedor_id]: aprobada } });
+  return vistaLlamada(l);
+}
+
+export async function llamada(id: string): Promise<Llamada> {
+  const l = leer().llamadas?.[id];
+  if (!l) throw new ApiError(`No existe la llamada '${id}'`);
+  return vistaLlamada(l);
 }
 
 export async function reset(): Promise<{ ok: boolean }> {

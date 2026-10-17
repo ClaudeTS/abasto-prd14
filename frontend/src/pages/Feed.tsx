@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowRightIcon, CheckCheckIcon, CheckIcon, ClockIcon, InboxIcon, TriangleAlertIcon } from "lucide-react";
+import { ArrowRightIcon, CheckCheckIcon, CheckIcon, ClockIcon, InboxIcon, PhoneIcon, TriangleAlertIcon } from "lucide-react";
 import * as api from "@/api";
 import { mensajeError } from "@/lib/errores";
 import { fechaCorta, formatNumero, hora, unidad } from "@/lib/format";
@@ -14,8 +14,9 @@ import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/spinner";
 import { Avatar, ErrorBanner, Etiqueta, Puntos } from "@/components/comunes";
 import { necesitaRevision } from "@/components/TarjetaCotizacion";
+import PanelLlamada, { BotonLlamar, ModoLlamadas, estaActiva, useConfigLlamadas, useLlamada } from "@/components/PanelLlamada";
 import VistaMensaje from "@/components/VistaMensaje";
-import type { Canal, Cotizacion, MensajeCrudo, PedidoDemo } from "@/types";
+import type { Canal, Cotizacion, Llamada, MensajeCrudo, PedidoDemo } from "@/types";
 
 const SEGUNDOS_PARA_INSISTIR = 25;
 
@@ -24,6 +25,7 @@ const QUE_LEE: Record<Canal, string> = {
   whatsapp_audio: "el audio",
   pdf: "el PDF",
   foto: "la foto",
+  llamada: "la llamada",
 };
 
 export default function Feed({
@@ -43,10 +45,35 @@ export default function Feed({
   const [cargado, setCargado] = useState(false);
   const chat = useRef<HTMLDivElement>(null);
 
+  // Llamada al proveedor que no respondió (una a la vez). El panel va en la columna, debajo de la lista.
+  const config = useConfigLlamadas();
+  const [objetivo, setObjetivo] = useState<string | null>(null);
+  const tel = useLlamada("llamada_feed", (simulada) =>
+    api.llamarParaCotizar(pedido.id, objetivo ?? tel.llamada?.proveedor_id ?? "", simulada),
+  );
+  const llamado = tel.llamada?.proveedor_id ?? objetivo;
+  const panelAbierto = !!llamado && (!!tel.llamada || tel.iniciando || !!tel.error);
+  const llamar = async (proveedorId: string) => {
+    setObjetivo(proveedorId);
+    // El objetivo nuevo todavía no está en el closure: se llama directo.
+    tel.setLlamada(null);
+    await tel.iniciarCon((simulada) => api.llamarParaCotizar(pedido.id, proveedorId, simulada));
+  };
+  const cerrarLlamada = () => {
+    tel.cerrar();
+    setObjetivo(null);
+  };
+
   const enLectura = mensajes.some((m) => m.estado === "pendiente" || m.estado === "leyendo");
   const faltan = PROVEEDORES.filter((p) => !mensajes.some((m) => m.proveedor_id === p.id));
   const recienPedido = cotizarEn !== null && Date.now() - cotizarEn < 120_000 && faltan.length > 0;
-  const activo = !cargado || pedido.estado === "cotizando" || enLectura || recienPedido;
+  // Si la llamada trajo la respuesta, el mensaje llega por este mismo polling.
+  const esperandoLlamada =
+    estaActiva(tel.llamada) ||
+    (tel.llamada?.tipo === "cotizacion" &&
+      tel.llamada.estado === "terminada" &&
+      !mensajes.some((m) => m.proveedor_id === tel.llamada!.proveedor_id && m.estado === "extraido"));
+  const activo = !cargado || pedido.estado === "cotizando" || enLectura || recienPedido || esperandoLlamada;
   const ahora = useReloj(1000, activo);
 
   usePolling(
@@ -143,7 +170,9 @@ export default function Feed({
 
           {inicio &&
             segundos >= SEGUNDOS_PARA_INSISTIR &&
-            faltan.map((p) => (
+            faltan
+              .filter((p) => p.id !== tel.llamada?.proveedor_id)
+              .map((p) => (
               <div key={p.id} className="flex animate-entrar justify-center">
                 <Etiqueta tono="ambar" className="h-auto py-1 text-sm">
                   <ClockIcon /> {p.nombre} no respondió todavía · Abasto le va a insistir en 30 min
@@ -184,15 +213,53 @@ export default function Feed({
           {PROVEEDORES.map((p, i) => {
             const m = mensajes.find((x) => x.proveedor_id === p.id);
             const c = m ? cotPorMensaje(m) : undefined;
+            const llamadaDeEste = tel.llamada?.proveedor_id === p.id ? tel.llamada : null;
+            const enLlamada = estaActiva(llamadaDeEste) || (tel.iniciando && llamado === p.id);
             return (
-              <div key={p.id} className={cn("flex items-center gap-3 px-4 py-2.5", i > 0 && "border-t")}>
+              <div key={p.id} className={cn("flex items-center gap-2 px-4 py-2.5", i > 0 && "border-t")}>
                 <Avatar proveedorId={p.id} className="size-7 text-[10px]" />
-                <span className="min-w-0 flex-1 truncate font-medium">{p.nombre}</span>
-                <EstadoProveedor mensaje={m} cotizacion={c} tarda={segundos >= SEGUNDOS_PARA_INSISTIR} />
+                <span className="min-w-0 flex-1 truncate font-medium" title={p.nombre}>
+                  {p.nombre}
+                </span>
+                {!m && enLlamada ? (
+                  <Etiqueta tono="verde">
+                    <span className="size-1.5 animate-pulse rounded-full bg-current" /> En llamada
+                  </Etiqueta>
+                ) : (
+                  <EstadoProveedor mensaje={m} cotizacion={c} tarda={segundos >= SEGUNDOS_PARA_INSISTIR} />
+                )}
+                {!m && inicio && !enLlamada && llamadaDeEste?.estado !== "terminada" && (
+                  <BotonLlamar
+                    config={config}
+                    proveedorId={p.id}
+                    size="xs"
+                    variant="outline"
+                    onClick={() => llamar(p.id)}
+                    disabled={estaActiva(tel.llamada) || tel.iniciando}
+                    motivoDeshabilitado="Hay otra llamada en curso"
+                  >
+                    <PhoneIcon /> Llamar
+                  </BotonLlamar>
+                )}
               </div>
             );
           })}
+          {faltan.length > 0 && inicio && <ModoLlamadas config={config} className="border-t px-4 py-2" />}
         </Card>
+
+        {panelAbierto && llamado && (
+          <PanelLlamada
+            proveedorId={llamado}
+            tel={tel}
+            titulo={`Llamada a ${nombreProveedor(llamado)}`}
+            onCerrar={cerrarLlamada}
+            className="animate-entrar"
+          >
+            {tel.llamada?.estado === "terminada" && (
+              <RespuestaPorTelefono llamada={tel.llamada} mensajes={mensajes} cotizacion={cotPorMensaje} />
+            )}
+          </PanelLlamada>
+        )}
 
         <div className="flex flex-col gap-2">
           {cotizaciones.length > 0 && (
@@ -299,5 +366,48 @@ function EstadoProveedor({ mensaje, cotizacion, tarda }: { mensaje?: MensajeCrud
     <Etiqueta tono="verde">
       <CheckIcon /> Listo
     </Etiqueta>
+  );
+}
+
+/** Al terminar la llamada: la respuesta entra al feed como un mensaje más y pasa por la extracción. */
+function RespuestaPorTelefono({
+  llamada,
+  mensajes,
+  cotizacion,
+}: {
+  llamada: Llamada;
+  mensajes: MensajeCrudo[];
+  cotizacion: (m: MensajeCrudo) => Cotizacion | undefined;
+}) {
+  const nombre = nombreProveedor(llamada.proveedor_id);
+  const m =
+    mensajes.find((x) => x.id === llamada.mensaje_id) ??
+    mensajes.find((x) => x.proveedor_id === llamada.proveedor_id && x.canal === "llamada");
+  const cotId = m ? (m.cotizacion_id ?? cotizacion(m)?.id) : undefined;
+  if (!m || m.estado === "pendiente" || m.estado === "leyendo") {
+    return (
+      <p className="flex items-center gap-2 rounded-md bg-muted px-3 py-2 text-sm">
+        <Spinner /> Abasto está leyendo la llamada <Puntos />
+      </p>
+    );
+  }
+  if (m.estado === "error") {
+    return (
+      <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+        La llamada terminó pero no se pudo leer{m.error ? `: ${m.error}` : "."}
+      </p>
+    );
+  }
+  return (
+    <Link
+      to={cotId ? `/cotizaciones#${cotId}` : "/cotizaciones"}
+      className="flex animate-entrar items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-900 transition-colors hover:bg-emerald-100 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-200"
+    >
+      <CheckIcon className="size-4 shrink-0" />
+      <span className="flex-1">La cotización de {nombre} entró por teléfono</span>
+      <span className="flex items-center gap-1 font-medium whitespace-nowrap">
+        Ver tarjeta <ArrowRightIcon className="size-3.5" />
+      </span>
+    </Link>
   );
 }

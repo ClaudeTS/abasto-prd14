@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { ExternalLinkIcon, FileTextIcon, MicIcon } from "lucide-react";
+import { ExternalLinkIcon, FileTextIcon, MicIcon, PhoneIcon } from "lucide-react";
 import { archivoUrl } from "@/api";
+import { nombreProveedor } from "@/lib/proveedores";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { TextoResaltado } from "@/components/comunes";
@@ -19,6 +20,8 @@ export default function VistaMensaje({
   const texto = mensaje.contenido_texto ?? "";
 
   if (mensaje.canal === "whatsapp_audio") return <Audio mensaje={mensaje} evidencias={evidencias} grande={grande} />;
+
+  if (mensaje.canal === "llamada") return <VistaLlamada mensaje={mensaje} evidencias={evidencias} grande={grande} />;
 
   if (mensaje.canal === "pdf") {
     const url = mensaje.archivo ? archivoUrl(mensaje.archivo) : "";
@@ -121,6 +124,67 @@ function Audio({ mensaje, evidencias, grande }: { mensaje: MensajeCrudo; evidenc
         <p className="rounded-md bg-muted p-3 text-sm leading-relaxed whitespace-pre-wrap italic">
           <TextoResaltado texto={texto} frases={evidencias} />
         </p>
+      )}
+    </div>
+  );
+}
+
+interface Turno {
+  abasto: boolean;
+  texto: string;
+}
+
+/** "Abasto: …" / "<Proveedor>: …" por línea. Una línea sin ese prefijo continúa el turno anterior. */
+export function turnosDeLlamada(texto: string, proveedorId: string): Turno[] {
+  const nombre = nombreProveedor(proveedorId);
+  const turnos: Turno[] = [];
+  for (const linea of texto.split("\n")) {
+    const abasto = linea.startsWith("Abasto:");
+    const proveedor = linea.startsWith(`${nombre}:`);
+    if (abasto || proveedor) {
+      turnos.push({ abasto, texto: linea.slice((abasto ? "Abasto" : nombre).length + 1).trim() });
+    } else if (turnos.length) {
+      turnos[turnos.length - 1].texto += "\n" + linea;
+    } else if (linea.trim()) {
+      turnos.push({ abasto: false, texto: linea });
+    }
+  }
+  return turnos;
+}
+
+/** Transcripción de una llamada del agente: quién habla en cada turno, con la evidencia resaltada. */
+function VistaLlamada({ mensaje, evidencias, grande }: { mensaje: MensajeCrudo; evidencias: string[]; grande: boolean }) {
+  const [abierto, setAbierto] = useState(grande);
+  const turnos = turnosDeLlamada(mensaje.contenido_texto ?? "", mensaje.proveedor_id);
+  const nombre = nombreProveedor(mensaje.proveedor_id);
+  const delProveedor = turnos.filter((t) => !t.abasto).map((t) => t.texto).join(" ");
+  return (
+    <div className="space-y-2">
+      <div className={cn("flex items-start gap-3", grande ? "w-full" : "w-72 sm:w-[28rem]")}>
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
+          <PhoneIcon className="size-4" />
+        </span>
+        <div className="min-w-0 text-sm">
+          <p className="font-medium">Abasto llamó a {nombre}</p>
+          {!abierto && delProveedor && (
+            <p className="line-clamp-2 text-muted-foreground italic">“{delProveedor}”</p>
+          )}
+        </div>
+      </div>
+      <Button variant="link" size="xs" className="h-auto px-0" onClick={() => setAbierto(!abierto)}>
+        {abierto ? "Ocultar transcripción" : `Ver transcripción (${turnos.length} turnos)`}
+      </Button>
+      {abierto && (
+        <div className="space-y-2 rounded-md bg-muted p-3 text-sm leading-relaxed">
+          {turnos.map((t, k) => (
+            <p key={k} className="whitespace-pre-wrap">
+              <span className={cn("mr-1.5 font-medium", t.abasto ? "text-muted-foreground" : "text-foreground")}>
+                {t.abasto ? "Abasto" : nombre}:
+              </span>
+              <TextoResaltado texto={t.texto} frases={evidencias} />
+            </p>
+          ))}
+        </div>
       )}
     </div>
   );
