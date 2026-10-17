@@ -28,7 +28,9 @@ modelar proveedores y ensayar negociaciones SÍ lo es.
 
 ### Fuera de alcance (NO implementar aunque parezca fácil)
 - Autenticación, multiusuario, roles.
-- Envío real a WhatsApp/email. Todo es simulado.
+- Envío real a WhatsApp/email. Todo es simulado. **Excepción decidida el sábado:** llamadas telefónicas reales del
+  agente (ElevenLabs + Twilio) para pedir la cotización a quien no respondió y para negociar con la estrategia
+  aprobada, con modo simulado por defecto y solo a los celulares del equipo. Ver `docs/LLAMADAS.md`.
 - Base de datos real. Persistencia en JSON/SQLite en `backend/data/`.
 - Capas 2, 3, 6 y 7 (perfil histórico, predicción, índice de mercado, agente-a-agente): solo pantallas estáticas en `/vision`.
 - Tests exhaustivos. Solo smoke tests de los endpoints críticos.

@@ -45,6 +45,13 @@ class Settings:
     seed_dir: Path  # de dónde se seedea: backend/data si `make seed` corrió, si no data/
     cors_origins: list[str]
     database_url: str  # Postgres (Supabase); vacío: archivos JSON en data_dir
+    # Llamadas (docs/LLAMADAS.md): "simulada" (default, sin costo) | "real" (ElevenLabs + Twilio)
+    llamadas_modo: str = "simulada"
+    elevenlabs_api_key: str = ""
+    elevenlabs_agent_id: str = ""
+    elevenlabs_phone_number_id: str = ""
+    elevenlabs_base_url: str = "https://api.elevenlabs.io"
+    telefonos_proveedores: dict[str, str] | None = None  # proveedor_id -> +598…
 
     @property
     def runtime_dir(self) -> Path:
@@ -57,6 +64,18 @@ class Settings:
     @property
     def archivos_dir(self) -> Path:
         return self.runtime_dir / "archivos"
+
+
+def _telefonos(valor: str) -> dict[str, str]:
+    """"papelera_del_sur:+59899111222,ofisillas:+59899333444" -> {id: número}."""
+    telefonos = {}
+    for par in valor.split(","):
+        if ":" in par:
+            proveedor, numero = par.split(":", 1)
+            numero = "".join(c for c in numero if c.isdigit() or c == "+")
+            if proveedor.strip() and numero:
+                telefonos[proveedor.strip()] = numero
+    return telefonos
 
 
 def cargar_settings() -> Settings:
@@ -74,6 +93,12 @@ def cargar_settings() -> Settings:
         seed_dir=seed_dir,
         cors_origins=[o.strip() for o in origins.split(",") if o.strip()],
         database_url=os.environ.get("DATABASE_URL", "").strip(),
+        llamadas_modo=os.environ.get("LLAMADAS_MODO", "simulada").strip() or "simulada",
+        elevenlabs_api_key=os.environ.get("ELEVENLABS_API_KEY", "").strip(),
+        elevenlabs_agent_id=os.environ.get("ELEVENLABS_AGENT_ID", "").strip(),
+        elevenlabs_phone_number_id=os.environ.get("ELEVENLABS_PHONE_NUMBER_ID", "").strip(),
+        elevenlabs_base_url=os.environ.get("ELEVENLABS_BASE_URL", "https://api.elevenlabs.io").rstrip("/"),
+        telefonos_proveedores=_telefonos(os.environ.get("TELEFONOS_PROVEEDORES", "")),
     )
 
 

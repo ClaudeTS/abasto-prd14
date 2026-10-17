@@ -28,7 +28,9 @@ T = TypeVar("T", bound=BaseModel)
 _lock = threading.RLock()
 _seed_cache: dict[str, Any] = {}
 
-COLECCIONES = ("pedidos", "mensajes", "cotizaciones", "extracciones", "planes", "negociaciones")
+COLECCIONES = (
+    "pedidos", "mensajes", "cotizaciones", "extracciones", "planes", "negociaciones", "llamadas",
+)
 
 
 # ---------------------------------------------------------------- semilla

@@ -19,13 +19,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from app import config, integracion_a, pedidos, pipeline, simulador, store
+from app import config, integracion_a, llamadas, pedidos, pipeline, simulador, store
 from app.models import (
     AprobacionNegociacion,
     Canal,
+    ConfigLlamadas,
     ConfirmacionCotizacion,
     Cotizacion,
     EstadoProveedor,
+    Llamada,
+    LlamarNegociacion,
     MensajeCrudo,
     Negociacion,
     PedidoCompleto,
@@ -56,6 +59,7 @@ async def lifespan(_: FastAPI):
     )
     yield
     simulador.cancelar_todo()
+    llamadas.cancelar_todo()
 
 
 app = FastAPI(title="Abasto API", version="0.1.0", lifespan=lifespan)
@@ -373,9 +377,90 @@ async def aprobar(negociacion_id: str, cuerpo: AprobacionNegociacion | None = No
     return neg
 
 
+# ---------------------------------------------------------------- llamadas (docs/LLAMADAS.md)
+@app.get("/llamadas/config", response_model=ConfigLlamadas)
+async def config_llamadas() -> ConfigLlamadas:
+    return llamadas.configuracion()
+
+
+@app.post("/pedidos/{pedido_id}/llamar/{proveedor_id}", response_model=Llamada)
+async def llamar_para_cotizar(
+    pedido_id: str,
+    proveedor_id: str,
+    simulada: bool = Query(False, description="Forzar llamada simulada (respaldo en vivo)"),
+) -> Llamada:
+    """Llama al proveedor para pedirle la cotización (p. ej. el que no respondió)."""
+    pedido = _pedido(pedido_id)
+    if proveedor_id not in pipeline.proveedores():
+        raise ErrorAbasto(404, f"Proveedor desconocido '{proveedor_id}'")
+    ya = [m for m in store.listar("mensajes", MensajeCrudo, pedido_id=pedido_id, proveedor_id=proveedor_id)]
+    if ya and llamadas.activa(pedido_id, proveedor_id) is None:
+        raise ErrorAbasto(409, f"{pipeline.proveedores()[proveedor_id].nombre} ya respondió")
+    try:
+        return await llamadas.iniciar(
+            pedido_id=pedido_id,
+            proveedor_id=proveedor_id,
+            tipo="cotizacion",
+            variables=llamadas.instrucciones_cotizacion(pedido, proveedor_id),
+            simulada=simulada,
+        )
+    except llamadas.LlamadaNoPosible as exc:
+        raise ErrorAbasto(409, str(exc), {"config": llamadas.configuracion().model_dump()}) from exc
+
+
+@app.post("/negociaciones/{negociacion_id}/llamar", response_model=Llamada)
+async def llamar_para_negociar(
+    negociacion_id: str,
+    cuerpo: LlamarNegociacion | None = None,
+    simulada: bool = Query(False, description="Forzar llamada simulada (respaldo en vivo)"),
+) -> Llamada:
+    """"Aprobar y llamar": Lucía aprueba la estrategia y el mensaje; el agente llama con eso."""
+    neg = store.obtener("negociaciones", negociacion_id, Negociacion)
+    if neg is None:
+        raise ErrorAbasto(404, f"No existe la negociación '{negociacion_id}'")
+    plan_dict = store.obtener_dict("planes", neg.pedido_id)
+    if plan_dict is None:
+        raise ErrorAbasto(409, "El plan cambió: volvé a optimizar y a negociar")
+    if cuerpo and cuerpo.mensaje and cuerpo.mensaje.strip():
+        neg.mensaje_propuesto = cuerpo.mensaje.strip()
+    try:
+        variables = llamadas.instrucciones_negociacion(
+            _pedido(neg.pedido_id), neg, Plan.model_validate(plan_dict), neg.mensaje_propuesto
+        )
+        llamada = await llamadas.iniciar(
+            pedido_id=neg.pedido_id,
+            proveedor_id=neg.proveedor_id,
+            tipo="negociacion",
+            variables=variables,
+            negociacion_id=neg.id,
+            simulada=simulada,
+        )
+    except llamadas.LlamadaNoPosible as exc:
+        raise ErrorAbasto(409, str(exc), {"config": llamadas.configuracion().model_dump()}) from exc
+    neg.estado, neg.llamada_id = "aprobada", llamada.id  # aprobada por Lucía al apretar "llamar"
+    store.guardar("negociaciones", neg)
+    log.info("Negociación %s aprobada para llamar (%s)", neg.id, llamada.modo)
+    return llamada
+
+
+@app.get("/llamadas/{llamada_id}", response_model=Llamada)
+async def obtener_llamada(llamada_id: str) -> Llamada:
+    llamada = store.obtener("llamadas", llamada_id, Llamada)
+    if llamada is None:
+        raise ErrorAbasto(404, f"No existe la llamada '{llamada_id}'")
+    return llamada
+
+
+@app.get("/pedidos/{pedido_id}/llamadas", response_model=list[Llamada])
+async def llamadas_del_pedido(pedido_id: str) -> list[Llamada]:
+    _pedido(pedido_id)
+    return sorted(store.listar("llamadas", Llamada, pedido_id=pedido_id), key=lambda l: l.iniciada_en)
+
+
 # ---------------------------------------------------------------- reset
 @app.post("/reset")
 async def reset(hard: bool = Query(False, description="También borra el cache")) -> dict:
     simulador.cancelar_todo()
+    llamadas.cancelar_todo()
     store.reset(borrar_cache=hard)
     return {"ok": True, "cache_borrado": hard}
