@@ -6,8 +6,8 @@ Horas relativas al arranque (H0). Pensado para **3 personas**; al final hay una 
 
 | Rol | Persona | Responsable de |
 |---|---|---|
-| **A — IA** | Claude | `llm.py`, prompts, extracción (Capa 1), negociación ensayada (Capa 5) |
-| **C — Backend y optimización** | | modelos, endpoints, simulador de proveedores, MILP (Capa 4), cache, `make reset` |
+| **A — IA** | | `llm.py`, prompts, extracción (Capa 1), negociación ensayada (Capa 5) |
+| **C — Backend y optimización** | Claude | modelos, endpoints, simulador de proveedores, MILP (Capa 4), cache, `make reset` |
 | **B — Producto y demo** | | Frontend completo, datos de demo, pantallas de visión, pitch, slides, video de respaldo |
 
 Los tres hacen pair en los dos checkpoints de integración (H9 y H17). Nadie empieza una feature nueva después de H18.

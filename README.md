@@ -80,8 +80,8 @@ Detalle en `AGENTS.md`.
 
 | Rol | Persona |
 |---|---|
-| A — IA (extracción, negociación, prompts) | Claude |
-| C — Backend y optimización (endpoints, simulador, MILP) | |
+| A — IA (extracción, negociación, prompts) | |
+| C — Backend y optimización (endpoints, simulador, MILP) | Claude |
 | B — Producto y demo (frontend, datos, pitch) | |
 
 Repo: https://github.com/Emontone21/HACKATON-GRUPO-25
