@@ -156,6 +156,7 @@ def armar_contenido(
         unidades=_unidades_para_prompt(),
         proveedor_nombre=proveedor.nombre,
         rubro=proveedor.rubro,
+        comprador=_comprador_para_prompt(),
         canal=canal,
         mensaje=mensaje,
     )
@@ -165,6 +166,11 @@ def armar_contenido(
 
 def _catalogo_para_prompt(catalogo: list[Producto]) -> str:
     return "\n".join(f"- {p.id} → {p.nombre} ({p.unidad_canonica})" for p in catalogo)
+
+
+def _comprador_para_prompt() -> str:
+    """El negocio que pidió la cotización: en una foto suele estar de encabezado."""
+    return store.semilla("pedido_demo").get("pedido", {}).get("negocio") or "(sin nombre)"
 
 
 def _unidades_para_prompt() -> str:
