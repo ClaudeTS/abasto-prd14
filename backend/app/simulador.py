@@ -115,6 +115,20 @@ async def generar_contenido(prov: dict[str, Any], pedido: Any) -> tuple[str, str
     return contenido, "llm"
 
 
+def _texto_visible(canal: str, contenido: str) -> str | None:
+    """Texto que la UI muestra junto al archivo (y donde resalta las evidencias).
+
+    PDF: el texto del presupuesto (para "Texto extraído del PDF"). Foto: nada, la lee el modelo.
+    """
+    if canal == "pdf":
+        from app.archivos import html_a_texto
+
+        return html_a_texto(contenido)
+    if canal == "foto":
+        return None
+    return contenido
+
+
 def _guardar_archivo(canal: str, contenido: str, mensaje_id: str) -> str | None:
     """Genera el PDF o la foto. Devuelve el nombre del archivo en runtime/archivos/."""
     from app import archivos  # import diferido: reportlab/PIL solo cuando hacen falta
@@ -144,7 +158,7 @@ async def _responder(pedido_id: str, prov: dict[str, Any], demora: float) -> Non
         pedido_id=pedido_id,
         proveedor_id=pub["id"],
         canal=canal,
-        contenido_texto=None if canal in ("pdf", "foto") else contenido,
+        contenido_texto=_texto_visible(canal, contenido),
         archivo=archivo,
         archivo_url=f"/archivos/{archivo}" if archivo else None,
         recibido_en=datetime.now(),

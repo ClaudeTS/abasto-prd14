@@ -109,6 +109,15 @@ def test_confirmar_iva_corrige_precio(client):
     notebook = next(i for i in compu["items"] if i["producto_id"] == "notebook")
     assert notebook["precio_unitario_sin_iva"] == 27459.02
     assert notebook["conversion_aplicada"].startswith("con IVA")
+    assert compu["confianza"] == 1.0  # el frontend deja de marcarla "para revisar"
+
+
+def test_pdf_trae_su_texto_para_resaltar_evidencias(client):
+    client.post(f"/pedidos/{PEDIDO}/cotizar")
+    pdf = next(m for m in _esperar_cotizaciones(client) if m["canal"] == "pdf")
+    cot = next(c for c in client.get(f"/pedidos/{PEDIDO}/cotizaciones").json() if c["mensaje_id"] == pdf["id"])
+    for item in cot["items"]:  # cada evidencia se encuentra en el texto que muestra la UI
+        assert " ".join(item["evidencia"].split()) in " ".join(pdf["contenido_texto"].split())
 
 
 def test_optimizar_bloquea_si_hay_que_revisar(client):

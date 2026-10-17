@@ -177,6 +177,7 @@ def normalizar_cotizacion(
     confianza = float(crudo.get("confianza") or 0)
     if incluye_iva_forzado is not None:
         estado = "confirmada"
+        confianza = 1.0  # lo confirmó una persona: deja de ser una lectura dudosa
     elif requiere_revision(confianza, dudas):
         estado = "revisar"
     else:
