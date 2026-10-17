@@ -13,13 +13,16 @@ from datetime import datetime
 from pathlib import Path
 
 from fastapi import FastAPI, File, Form, HTTPException, Query, Request, UploadFile
+from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app import config, integracion_a, pedidos, pipeline, simulador, store
 from app.models import (
     AprobacionNegociacion,
+    Canal,
     ConfirmacionCotizacion,
     Cotizacion,
     EstadoProveedor,
@@ -43,6 +46,7 @@ class ErrorAbasto(HTTPException):
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     config.settings.runtime_dir.mkdir(parents=True, exist_ok=True)
+    simulador.reanudar()  # si el server se reinició a mitad de una cotización (--reload)
     log.info(
         "Abasto backend · datos en %s · SIM_MODE=%s · extracción=%s · SIM_DELAY_SECONDS=%s",
         config.settings.data_dir,
@@ -55,6 +59,22 @@ async def lifespan(_: FastAPI):
 
 
 app = FastAPI(title="Abasto API", version="0.1.0", lifespan=lifespan)
+
+
+# ---------------------------------------------------------------- errores con forma única
+@app.middleware("http")
+async def _inesperado(request: Request, call_next):
+    """Captura los 500 DENTRO del middleware de CORS (registrado después, queda por fuera):
+    así el navegador recibe el error con sus headers y el frontend puede mostrar `error`."""
+    try:
+        return await call_next(request)
+    except Exception as exc:  # noqa: BLE001
+        log.exception("Error no controlado en %s %s", request.method, request.url.path)
+        return JSONResponse(
+            status_code=500, content={"error": "Error interno del backend", "detalle": str(exc)}
+        )
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=config.settings.cors_origins,
@@ -63,9 +83,8 @@ app.add_middleware(
 )
 
 
-# ---------------------------------------------------------------- errores con forma única
-@app.exception_handler(HTTPException)
-async def _http_error(_: Request, exc: HTTPException) -> JSONResponse:
+@app.exception_handler(StarletteHTTPException)  # incluye 404/405 de rutas inexistentes
+async def _http_error(_: Request, exc: StarletteHTTPException) -> JSONResponse:
     cuerpo = exc.detail if isinstance(exc.detail, dict) else {"error": str(exc.detail), "detalle": None}
     return JSONResponse(status_code=exc.status_code, content=cuerpo)
 
@@ -73,15 +92,8 @@ async def _http_error(_: Request, exc: HTTPException) -> JSONResponse:
 @app.exception_handler(RequestValidationError)
 async def _validacion(_: Request, exc: RequestValidationError) -> JSONResponse:
     return JSONResponse(
-        status_code=422, content={"error": "Datos de entrada inválidos", "detalle": exc.errors()}
-    )
-
-
-@app.exception_handler(Exception)
-async def _inesperado(_: Request, exc: Exception) -> JSONResponse:
-    log.exception("Error no controlado")
-    return JSONResponse(
-        status_code=500, content={"error": "Error interno del backend", "detalle": str(exc)}
+        status_code=422,
+        content={"error": "Datos de entrada inválidos", "detalle": jsonable_encoder(exc.errors())},
     )
 
 
@@ -164,13 +176,27 @@ async def confirmar_cotizacion(
     cot = store.obtener("cotizaciones", cotizacion_id, Cotizacion)
     if cot is None:
         raise ErrorAbasto(404, f"No existe la cotización '{cotizacion_id}'")
-    return pipeline.confirmar(cot, (cuerpo or ConfirmacionCotizacion()).incluye_iva)
+    incluye_iva = (cuerpo or ConfirmacionCotizacion()).incluye_iva
+    if "iva" in cot.campos_dudosos and incluye_iva is None:
+        raise ErrorAbasto(
+            422,
+            "Falta indicar si los precios incluyen IVA",
+            {"esperado": {"incluye_iva": "true | false"}},
+        )
+    try:
+        nueva = pipeline.confirmar(cot, incluye_iva)
+    except KeyError as exc:
+        raise ErrorAbasto(409, "No se encontró la extracción original de esta cotización") from exc
+    if store.obtener_dict("planes", cot.pedido_id) is not None:  # el plan quedó viejo
+        store.guardar_dict("planes", cot.pedido_id, None)
+        pedidos.cambiar_estado(cot.pedido_id, "cotizado")
+    return nueva
 
 
 @app.post("/extraer", response_model=Cotizacion)
 async def extraer(
     proveedor_id: str = Form(...),
-    canal: str = Form("whatsapp_texto"),
+    canal: Canal = Form("whatsapp_texto"),
     texto: str | None = Form(None),
     archivo: UploadFile | None = File(None),
     pedido_id: str = Form("pruebas"),
@@ -203,7 +229,7 @@ async def extraer(
         id=mensaje_id,
         pedido_id=pedido_id,
         proveedor_id=proveedor_id,
-        canal=canal,  # type: ignore[arg-type]
+        canal=canal,
         contenido_texto=texto,
         archivo=nombre_archivo,
         archivo_url=f"/archivos/{nombre_archivo}" if nombre_archivo else None,
@@ -285,6 +311,8 @@ async def obtener_plan(pedido_id: str) -> Plan:
 @app.post("/pedidos/{pedido_id}/negociar/{proveedor_id}", response_model=Negociacion)
 async def negociar(pedido_id: str, proveedor_id: str) -> Negociacion:
     pedido = _pedido(pedido_id)
+    if proveedor_id not in pipeline.proveedores():
+        raise ErrorAbasto(404, f"Proveedor desconocido '{proveedor_id}'")
     plan_dict = store.obtener_dict("planes", pedido_id)
     if plan_dict is None:
         raise ErrorAbasto(409, "Primero hay que optimizar el pedido")

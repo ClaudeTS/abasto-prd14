@@ -13,7 +13,7 @@ from datetime import date, datetime
 from decimal import Decimal
 from typing import Annotated, Any, Literal
 
-from pydantic import BaseModel, Field, PlainSerializer
+from pydantic import BaseModel, ConfigDict, Field, PlainSerializer
 
 Monto = Annotated[
     Decimal,
@@ -128,6 +128,8 @@ class Cotizacion(BaseModel):
 
 
 class ConfirmacionCotizacion(BaseModel):  # ext: el "un clic" de Lucía
+    model_config = ConfigDict(extra="forbid")  # "incluyeIva" mal escrito → 422, no confirma en silencio
+
     incluye_iva: bool | None = None
 
 

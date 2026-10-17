@@ -32,7 +32,9 @@ cacheada (corré la demo una vez antes: `backend/data/cache/` guarda las extracc
 
 ## Endpoints
 
-Errores: siempre `{"error": "mensaje legible", "detalle": ...}`. El frontend muestra `error` tal cual.
+Errores: siempre `{"error": "mensaje legible", "detalle": ...}`, también en 404/405 de rutas inexistentes, 422 de validación y 500 (que llegan con headers CORS). El frontend muestra `error` tal cual.
+
+Si el backend se reinicia a mitad de una cotización (por ejemplo `--reload` al guardar un `.py`), al arrancar relanza las respuestas que faltaban con su demora restante.
 
 | Método | Ruta | Devuelve | Notas |
 |---|---|---|---|
@@ -40,11 +42,11 @@ Errores: siempre `{"error": "mensaje legible", "detalle": ...}`. El frontend mue
 | GET | `/pedidos/demo` | `PedidoCompleto` | Pedido + `catalogo`, `conversiones`, `tipo_cambio_usd`, `iva`. |
 | GET | `/pedidos/{id}` | `PedidoCompleto` | Igual, con el `estado` actualizado. |
 | GET | `/proveedores` | `Proveedor[]` | Solo los datos públicos. |
-| POST | `/pedidos/{id}/cotizar` | `{estado: "cotizando", proveedores}` | Idempotente mientras corre (`ya_estaba_en_curso: true`). |
+| POST | `/pedidos/{id}/cotizar` | `{estado, proveedores, ya_estaba_en_curso, ya_cotizado}` | Siempre las mismas claves. Idempotente: si ya corre o ya se cotizó, no relanza (para repetir la demo: `POST /reset`). |
 | GET | `/pedidos/{id}/mensajes` | `MensajeCrudo[]` | Polling cada 1,5 s. Orden de llegada. |
 | GET | `/pedidos/{id}/proveedores/estado` | `EstadoProveedor[]` | **Nuevo.** `esperando` + `responde_en_segundos`, `respondio`. Para "Papelera del Sur no respondió todavía". |
 | GET | `/pedidos/{id}/cotizaciones` | `Cotizacion[]` | |
-| POST | `/cotizaciones/{id}/confirmar` | `Cotizacion` | **Nuevo.** Body `{"incluye_iva": true}`. El "un clic" de Lucía: re-normaliza y queda `estado: "confirmada"`. |
+| POST | `/cotizaciones/{id}/confirmar` | `Cotizacion` | **Nuevo.** Body JSON `{"incluye_iva": true}` (con `Content-Type: application/json`). El "un clic" de Lucía: re-normaliza y queda `estado: "confirmada"`. Sin `incluye_iva` cuando la duda es el IVA, o con claves desconocidas → 422. Si había plan, se invalida (hay que volver a optimizar). |
 | POST | `/extraer` | `Cotizacion` | Form: `proveedor_id`, `canal`, `texto` y/o `archivo`. Texto libre requiere la Capa 1 de A (si no, 503). No toca el feed de la demo. |
 | GET | `/archivos/{nombre}` | archivo | PDF y foto de los mensajes (`MensajeCrudo.archivo_url`). |
 | POST | `/pedidos/{id}/optimizar` | `Plan` | 409 si faltan respuestas o hay cotizaciones para revisar (ver abajo). `?forzar=true` optimiza igual excluyéndolas. |
@@ -52,7 +54,7 @@ Errores: siempre `{"error": "mensaje legible", "detalle": ...}`. El frontend mue
 | POST | `/pedidos/{id}/negociar/{proveedor_id}` | `Negociacion` | 501 hasta que A entregue la Capa 5 (el `detalle.contexto` muestra lo que A va a recibir). Timeout 90 s → 504. |
 | GET | `/negociaciones/{id}` | `Negociacion` | |
 | POST | `/negociaciones/{id}/aprobar` | `Negociacion` | Body opcional `{"mensaje": "texto editado"}`. Estado → `enviada_simulada`. |
-| POST | `/reset` | `{ok}` | `?hard=true` también borra el cache. |
+| POST | `/reset` | `{ok}` | `?hard=true` también borra el cache. Cancela las respuestas en curso. `make reset` usa este endpoint si el backend está levantado. |
 
 ## Para B (frontend)
 

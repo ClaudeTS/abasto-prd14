@@ -152,7 +152,10 @@ async def _responder(pedido_id: str, prov: dict[str, Any], demora: float) -> Non
     )
     store.guardar("mensajes", mensaje)
     log.info("Llegó %s de %s (%s, origen %s)", canal, pub["id"], mensaje_id, origen)
-    # Pausa corta en "leyendo…" para que el feed muestre el paso (la extracción fija es instantánea).
+    # Pausa en "leyendo…" para que el feed muestre el paso (la extracción fija es instantánea).
+    await asyncio.sleep(0.3 * _escala())
+    mensaje.estado = "leyendo"
+    store.guardar("mensajes", mensaje)
     await asyncio.sleep(1.6 * _escala())
     try:
         await procesar_mensaje(mensaje)
@@ -162,7 +165,9 @@ async def _responder(pedido_id: str, prov: dict[str, Any], demora: float) -> Non
 
 async def _todas(pedido_id: str, tareas: list[asyncio.Task]) -> None:
     await asyncio.gather(*tareas, return_exceptions=True)
-    pedidos.cambiar_estado(pedido_id, "cotizado")
+    pedido = pedidos.obtener(pedido_id)
+    if pedido is not None and pedido.estado == "cotizando":  # no pisar "optimizado" (forzar=true)
+        pedidos.cambiar_estado(pedido_id, "cotizado")
     log.info("Pedido %s cotizado", pedido_id)
 
 
@@ -170,30 +175,98 @@ def en_curso(pedido_id: str) -> bool:
     return any(not t.done() for t in _tareas.get(pedido_id, set()))
 
 
-async def iniciar(pedido_id: str) -> dict[str, Any]:
-    """Lanza las respuestas de todos los proveedores. Idempotente mientras está cotizando."""
-    if en_curso(pedido_id):
-        return {"estado": "cotizando", "ya_estaba_en_curso": True}
-    inicio = time.time()
-    plan: dict[str, Any] = {"inicio": inicio, "proveedores": {}}
-    tareas = []
-    for prov in _proveedores_sim():
-        pid = prov["publico"]["id"]
-        demora = demora_de(pid, prov["privado"].get("demora_factor", 1.0))
-        plan["proveedores"][pid] = {"eta": inicio + demora}
-        tareas.append(asyncio.create_task(_responder(pedido_id, prov, demora)))
-    store.guardar_dict("simulaciones", pedido_id, plan)
-    pedidos.cambiar_estado(pedido_id, "cotizando")
+def _respuesta(estado: str, *, en_curso_ya: bool = False, ya_cotizado: bool = False) -> dict[str, Any]:
+    """Misma forma siempre, para que el frontend no tenga que adivinar claves."""
+    return {
+        "estado": estado,
+        "proveedores": len(_proveedores_sim()),
+        "ya_estaba_en_curso": en_curso_ya,
+        "ya_cotizado": ya_cotizado,
+    }
+
+
+def _lanzar(pedido_id: str, demoras: dict[str, float]) -> None:
+    sims = {p["publico"]["id"]: p for p in _proveedores_sim()}
+    tareas = [
+        asyncio.create_task(_responder(pedido_id, sims[pid], demora)) for pid, demora in demoras.items()
+    ]
     cierre = asyncio.create_task(_todas(pedido_id, tareas))
     _tareas[pedido_id] = {*tareas, cierre}
-    return {"estado": "cotizando", "proveedores": len(tareas)}
+
+
+def _cancelar(pedido_id: str) -> None:
+    for t in _tareas.pop(pedido_id, set()):
+        t.cancel()
+
+
+async def iniciar(pedido_id: str) -> dict[str, Any]:
+    """Lanza las respuestas de todos los proveedores.
+
+    Idempotente: si ya está corriendo o ya se cotizó, no relanza (para repetir: POST /reset).
+    Si el runtime se borró por fuera (rm -rf con el server vivo), cancela las tareas huérfanas.
+    """
+    hay_registro = store.obtener_dict("simulaciones", pedido_id) is not None
+    if en_curso(pedido_id):
+        if hay_registro:
+            return _respuesta("cotizando", en_curso_ya=True)
+        _cancelar(pedido_id)  # tareas de un runtime que ya no existe
+    pedido = pedidos.obtener(pedido_id)
+    if hay_registro and pedido is not None and pedido.estado != "nuevo":
+        return _respuesta(pedido.estado, ya_cotizado=True)
+    inicio = time.time()
+    demoras = {
+        p["publico"]["id"]: demora_de(p["publico"]["id"], p["privado"].get("demora_factor", 1.0))
+        for p in _proveedores_sim()
+    }
+    plan = {
+        "pedido_id": pedido_id,
+        "inicio": inicio,
+        "proveedores": {pid: {"eta": inicio + d} for pid, d in demoras.items()},
+    }
+    store.guardar_dict("simulaciones", pedido_id, plan)
+    pedidos.cambiar_estado(pedido_id, "cotizando")
+    _lanzar(pedido_id, demoras)
+    return _respuesta("cotizando")
+
+
+def reanudar() -> None:
+    """Al arrancar: relanza las respuestas que faltaban si el server se reinició cotizando."""
+    ahora = time.time()
+    for plan in store.valores("simulaciones"):
+        if not plan or en_curso(plan["pedido_id"]):
+            continue
+        pedido = pedidos.obtener(plan["pedido_id"])
+        if pedido is None or pedido.estado != "cotizando":
+            continue
+        respondieron = {
+            m["proveedor_id"] for m in store.valores("mensajes") if m["pedido_id"] == pedido.id
+        }
+        faltan = {
+            pid: max(datos["eta"] - ahora, 0.0)
+            for pid, datos in plan["proveedores"].items()
+            if pid not in respondieron
+        }
+        log.info("Reanudo la cotización de %s: faltan %s", pedido.id, sorted(faltan))
+        _lanzar(pedido.id, faltan)
+        trabados = [
+            MensajeCrudo.model_validate(m)
+            for m in store.valores("mensajes")
+            if m["pedido_id"] == pedido.id and m["estado"] in ("pendiente", "leyendo")
+        ]
+        for mensaje in trabados:  # quedaron a medio leer cuando se cortó el server
+            _tareas[pedido.id].add(asyncio.create_task(_reprocesar(mensaje)))
+
+
+async def _reprocesar(mensaje: MensajeCrudo) -> None:
+    try:
+        await procesar_mensaje(mensaje)
+    except Exception:  # noqa: BLE001 — queda en estado "error" con el motivo
+        pass
 
 
 def cancelar_todo() -> None:
-    for tareas in _tareas.values():
-        for t in tareas:
-            t.cancel()
-    _tareas.clear()
+    for pedido_id in list(_tareas):
+        _cancelar(pedido_id)
 
 
 def estado_proveedores(pedido_id: str) -> list[EstadoProveedor]:

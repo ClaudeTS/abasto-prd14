@@ -206,3 +206,111 @@ def test_reset_rapido(client):
     assert time.time() - inicio < 10
     assert client.get(f"/pedidos/{PEDIDO}/mensajes").json() == []
     assert client.get(f"/pedidos/{PEDIDO}").json()["estado"] == "nuevo"
+
+
+# ---------------------------------------------------------------- regresiones de la revisión
+def _con_demora(monkeypatch, segundos: float) -> None:
+    monkeypatch.setattr(config, "settings", dataclasses.replace(config.settings, sim_delay_seconds=segundos))
+
+
+def test_feed_muestra_leyendo(client, monkeypatch):
+    _con_demora(monkeypatch, 0.4)  # escala 0,1: "leyendo" dura 0,16 s
+    client.post(f"/pedidos/{PEDIDO}/cotizar")
+    vistos: set[str] = set()
+    limite = time.time() + 10
+    while time.time() < limite and "extraido" not in vistos:
+        for m in client.get(f"/pedidos/{PEDIDO}/mensajes").json():
+            if m["proveedor_id"] == "compuservice":
+                vistos.add(m["estado"])
+        time.sleep(0.02)
+    assert {"leyendo", "extraido"} <= vistos
+
+
+def test_confirmar_valida_el_body(client):
+    client.post(f"/pedidos/{PEDIDO}/cotizar")
+    _esperar_cotizaciones(client)
+    compu = next(
+        c for c in client.get(f"/pedidos/{PEDIDO}/cotizaciones").json() if c["proveedor_id"] == "compuservice"
+    )
+    url = f"/cotizaciones/{compu['id']}/confirmar"
+    mal_escrito = client.post(url, json={"incluyeIva": True})
+    assert mal_escrito.status_code == 422 and set(mal_escrito.json()) == {"error", "detalle"}
+    sin_body = client.post(url)
+    assert sin_body.status_code == 422 and "IVA" in sin_body.json()["error"]
+    texto_plano = client.post(url, content=b'{"incluye_iva": true}', headers={"Content-Type": "text/plain"})
+    assert texto_plano.status_code == 422  # antes: 500 por bytes no serializables
+    sigue = client.get(f"/pedidos/{PEDIDO}/cotizaciones").json()
+    assert next(c for c in sigue if c["id"] == compu["id"])["estado"] == "revisar"
+
+
+def test_errores_500_y_404_con_cors_y_forma_unica(monkeypatch):
+    from app import pipeline
+
+    def explota(*_a, **_k):
+        raise RuntimeError("boom")
+
+    origen = {"Origin": "http://localhost:5173"}
+    with TestClient(app, raise_server_exceptions=False) as c:
+        c.post("/reset")
+        c.post(f"/pedidos/{PEDIDO}/cotizar")
+        _esperar_cotizaciones(c)
+        cot = c.get(f"/pedidos/{PEDIDO}/cotizaciones").json()[0]
+        monkeypatch.setattr(pipeline, "confirmar", explota)
+        r = c.post(f"/cotizaciones/{cot['id']}/confirmar", json={"incluye_iva": True}, headers=origen)
+        assert r.status_code == 500 and r.json()["error"] == "Error interno del backend"
+        assert r.headers.get("access-control-allow-origin") == "http://localhost:5173"
+        r404 = c.get("/no/existe", headers=origen)
+        assert r404.status_code == 404 and set(r404.json()) == {"error", "detalle"}
+        c.post("/reset")
+
+
+def test_recotizar_no_duplica(client):
+    primero = client.post(f"/pedidos/{PEDIDO}/cotizar").json()
+    _esperar_cotizaciones(client)
+    segundo = client.post(f"/pedidos/{PEDIDO}/cotizar").json()
+    assert set(primero) == set(segundo)  # misma forma siempre
+    assert segundo["ya_cotizado"] is True and segundo["estado"] == "cotizado"
+    time.sleep(0.3)
+    assert len(client.get(f"/pedidos/{PEDIDO}/mensajes").json()) == 6
+    assert len(client.get(f"/pedidos/{PEDIDO}/cotizaciones").json()) == 6
+
+
+def test_confirmar_invalida_el_plan_viejo(client):
+    cots = _cotizar_y_confirmar(client)
+    assert client.post(f"/pedidos/{PEDIDO}/optimizar").status_code == 200
+    compu = next(c for c in cots if c["proveedor_id"] == "compuservice")
+    client.post(f"/cotizaciones/{compu['id']}/confirmar", json={"incluye_iva": False})
+    assert client.get(f"/pedidos/{PEDIDO}/plan").status_code == 404
+    assert client.get(f"/pedidos/{PEDIDO}").json()["estado"] == "cotizado"
+
+
+def test_negociar_proveedor_desconocido(client):
+    r = client.post(f"/pedidos/{PEDIDO}/negociar/zzz")
+    assert r.status_code == 404 and "desconocido" in r.json()["error"]
+
+
+def test_reanuda_si_el_server_se_reinicia_cotizando(monkeypatch):
+    _con_demora(monkeypatch, 0.4)  # papelera a los 4 s, el resto antes de 1 s
+    with TestClient(app) as c:
+        c.post("/reset")
+        c.post(f"/pedidos/{PEDIDO}/cotizar")
+        time.sleep(0.5)
+    # "se cayó el server": el lifespan canceló las tareas, el disco quedó a medias
+    with TestClient(app) as c:
+        assert c.get(f"/pedidos/{PEDIDO}").json()["estado"] in ("cotizando", "cotizado")
+        mensajes = _esperar_cotizaciones(c, timeout=15)
+        assert all(m["estado"] == "extraido" for m in mensajes)
+        assert c.get(f"/pedidos/{PEDIDO}").json()["estado"] == "cotizado"
+        c.post("/reset")
+
+
+def test_runtime_borrado_con_server_vivo(client, monkeypatch):
+    _con_demora(monkeypatch, 4)
+    client.post(f"/pedidos/{PEDIDO}/cotizar")
+    import shutil
+
+    shutil.rmtree(config.settings.runtime_dir)  # lo que hacía el viejo `make reset`
+    _con_demora(monkeypatch, 0)
+    r = client.post(f"/pedidos/{PEDIDO}/cotizar").json()
+    assert r["ya_estaba_en_curso"] is False and r["estado"] == "cotizando"
+    assert len(_esperar_cotizaciones(client)) == 6

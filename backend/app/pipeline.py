@@ -92,9 +92,14 @@ def modo_extraccion() -> str:
 async def extraer_crudo(mensaje: MensajeCrudo) -> tuple[dict[str, Any], str]:
     """Devuelve (salida cruda del extractor, origen 'llm'|'cache'|'fijo')."""
     modo = modo_extraccion()
-    clave_cache = f"extraccion_{mensaje.pedido_id}_{mensaje.proveedor_id}"
+    # /extraer (pedido "pruebas") no cachea: A prueba distintos textos para el mismo proveedor.
+    clave_cache = (
+        f"extraccion_{mensaje.pedido_id}_{mensaje.proveedor_id}"
+        if mensaje.pedido_id != "pruebas"
+        else None
+    )
     if modo == "llm":
-        if (en_cache := store.cache_leer(clave_cache)) is not None:
+        if clave_cache and (en_cache := store.cache_leer(clave_cache)) is not None:
             return en_cache, "cache"
         texto, imagen = obtener_texto(mensaje)
         try:
@@ -110,7 +115,8 @@ async def extraer_crudo(mensaje: MensajeCrudo) -> tuple[dict[str, Any], str]:
                 raise
             log.warning("Extracción LLM falló para %s (%s); uso fixture", mensaje.id, exc)
             return _crudo_fijo(mensaje.proveedor_id), "fijo"  # type: ignore[return-value]
-        store.cache_guardar(clave_cache, crudo)
+        if clave_cache:
+            store.cache_guardar(clave_cache, crudo)
         return crudo, "llm"
     if modo == "no_disponible":
         raise ExtraccionNoDisponible(
