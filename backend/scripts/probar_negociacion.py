@@ -1,81 +1,98 @@
-"""Prueba la Capa 5 contra el LLM real, sin levantar el server.
+"""Corre la negociación ensayada real (con el LLM) contra el gemelo de un proveedor.
 
-Uso (desde backend/, con ANTHROPIC_API_KEY en backend/.env):
-    python -m scripts.probar_negociacion            # Ofisillas, como en la demo
-    python -m scripts.probar_negociacion tecnoimport
+Uso, desde backend/ y con ANTHROPIC_API_KEY en .env:
+    python -m scripts.probar_negociacion                # Ofisillas, el caso de la demo
+    python -m scripts.probar_negociacion compuservice   # otro proveedor del plan
 
-Recorre cotizar → confirmar IVA → optimizar con datos fijos, ensaya la negociación con el
-proveedor elegido e imprime las 3 estrategias, tiempos y el mensaje propuesto. Usa un directorio
-de datos temporal: no toca el runtime de la demo.
+Arma el mismo contexto que POST /negociar (`scripts.demo.contexto_demo`: extracciones fijas,
+normalización y solver de C) y pasa por `integracion_a.negociar`, que pone la ganancia y valida la
+salida de `ensayar`. Verifica ARQUITECTURA §7 (< 40 s, mensaje de ≤ 80 palabras) y, para Ofisillas,
+que gane "volumen" como en el guion. Guarda el resultado en backend/data/runtime/ensayos/.
 """
 
-from __future__ import annotations
-
 import asyncio
-import os
+import json
 import sys
-import tempfile
 import time
 
-os.environ.setdefault("ABASTO_DATA_DIR", tempfile.mkdtemp(prefix="abasto_negociacion_"))
-os.environ["SIM_DELAY_SECONDS"] = "0"
+from app import config, integracion_a
+from app.llm import MODEL, LLMError
+from app.negociacion import LIMITE_SEGUNDOS, NO_ENSAYADA
+from scripts.demo import contexto_demo
 
-from fastapi.testclient import TestClient  # noqa: E402
-
-from app import config, negociacion  # noqa: E402
-from app.main import app  # noqa: E402
-from app.models import ContextoNegociacion  # noqa: E402
-
-PEDIDO = "pedido_demo_oct_2026"
+ESPERADA = {"ofisillas": "volumen"}  # PITCH_Y_DEMO.md, paso 5
+MAX_PALABRAS = 80
 
 
-def preparar_contexto(proveedor_id: str) -> ContextoNegociacion:
-    with TestClient(app) as c:
-        c.post("/reset")
-        c.post(f"/pedidos/{PEDIDO}/cotizar")
-        for _ in range(200):
-            m = c.get(f"/pedidos/{PEDIDO}/mensajes").json()
-            if len(m) == 6 and all(x["estado"] in ("extraido", "error") for x in m):
-                break
-            time.sleep(0.1)
-        for cot in c.get(f"/pedidos/{PEDIDO}/cotizaciones").json():
-            if "iva" in cot["campos_dudosos"]:
-                c.post(f"/cotizaciones/{cot['id']}/confirmar", json={"incluye_iva": True})
-        c.post(f"/pedidos/{PEDIDO}/optimizar")
-        # Sin pasar por /negociar: armamos el contexto igual que el endpoint.
-        from app import integracion_a, pedidos, pipeline, store
-        from app.models import Cotizacion, Plan
-
-        pedido = pedidos.obtener(PEDIDO)
-        plan = Plan.model_validate(store.obtener_dict("planes", PEDIDO))
-        return integracion_a.construir_contexto(
-            pedido,
-            plan,
-            store.listar("cotizaciones", Cotizacion, pedido_id=PEDIDO),
-            pipeline.proveedores(),
-            pipeline.perfil_privado(proveedor_id),
-            proveedor_id,
-            {p.id: p.nombre for p in pipeline.catalogo()},
-        )
-
-
-async def main(proveedor_id: str) -> None:
-    if not config.settings.anthropic_api_key:
-        sys.exit("Falta ANTHROPIC_API_KEY en backend/.env")
-    contexto = preparar_contexto(proveedor_id)
-    print(f"Negociando con {contexto.proveedor.nombre} · valor en juego $ {contexto.valor_en_juego_uyu:,.0f}")
+async def main(proveedor_id: str) -> int:
+    sys.stdout.reconfigure(encoding="utf-8")
+    try:
+        contexto = contexto_demo(proveedor_id)
+    except (KeyError, ValueError) as e:
+        print(f"ERROR: no se puede negociar con {proveedor_id}: {e}")
+        return 1
+    print(
+        f"Modelo: {MODEL} · negociación con {contexto.proveedor.nombre}"
+        f" · en juego $ {contexto.valor_en_juego_uyu}\n"
+    )
     inicio = time.perf_counter()
-    resultado = await negociacion.ensayar(contexto)
-    print(f"\nTardó {time.perf_counter() - inicio:.1f} s (objetivo < 40 s)\n")
-    for e in resultado["estrategias"]:
-        marca = "★" if e["nombre"] == resultado["elegida"] else " "
-        print(f"{marca} {e['nombre']:<12} {e['concesion_obtenida_pct']:5.2f} %  "
-              f"$ {e['ganancia_esperada_uyu']:>9,.0f}  riesgo {e['riesgo']}")
-        for t in e["transcripcion"]:
-            print(f"      {t['rol']:>9}: {t['texto']}")
-    print(f"\nMensaje propuesto ({len(resultado['mensaje_propuesto'].split())} palabras):\n")
-    print(resultado["mensaje_propuesto"])
+    try:
+        negociacion = await integracion_a.negociar(contexto)
+    except (LLMError, integracion_a.CapaNoDisponible) as e:
+        print(f"ERROR: {e}")
+        return 1
+    except TimeoutError as e:
+        print(f"ERROR: se venció el plazo de la negociación ({e})")
+        return 1
+    segundos = time.perf_counter() - inicio
+
+    for e in negociacion.estrategias:
+        marca = "  ← elegida" if e.nombre == negociacion.elegida else ""
+        print(
+            f"── {e.nombre}: {e.concesion_obtenida_pct:.2f} % · UYU {e.ganancia_esperada_uyu}"
+            f" · riesgo {e.riesgo}{marca}"
+        )
+        print(f"   {e.descripcion}")
+        for turno in e.transcripcion:
+            quien = "Abasto   " if turno["rol"] == "abasto" else "Proveedor"
+            print(f"   {quien} › {turno['texto']}")
+        print()
+    palabras = len(negociacion.mensaje_propuesto.split())
+    print(
+        f"Mensaje propuesto ({palabras} palabras):\n{negociacion.mensaje_propuesto}\n"
+    )
+
+    problemas = []
+    if segundos > LIMITE_SEGUNDOS:
+        problemas.append(f"tardó {segundos:.1f} s (> {LIMITE_SEGUNDOS} s)")
+    if palabras > MAX_PALABRAS:
+        problemas.append(f"el mensaje tiene {palabras} palabras (> {MAX_PALABRAS})")
+    fallidas = [
+        e.nombre
+        for e in negociacion.estrategias
+        if e.descripcion.startswith(NO_ENSAYADA)
+    ]
+    if fallidas:
+        problemas.append(f"no se pudieron ensayar: {', '.join(fallidas)}")
+    esperada = ESPERADA.get(proveedor_id)
+    if esperada and negociacion.elegida != esperada:
+        print(f"AVISO: el guion espera '{esperada}' y ganó '{negociacion.elegida}'.")
+
+    salida = (
+        config.settings.runtime_dir / "ensayos" / f"negociacion_{proveedor_id}.json"
+    )
+    salida.parent.mkdir(parents=True, exist_ok=True)
+    salida.write_text(
+        json.dumps(negociacion.model_dump(mode="json"), ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    print(
+        f"{segundos:.1f} s · "
+        + ("OK" if not problemas else "PROBLEMAS: " + " | ".join(problemas))
+    )
+    print(f"Guardado en {salida}")
+    return 1 if problemas else 0
 
 
 if __name__ == "__main__":
-    asyncio.run(main(sys.argv[1] if len(sys.argv) > 1 else "ofisillas"))
+    sys.exit(asyncio.run(main(sys.argv[1] if len(sys.argv) > 1 else "ofisillas")))

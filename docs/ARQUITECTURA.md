@@ -158,7 +158,7 @@ Pipeline por mensaje:
 
 1. **Obtener texto:**
    - `whatsapp_texto` → directo.
-   - `pdf` → `pdfplumber.extract_text()`; si devuelve < 50 caracteres, rasterizar la página y pasar a visión.
+   - `pdf` → `pdfplumber.extract_text()`; si devuelve < 50 caracteres (PDF escaneado), el PDF va al LLM como documento.
    - `foto` → LLM con la imagen adjunta.
    - `whatsapp_audio` → transcripción (Whisper) si `ENABLE_AUDIO=1`; si no, usar `contenido_texto` precargado.
 2. **Extraer + normalizar en una sola llamada** (prompt `extractor`, ver `PROMPTS.md`) con el catálogo de productos del pedido como contexto, para que mapee "tóner 85a" → `toner` pero no un "tóner compatible" si el catálogo pide original, y marque como dudoso lo que no esté claro.
@@ -226,10 +226,16 @@ Entradas: pedido, cotización del proveedor objetivo, mejor precio alternativo p
 proveedor (del simulador: `perfil_concesion`, `sensible_a`, `personalidad`).
 
 Para cada estrategia en `["competencia", "volumen", "plazo"]`:
-1. Correr 2 simulaciones de 3 rondas: turno de **Abasto** (prompt `negociador` con la estrategia) y turno del **gemelo** (prompt `proveedor_gemelo`, que conoce su precio de piso y su perfil, y responde en personaje). Temperatura 0.7.
-2. Al final, el gemelo emite su oferta final en JSON (`{"precio_final_por_item": {...}, "acepta": bool}`).
+1. Correr 2 simulaciones de 3 rondas: turno de **Abasto** (prompt `negociador` con la estrategia) y turno del **gemelo** (prompt `proveedor_gemelo`, que conoce su precio de piso y su perfil, y responde en personaje).
+2. Al final, el gemelo emite su oferta final en JSON (prompt `cierre_gemelo`: `acepta_negociar`, `precios_finales` por producto, `condicion`, `animo`). El código acota cada precio entre el piso del perfil y lo cotizado.
 3. `concesion_pct` = promedio de reducción vs. cotización original; `ganancia_esperada_uyu` = concesión × cantidades del plan.
-4. `riesgo`: "alto" si el gemelo mostró molestia o cortó; "bajo" si cerró en ≤ 2 rondas.
+4. `riesgo`: "alto" si el gemelo terminó molesto en alguna corrida; "bajo" si en todas terminó cordial y aceptó negociar; si no, "medio".
+
+Concesión y riesgo salen de las corridas que terminaron: una corrida que falla o no termina en 55 s
+se descarta. `competencia` solo se ensaya si otro proveedor cotiza más barato algún ítem (si no, no
+hay alternativa real que mencionar). Una estrategia sin corridas, porque no se ensayó o porque
+fallaron las dos, vuelve igual: al final de la lista, sin transcripción, con 0 % y riesgo "alto".
+Así la UI muestra siempre las 3 y esa estrategia nunca se elige.
 
 Elegida = mayor `ganancia_esperada_uyu` con riesgo ≠ alto (si todas son altas, la de mayor ganancia).
 Mensaje propuesto = prompt `redactar_mensaje` con la estrategia elegida, tono de WhatsApp, ≤ 80 palabras,
@@ -238,6 +244,11 @@ de las otras cotizaciones.
 
 Costo: 3 × 2 × 3 = 18 turnos de negociador + 18 del gemelo + 6 cierres. Paralelizar las 6 corridas con
 `asyncio.gather`. Objetivo: < 40 s en total.
+
+Plazos y errores (C corta `POST /negociar` a los 90 s): las corridas tienen 55 s y el mensaje final,
+lo que falte hasta 85 s. Si se vence el plazo, `ensayar` lanza `TimeoutError` y C responde 504. Si
+el LLM falla, lanza `NegociacionFallida`, que es un `CapaNoDisponible`, y C responde 501 con el
+motivo. En los dos casos el pedido vuelve a "optimizado".
 
 **Humano al mando:** nada se "envía" sin `POST /aprobar`. El mensaje es editable antes de aprobar.
 

@@ -1,66 +1,68 @@
-"""Capa 5 — Negociación ensayada. ARQUITECTURA §7, prompts de PROMPTS.md §3–§5.
+"""Capa 5 — Negociación ensayada contra el gemelo del proveedor (rol A, ARQUITECTURA.md §7).
 
-Para cada estrategia (competencia, volumen, plazo) se corren 2 simulaciones de hasta 3 rondas entre
-Abasto (prompt `negociador`) y el gemelo del proveedor (prompt `proveedor_gemelo`), que conoce su
-precio piso y su perfil. Al final el gemelo emite su oferta (`cierre_gemelo`) y el código mide la
-concesión. Las 6 corridas van en paralelo con asyncio.gather.
+Contrato con C: `ensayar(contexto)` recibe el `ContextoNegociacion` que arma
+`integracion_a.construir_contexto` (cantidades del plan, mejor alternativa real por ítem y el perfil
+privado del gemelo) y devuelve las 3 estrategias, la elegida y el mensaje propuesto.
 
-Los números los pone el código, no el LLM:
-- la concesión se calcula contra la cotización y se acota al piso del proveedor;
-- el backend (integracion_a.py) recalcula la ganancia y aplica la regla de elección de §7.
+Por cada estrategia (competencia, volumen, plazo) se corren 2 simulaciones de 3 rondas: Abasto
+(prompt `negociador`) contra el gemelo (prompt `proveedor_gemelo`), que conoce su piso y su perfil
+de concesión. Al final el gemelo da su oferta en JSON (`cierre_gemelo`). Las 6 corridas van en
+paralelo. El LLM solo conversa: la concesión y el respeto del piso se calculan acá (C recalcula la
+ganancia con la concesión). Nada se envía: el mensaje espera la aprobación de Compras.
 
-Contrato: `ensayar(contexto) -> dict` (docs/CONTRATO_BACKEND.md, "Para A").
+"competencia" solo se ensaya si otro proveedor cotiza más barato algún ítem. Una estrategia que no
+se ensaya, o cuyas corridas fallan todas, vuelve igual (sin transcripción, 0 % y riesgo alto, al
+final de la lista): la UI muestra las 3 y nunca se elige. Las corridas que no terminan en
+PLAZO_CORRIDAS_SEGUNDOS se descartan, así la respuesta llega antes de los 90 s de C.
+
+Errores, según cómo los trata C en `main.negociar`: si se vence el plazo, TimeoutError (504 y el
+pedido vuelve a "optimizado"); si el LLM falla, NegociacionFallida, que es un CapaNoDisponible
+(501 con el mensaje legible, también vuelve a "optimizado").
 """
 
 from __future__ import annotations
 
 import asyncio
 import logging
-import statistics
 import time
-from dataclasses import dataclass, field
-from decimal import Decimal
-from typing import Any, Literal
+from dataclasses import dataclass
+from decimal import ROUND_HALF_UP, Decimal
+from statistics import mean
+from typing import Literal
 
 from pydantic import BaseModel
 
-from app import llm
+from app import pipeline
+from app.integracion_a import CapaNoDisponible
+from app.llm import LLMError, cargar_prompt, pedir_json, pedir_texto
 from app.models import ContextoNegociacion
+from app.normalizacion import CENTAVO, fmt
 
 log = logging.getLogger("abasto.negociacion")
 
-ESTRATEGIAS: tuple[str, ...] = ("competencia", "volumen", "plazo")
-CORRIDAS = 2
-RONDAS = 3
-MAX_PALABRAS_MENSAJE = 80
-# AGENTS §6.6 pide temperatura 0,7 para negociador y gemelo; el llm.py de A todavía no expone
-# temperatura (usa salida estructurada con effort), así que la variación entre corridas sale del
-# propio modelo. Si A agrega el parámetro, pasarlo en _pedir().
-MAX_TOKENS_TURNO = 1024  # PROMPTS.md sugiere 300; con margen para que no corte por max_tokens
-MAX_TOKENS_CIERRE = 1024
-MAX_TOKENS_MENSAJE = 1024
-
+ESTRATEGIAS = ("competencia", "volumen", "plazo")
 DESCRIPCIONES = {
-    "competencia": "Mencionar la mejor cotización alternativa real, con nombre y precio.",
-    "volumen": "Ofrecer compromiso de compras futuras a cambio de mejor precio.",
+    "competencia": "Mencionar la mejor cotización alternativa, con nombre y precio reales.",
+    "volumen": "Comprometer compras futuras a cambio de mejor precio.",
     "plazo": "Ofrecer pago contado o anticipado a cambio de descuento.",
 }
-# Qué ofrece Abasto en la estrategia "volumen". Supuesto de negocio de la demo: para
-# equipamiento, puestos nuevos; para insumos, el pedido mensual.
-EQUIPAMIENTO = {"silla", "notebook"}
-COMPROMISO_EQUIPAMIENTO = "equipar 10 puestos más en los próximos tres meses"
-COMPROMISO_INSUMOS = "repetir este pedido todos los meses durante 6 meses"
+NO_ENSAYADA = "No se pudo ensayar"
+CORRIDAS = 2
+RONDAS = 3
+LIMITE_SEGUNDOS = 40  # objetivo de ARQUITECTURA §7 para toda la negociación
+PLAZO_CORRIDAS_SEGUNDOS = 55  # las corridas que no terminen se descartan
+PLAZO_TOTAL_SEGUNDOS = 85  # C corta POST /negociar a los 90 s
+# Productos del catálogo demo que se compran al equipar puestos; el resto es compra mensual.
+EQUIPAMIENTO = {"notebook", "silla"}
+POR_UNIDAD = {"unidad": "por unidad", "l": "por litro", "kg": "por kg"}
 
 
-# ---------------------------------------------------------------- esquemas de salida
-class TurnoAbasto(BaseModel):
-    texto: str
+class NegociacionFallida(CapaNoDisponible, LLMError):
+    """El LLM falló. Es un CapaNoDisponible para que C responda 501 con este mensaje y vuelva el
+    pedido a "optimizado"; un LLMError suelto le llega como 500 genérico y sin CORS."""
 
 
-class TurnoGemelo(BaseModel):
-    texto: str
-    cierra_trato: bool
-    molesto: bool
+# --- Esquema del cierre del gemelo (prompt `cierre_gemelo`, docs/PROMPTS.md §3) ---
 
 
 class PrecioFinal(BaseModel):
@@ -68,317 +70,455 @@ class PrecioFinal(BaseModel):
     precio: float
 
 
-class Cierre(BaseModel):
+class CierreGemelo(BaseModel):
     acepta_negociar: bool
-    precio_final_por_item: list[PrecioFinal]
-    condicion: str | None = None
+    precios_finales: list[PrecioFinal]
+    condicion: str | None
     animo: Literal["cordial", "neutral", "molesto"]
 
 
-class Redaccion(BaseModel):
-    mensaje: str
+@dataclass(frozen=True)
+class ItemNegociado:
+    producto_id: str
+    nombre: str
+    unidad: str
+    cantidad: Decimal
+    precio: Decimal  # cotizado, sin IVA, por unidad canónica
+    alternativa: (
+        str | None
+    )  # "Mueblería Rivera cotiza $ 9.800 … pero exige mínimo 20 …"
 
 
-class Texto(BaseModel):
-    texto: str
-
-
-# ---------------------------------------------------------------- resultado de una corrida
-@dataclass
+@dataclass(frozen=True)
 class Corrida:
     estrategia: str
-    transcripcion: list[dict[str, str]] = field(default_factory=list)
-    rondas: int = RONDAS
-    molesto: bool = False
-    cierre: Cierre | None = None
-    concesion_pct: float = 0.0
-    precios_finales: dict[str, Decimal] = field(default_factory=dict)
+    transcripcion: list[dict]
+    cierre: CierreGemelo
+    precios_finales: dict[str, Decimal]
+    ganancia: Decimal
+    concesion_pct: float
 
 
-# ---------------------------------------------------------------- formato
-def _monto(valor: Decimal | float) -> str:
-    return "$ " + f"{Decimal(str(valor)).quantize(Decimal(1)):,}".replace(",", ".")
+@dataclass(frozen=True)
+class Estrategia:
+    nombre: str
+    descripcion: str
+    transcripcion: list[dict]
+    concesion_obtenida_pct: float
+    riesgo: Literal["bajo", "medio", "alto"]
+
+    def como_dict(self) -> dict:
+        return {
+            "nombre": self.nombre,
+            "descripcion": self.descripcion,
+            "transcripcion": self.transcripcion,
+            "concesion_obtenida_pct": self.concesion_obtenida_pct,
+            "riesgo": self.riesgo,
+        }
 
 
-def _nombres() -> dict[str, str]:
-    from app.pipeline import catalogo  # import diferido: evita ciclos al cargar módulos
-
-    return {p.id: p.nombre for p in catalogo()}
-
-
-def _cotizacion_resumen(ctx: ContextoNegociacion, nombres: dict[str, str]) -> str:
-    c = ctx.cotizacion
-    lineas = [
-        f"- {nombres.get(i.producto_id, i.producto_id)}: {_monto(i.precio_unitario_sin_iva)} "
-        f"por unidad, sin IVA"
-        for i in c.items
-        if i.producto_id in {x.producto_id for x in ctx.items}
-    ]
-    condiciones = [
-        f"envío {_monto(c.costo_envio) if c.costo_envio else 'sin cargo'}",
-        f"pago {'contado' if c.plazo_pago_dias == 0 else f'a {c.plazo_pago_dias} días'}",
-        f"entrega en {c.lead_time_dias} días",
-    ]
-    return "\n".join(lineas) + "\nCondiciones: " + ", ".join(condiciones) + "."
+async def ensayar(contexto: ContextoNegociacion) -> dict:
+    """Ensaya las 3 estrategias contra el gemelo y propone el mensaje de la mejor."""
+    try:
+        return await _ensayar(contexto)
+    except LLMError as e:
+        raise NegociacionFallida(str(e)) from e
 
 
-def _items_plan(ctx: ContextoNegociacion, nombres: dict[str, str]) -> str:
-    return "\n".join(
-        f"- {nombres.get(i.producto_id, i.producto_id)}: {i.cantidad:g} × "
-        f"{_monto(i.precio_cotizado_sin_iva)} = {_monto(Decimal(str(i.cantidad)) * i.precio_cotizado_sin_iva)}"
-        for i in ctx.items
-    )
-
-
-def _alternativas(ctx: ContextoNegociacion, nombres: dict[str, str]) -> str:
-    lineas = []
-    for i in ctx.items:
-        if i.mejor_alternativa_precio is None:
-            continue
-        linea = (
-            f"- {i.mejor_alternativa_nombre} cotiza {nombres.get(i.producto_id, i.producto_id)} "
-            f"a {_monto(i.mejor_alternativa_precio)} sin IVA"
-        )
-        if i.mejor_alternativa_condicion:
-            linea += f" (ojo: {i.mejor_alternativa_condicion})"
-        lineas.append(linea)
-    return "\n".join(lineas) or "- No hay cotizaciones alternativas para estos ítems."
-
-
-def _compromiso(ctx: ContextoNegociacion) -> str:
-    if any(i.producto_id in EQUIPAMIENTO for i in ctx.items):
-        return COMPROMISO_EQUIPAMIENTO
-    return COMPROMISO_INSUMOS
-
-
-def _historial(turnos: list[dict[str, str]], proveedor: str) -> str:
-    if not turnos:
-        return "(todavía no hay mensajes; arrancás vos)"
-    nombre = {"abasto": "Abasto", "proveedor": proveedor}
-    return "\n".join(f"{nombre[t['rol']]}: {t['texto']}" for t in turnos)
-
-
-def _prompt(archivo: str, **variables: object) -> str:
-    """Como llm.cargar_prompt, pero admite la variable {{nombre}} (que choca con el primer
-    parámetro de cargar_prompt). Arreglo sugerido en llm.py: `def cargar_prompt(nombre, /, **v)`."""
-    texto = llm.cargar_prompt(archivo)
-    for clave, valor in variables.items():
-        texto = texto.replace("{{" + clave + "}}", str(valor))
-    return texto
-
-
-# ---------------------------------------------------------------- llamadas al LLM
-async def _pedir(system: str, user: str, esquema: type[BaseModel], max_tokens: int) -> Any:
-    return await llm.pedir_json(
-        system=system,
-        contenido=[{"type": "text", "text": user}],
-        esquema=esquema,
-        max_tokens=max_tokens,
-    )
-
-
-def _system_gemelo(ctx: ContextoNegociacion, resumen: str) -> str:
-    perfil = ctx.perfil_privado
-    return _prompt(
-        "proveedor_gemelo_system",
-        nombre=ctx.proveedor.nombre,
-        rubro=ctx.proveedor.rubro,
-        personalidad=perfil.get("personalidad", ""),
-        negocio=ctx.negocio,
-        cotizacion_resumen=resumen,
-        precio_piso_pct=perfil.get("precio_piso_pct", 0),
-        perfil_concesion=perfil.get("perfil_concesion", ""),
-        sensible_a="; ".join(perfil.get("sensible_a", [])) or "nada en particular",
-        insensible_a="; ".join(perfil.get("insensible_a", [])) or "nada en particular",
-    )
-
-
-async def _correr(ctx: ContextoNegociacion, estrategia: str, textos: dict[str, str]) -> Corrida:
-    """Una simulación: hasta RONDAS idas y vueltas + cierre del gemelo."""
-    corrida = Corrida(estrategia=estrategia)
-    proveedor = ctx.proveedor.nombre
-    system_abasto = _prompt(
-        "negociador_system",
-        negocio=ctx.negocio,
-        proveedor_nombre=proveedor,
-        estrategia=estrategia,
-        mejores_alternativas=textos["alternativas"],
-        compromiso_volumen=textos["compromiso"],
-    )
-    system_gemelo = _system_gemelo(ctx, textos["resumen"])
-    for ronda in range(1, RONDAS + 1):
-        historial = _historial(corrida.transcripcion, proveedor)
-        turno: TurnoAbasto = await _pedir(
-            system_abasto,
-            _prompt(
-                "negociador_user",
-                proveedor_nombre=proveedor,
-                negocio=ctx.negocio,
-                cotizacion_resumen=textos["resumen"],
-                items_plan=textos["items"],
-                mejores_alternativas=textos["alternativas"],
-                historial=historial,
-            ),
-            TurnoAbasto,
-            MAX_TOKENS_TURNO,
-        )
-        corrida.transcripcion.append({"rol": "abasto", "texto": turno.texto.strip()})
-        respuesta: TurnoGemelo = await _pedir(
-            system_gemelo,
-            _prompt(
-                "proveedor_gemelo_user",
-                negocio=ctx.negocio,
-                historial=_historial(corrida.transcripcion, proveedor),
-            ),
-            TurnoGemelo,
-            MAX_TOKENS_TURNO,
-        )
-        corrida.transcripcion.append({"rol": "proveedor", "texto": respuesta.texto.strip()})
-        corrida.molesto = corrida.molesto or respuesta.molesto
-        if respuesta.cierra_trato:
-            corrida.rondas = ronda
-            break
-    cierre_user = (
-        f"Conversación con {ctx.negocio}:\n{_historial(corrida.transcripcion, proveedor)}\n\n"
-        + _prompt("cierre_gemelo_user", nombre=proveedor)
-    )
-    corrida.cierre = await _pedir(system_gemelo, cierre_user, Cierre, MAX_TOKENS_CIERRE)
-    corrida.molesto = corrida.molesto or corrida.cierre.animo == "molesto"
-    _medir(corrida, ctx)
-    return corrida
-
-
-def _medir(corrida: Corrida, ctx: ContextoNegociacion) -> None:
-    """Concesión ponderada por el valor del plan, acotada a [0, piso del proveedor]."""
-    piso = Decimal(str(ctx.perfil_privado.get("precio_piso_pct", 0))) / 100
-    ofertas = {p.producto_id: Decimal(str(p.precio)) for p in corrida.cierre.precio_final_por_item}
-    total = ahorro = Decimal(0)
-    for item in ctx.items:
-        original = item.precio_cotizado_sin_iva
-        final = ofertas.get(item.producto_id, original) if corrida.cierre.acepta_negociar else original
-        final = min(max(final, original * (1 - piso)), original)  # nunca bajo el piso ni sobre lo cotizado
-        corrida.precios_finales[item.producto_id] = final
-        cantidad = Decimal(str(item.cantidad))
-        total += original * cantidad
-        ahorro += (original - final) * cantidad
-    corrida.concesion_pct = float(ahorro / total * 100) if total else 0.0
-
-
-def _riesgo(corridas: list[Corrida]) -> str:
-    if any(c.molesto for c in corridas):
-        return "alto"
-    if all(c.rondas <= 2 for c in corridas):
-        return "bajo"
-    return "medio"
-
-
-def _representativa(corridas: list[Corrida]) -> Corrida:
-    """La corrida más cercana al promedio: la que se muestra en la UI."""
-    promedio = statistics.mean(c.concesion_pct for c in corridas)
-    return min(corridas, key=lambda c: abs(c.concesion_pct - promedio))
-
-
-def _elegir(estrategias: list[dict[str, Any]]) -> str:
-    """ARQUITECTURA §7: mayor ganancia con riesgo ≠ alto; si todas son altas, la de mayor ganancia."""
-    candidatas = [e for e in estrategias if e["riesgo"] != "alto"] or estrategias
-    return max(candidatas, key=lambda e: e["ganancia_esperada_uyu"])["nombre"]
-
-
-# ---------------------------------------------------------------- mensaje final
-def _datos_reales(ctx: ContextoNegociacion, estrategia: str, textos: dict[str, str]) -> str:
-    partes = [f"Cotización de {ctx.proveedor.nombre}:\n{textos['resumen']}"]
-    if estrategia == "competencia":
-        partes.append(f"Mejores alternativas reales:\n{textos['alternativas']}")
-    elif estrategia == "volumen":
-        partes.append(f"Compromiso que se puede ofrecer: {textos['compromiso']}.")
-    else:
-        partes.append("Condición que se puede ofrecer: pago contado al recibir la mercadería.")
-    return "\n".join(partes)
-
-
-async def _redactar(
-    ctx: ContextoNegociacion, estrategia: str, corrida: Corrida, textos: dict[str, str]
-) -> str:
-    nombres = _nombres()
-    resultado = ", ".join(
-        f"{nombres.get(pid, pid)} a {_monto(precio)}" for pid, precio in corrida.precios_finales.items()
-    )
-    if corrida.cierre and corrida.cierre.condicion:
-        resultado += f" ({corrida.cierre.condicion})"
-    system = _prompt(
-        "redactar_mensaje_system",
-        negocio=ctx.negocio,
-        proveedor_nombre=ctx.proveedor.nombre,
-        estrategia=estrategia,
-        datos_reales=_datos_reales(ctx, estrategia, textos),
-    )
-    user = _prompt(
-        "redactar_mensaje_user",
-        estrategia=estrategia,
-        resultado=resultado,
-        transcripcion=_historial(corrida.transcripcion, ctx.proveedor.nombre),
-    )
-    redaccion: Redaccion = await _pedir(system, user, Redaccion, MAX_TOKENS_MENSAJE)
-    mensaje = redaccion.mensaje.strip()
-    if len(mensaje.split()) > MAX_PALABRAS_MENSAJE:
-        log.warning("El mensaje propuesto tiene %s palabras (máx. %s)", len(mensaje.split()), MAX_PALABRAS_MENSAJE)
-    return mensaje
-
-
-# ---------------------------------------------------------------- entrada pública
-async def ensayar(contexto: ContextoNegociacion) -> dict[str, Any]:
-    """Ensaya las 3 estrategias y propone el mensaje. Devuelve el dict del contrato."""
+async def _ensayar(contexto: ContextoNegociacion) -> dict:
     inicio = time.perf_counter()
-    nombres = _nombres()
-    textos = {
-        "resumen": _cotizacion_resumen(contexto, nombres),
-        "items": _items_plan(contexto, nombres),
-        "alternativas": _alternativas(contexto, nombres),
-        "compromiso": _compromiso(contexto),
+    items = items_negociados(contexto)
+    if not items:
+        raise ValueError(f"El plan no le compra nada a {contexto.proveedor.nombre}.")
+    ensayadas = [
+        e
+        for e in ESTRATEGIAS
+        if e != "competencia" or any(i.alternativa for i in items)
+    ]
+    corridas, errores = await correr_todas(contexto, items, ensayadas)
+    if not corridas:
+        # Un error del LLM dice más que un plazo vencido; si todas se cortaron, es TimeoutError.
+        raise next((e for e in errores if isinstance(e, LLMError)), errores[0])
+
+    estrategias = [
+        resumir(nombre, [c for c in corridas if c.estrategia == nombre])
+        for nombre in ensayadas
+        if any(c.estrategia == nombre for c in corridas)
+    ]
+    # Al final y con riesgo alto: si todas empatan en 0, C elige la primera de la lista.
+    for nombre in ESTRATEGIAS:
+        if all(e.nombre != nombre for e in estrategias):
+            estrategias.append(
+                SIN_COMPETENCIA if nombre not in ensayadas else sin_corridas(nombre)
+            )
+    elegida = elegir(estrategias, contexto.valor_en_juego_uyu)
+    restante = PLAZO_TOTAL_SEGUNDOS - (time.perf_counter() - inicio)
+    mensaje = await asyncio.wait_for(
+        redactar_mensaje(contexto, items, elegida), max(restante, 1.0)
+    )
+    duracion = time.perf_counter() - inicio
+    log.log(
+        logging.WARNING if duracion > LIMITE_SEGUNDOS else logging.INFO,
+        "Negociación con %s: %.1f s · elegida %s · %d/%d corridas",
+        contexto.proveedor.id,
+        duracion,
+        elegida.nombre,
+        len(corridas),
+        len(corridas) + len(errores),
+    )
+    return {
+        "estrategias": [e.como_dict() for e in estrategias],
+        "elegida": elegida.nombre,
+        "mensaje_propuesto": mensaje,
     }
+
+
+def sin_corridas(
+    nombre: str,
+    descripcion: str = f"{NO_ENSAYADA}: el LLM falló o no respondió a tiempo; probá negociar de nuevo.",
+) -> Estrategia:
+    return Estrategia(
+        nombre=nombre,
+        descripcion=descripcion,
+        transcripcion=[],
+        concesion_obtenida_pct=0.0,
+        riesgo="alto",
+    )
+
+
+SIN_COMPETENCIA = sin_corridas(
+    "competencia",
+    "No se ensayó: ningún otro proveedor cotiza más barato estos productos.",
+)
+
+
+async def correr_todas(
+    contexto: ContextoNegociacion, items: list[ItemNegociado], nombres: list[str]
+) -> tuple[list[Corrida], list[Exception]]:
+    """Las CORRIDAS de cada estrategia en paralelo. Una corrida que falla con LLMError o no
+    termina en PLAZO_CORRIDAS_SEGUNDOS (queda un TimeoutError) se descarta; cualquier otro error
+    se propaga."""
     tareas = [
-        _correr(contexto, estrategia, textos)
-        for estrategia in ESTRATEGIAS
+        asyncio.create_task(correr(contexto, items, nombre))
+        for nombre in nombres
         for _ in range(CORRIDAS)
     ]
-    resultados = await asyncio.gather(*tareas, return_exceptions=True)
+    try:
+        await asyncio.wait(tareas, timeout=PLAZO_CORRIDAS_SEGUNDOS)
+    finally:
+        for tarea in tareas:  # a las terminadas no les hace nada
+            tarea.cancel()
+    await asyncio.gather(*tareas, return_exceptions=True)
 
-    por_estrategia: dict[str, list[Corrida]] = {e: [] for e in ESTRATEGIAS}
-    errores: list[BaseException] = []
-    for resultado in resultados:
-        if isinstance(resultado, BaseException):
-            errores.append(resultado)
-            log.warning("Una corrida falló: %s", resultado)
+    corridas, errores = [], []
+    for tarea in tareas:
+        if tarea.cancelled():
+            error = TimeoutError(
+                f"La corrida no terminó en {PLAZO_CORRIDAS_SEGUNDOS} s."
+            )
+        elif isinstance(tarea.exception(), LLMError):
+            error = tarea.exception()
+        elif tarea.exception() is not None:
+            raise tarea.exception()
         else:
-            por_estrategia[resultado.estrategia].append(resultado)
-    if not any(por_estrategia.values()):
-        raise errores[0]  # todas fallaron: que el endpoint muestre el error real del LLM
+            corridas.append(tarea.result())
+            continue
+        log.warning("Corrida fallida: %s", error)
+        errores.append(error)
+    return corridas, errores
 
-    estrategias: list[dict[str, Any]] = []
-    representativas: dict[str, Corrida] = {}
-    for nombre, corridas in por_estrategia.items():
-        if not corridas:
-            continue  # si una estrategia falló entera, se muestran las otras
-        concesion = statistics.mean(c.concesion_pct for c in corridas)
-        representativa = _representativa(corridas)
-        representativas[nombre] = representativa
-        estrategias.append(
-            {
-                "nombre": nombre,
-                "descripcion": DESCRIPCIONES[nombre],
-                "transcripcion": representativa.transcripcion,
-                "concesion_obtenida_pct": round(concesion, 2),
-                "ganancia_esperada_uyu": float(contexto.valor_en_juego_uyu) * concesion / 100,
-                "riesgo": _riesgo(corridas),
-            }
+
+def items_negociados(contexto: ContextoNegociacion) -> list[ItemNegociado]:
+    """Los ítems del plan con nombre y unidad del catálogo y, si otro proveedor lo cotiza más
+    barato, esa alternativa real en texto (para la estrategia competencia)."""
+    catalogo = {p.id: p for p in pipeline.catalogo()}
+    descripciones = {
+        i.producto_id: i.descripcion_original for i in contexto.cotizacion.items
+    }
+    items = []
+    for i in contexto.items:
+        producto = catalogo.get(i.producto_id)
+        nombre = (
+            producto.nombre
+            if producto
+            else descripciones.get(i.producto_id) or i.producto_id
         )
-    elegida = _elegir(estrategias)
-    mensaje = await _redactar(contexto, elegida, representativas[elegida], textos)
-    log.info(
-        "Negociación con %s ensayada en %.1f s · elegida %s · %s",
-        contexto.proveedor.id,
-        time.perf_counter() - inicio,
-        elegida,
-        ", ".join(f"{e['nombre']} {e['concesion_obtenida_pct']} % ({e['riesgo']})" for e in estrategias),
+        unidad = producto.unidad_canonica if producto else "unidad"
+        alternativa = None
+        if (
+            i.mejor_alternativa_precio is not None
+            and i.mejor_alternativa_precio < i.precio_cotizado_sin_iva
+        ):
+            proveedor = i.mejor_alternativa_nombre or i.mejor_alternativa_proveedor_id
+            alternativa = (
+                f"{proveedor} cotiza $ {_fmt(i.mejor_alternativa_precio)}"
+                f" {POR_UNIDAD[unidad]} sin IVA"
+            )
+            if i.mejor_alternativa_condicion:
+                alternativa += f", pero {i.mejor_alternativa_condicion}"
+        items.append(
+            ItemNegociado(
+                producto_id=i.producto_id,
+                nombre=nombre,
+                unidad=unidad,
+                cantidad=Decimal(str(i.cantidad)),
+                precio=i.precio_cotizado_sin_iva,
+                alternativa=alternativa,
+            )
+        )
+    return items
+
+
+async def correr(
+    contexto: ContextoNegociacion, items: list[ItemNegociado], estrategia: str
+) -> Corrida:
+    """Una simulación: RONDAS turnos de Abasto y del gemelo, y el cierre del gemelo."""
+    nombre = contexto.proveedor.nombre
+    system_abasto = cargar_prompt(
+        "negociador_system",
+        negocio=contexto.negocio,
+        proveedor_nombre=nombre,
+        estrategia=estrategia,
+        mejores_alternativas=texto_alternativas(items),
+        compromiso_volumen=compromiso_volumen(items),
     )
-    return {"estrategias": estrategias, "elegida": elegida, "mensaje_propuesto": mensaje}
+    apertura = cargar_prompt(
+        "negociador_user",
+        proveedor_nombre=nombre,
+        cotizacion_resumen="\n".join(
+            f"- {linea}" for linea in resumen(contexto, items)
+        ),
+    )
+    system_gemelo = _system_gemelo(contexto, items)
+
+    transcripcion: list[dict] = []
+    for _ in range(RONDAS):
+        texto = await pedir_texto(
+            system=system_abasto, mensajes=_vista_abasto(apertura, transcripcion)
+        )
+        transcripcion.append({"rol": "abasto", "texto": texto})
+        texto = await pedir_texto(
+            system=system_gemelo, mensajes=_vista_gemelo(transcripcion)
+        )
+        transcripcion.append({"rol": "proveedor", "texto": texto})
+
+    cierre = await pedir_json(
+        system=system_gemelo,
+        historial=_vista_gemelo(transcripcion),
+        contenido=[
+            {"type": "text", "text": cargar_prompt("cierre_gemelo", nombre=nombre)}
+        ],
+        esquema=CierreGemelo,
+    )
+    precios = precios_finales(cierre, items, contexto.perfil_privado)
+    ganancia = sum(
+        ((i.precio - precios[i.producto_id]) * i.cantidad for i in items), Decimal(0)
+    )
+    base = sum((i.precio * i.cantidad for i in items), Decimal(0))
+    return Corrida(
+        estrategia=estrategia,
+        transcripcion=transcripcion,
+        cierre=cierre,
+        precios_finales=precios,
+        ganancia=ganancia.quantize(CENTAVO, ROUND_HALF_UP),
+        concesion_pct=float(ganancia / base * 100) if base else 0.0,
+    )
+
+
+def precios_finales(
+    cierre: CierreGemelo, items: list[ItemNegociado], perfil: dict
+) -> dict[str, Decimal]:
+    """Oferta final del gemelo, acotada entre su piso y lo cotizado.
+
+    Si no acepta negociar, o no menciona un producto, queda el precio cotizado.
+    """
+    piso_pct = Decimal(str(perfil.get("precio_piso_pct", 0)))
+    ofrecidos = {
+        p.producto_id: Decimal(str(p.precio))
+        for p in cierre.precios_finales
+        if p.precio > 0
+    }
+    precios = {}
+    for item in items:
+        precio = ofrecidos.get(item.producto_id, item.precio)
+        if not cierre.acepta_negociar:
+            precio = item.precio
+        piso = item.precio * (1 - piso_pct / 100)
+        precios[item.producto_id] = min(item.precio, max(piso, precio)).quantize(
+            CENTAVO, ROUND_HALF_UP
+        )
+    return precios
+
+
+def resumir(nombre: str, corridas: list[Corrida]) -> Estrategia:
+    """Promedia las corridas de una estrategia y muestra la transcripción de la mejor."""
+    mejor = max(corridas, key=lambda c: c.ganancia)
+    animos = {c.cierre.animo for c in corridas}
+    if "molesto" in animos:
+        riesgo = "alto"
+    elif animos == {"cordial"} and all(c.cierre.acepta_negociar for c in corridas):
+        riesgo = "bajo"
+    else:
+        riesgo = "medio"
+    descripcion = DESCRIPCIONES[nombre]
+    if mejor.cierre.condicion:
+        descripcion += (
+            f" Condición del proveedor: {mejor.cierre.condicion.rstrip('.')}."
+        )
+    return Estrategia(
+        nombre=nombre,
+        descripcion=descripcion,
+        transcripcion=mejor.transcripcion,
+        concesion_obtenida_pct=round(mean(c.concesion_pct for c in corridas), 2),
+        riesgo=riesgo,
+    )
+
+
+def ganancia(estrategia: Estrategia, valor_en_juego: Decimal) -> Decimal:
+    """La misma cuenta que hace C (integracion_a.negociar): valor en juego × concesión %."""
+    pct = Decimal(str(estrategia.concesion_obtenida_pct))
+    return (valor_en_juego * pct / 100).quantize(CENTAVO)
+
+
+def elegir(estrategias: list[Estrategia], valor_en_juego: Decimal) -> Estrategia:
+    """La regla de C (integracion_a._elegir), para que el mensaje sea el de la que muestra C:
+    mayor ganancia con riesgo distinto de alto; si todas son altas, la de mayor ganancia. En un
+    empate gana la primera de la lista."""
+    candidatas = [e for e in estrategias if e.riesgo != "alto"] or estrategias
+    return max(candidatas, key=lambda e: ganancia(e, valor_en_juego))
+
+
+async def redactar_mensaje(
+    contexto: ContextoNegociacion, items: list[ItemNegociado], elegida: Estrategia
+) -> str:
+    system = cargar_prompt(
+        "redactar_mensaje_system",
+        negocio=contexto.negocio,
+        proveedor_nombre=contexto.proveedor.nombre,
+        estrategia=elegida.nombre,
+        datos_reales="; ".join(datos_reales(contexto, items, elegida)),
+    )
+    return await pedir_texto(
+        system=system,
+        mensajes=[{"role": "user", "content": cargar_prompt("redactar_mensaje_user")}],
+    )
+
+
+def datos_reales(
+    contexto: ContextoNegociacion, items: list[ItemNegociado], elegida: Estrategia
+) -> list[str]:
+    """Lo único que puede usar el mensaje final: nada del gemelo salvo el % a pedir."""
+    datos = [
+        f"cotización de {contexto.proveedor.nombre}: "
+        + "; ".join(resumen(contexto, items))
+    ]
+    if elegida.nombre == "competencia":
+        datos.append(f"mejor alternativa: {texto_alternativas(items)}")
+    elif elegida.nombre == "volumen":
+        datos.append(f"compromiso a ofrecer: {compromiso_volumen(items)}")
+    else:
+        datos.append(
+            "condición a ofrecer: pago contado o anticipado"
+            f" (hoy la cotización es {_texto_plazo(contexto.cotizacion.plazo_pago_dias)})"
+        )
+    pct = round(elegida.concesion_obtenida_pct)
+    if pct >= 1:
+        objetivos = ", ".join(
+            f"{i.nombre} a $ {_fmt(i.precio * (100 - pct) / 100)} {POR_UNIDAD[i.unidad]}"
+            for i in items
+        )
+        datos.append(f"pedido concreto: {pct} % de descuento ({objetivos})")
+    else:
+        datos.append("pedido concreto: preguntar qué mejora de precio pueden hacer")
+    return datos
+
+
+def resumen(contexto: ContextoNegociacion, items: list[ItemNegociado]) -> list[str]:
+    """Una línea por producto que el plan le compra, más las condiciones."""
+    lineas = [
+        f"{i.nombre} [{i.producto_id}]: $ {_fmt(i.precio)} {POR_UNIDAD[i.unidad]} sin IVA"
+        f" × {_fmt(i.cantidad)} = $ {_fmt(i.precio * i.cantidad)}"
+        for i in items
+    ]
+    c = contexto.cotizacion
+    condiciones = [
+        "envío sin cargo" if not c.costo_envio else f"envío $ {_fmt(c.costo_envio)}",
+        f"pago {_texto_plazo(c.plazo_pago_dias)}",
+        f"entrega en {_dias(c.lead_time_dias)}",
+    ]
+    if c.pedido_minimo_total:
+        condiciones.append(f"pedido mínimo $ {_fmt(c.pedido_minimo_total)}")
+    return lineas + [", ".join(condiciones)]
+
+
+def texto_alternativas(items: list[ItemNegociado]) -> str:
+    partes = [f"{i.nombre}: {i.alternativa}" for i in items if i.alternativa]
+    if not partes:
+        return "ninguna (nadie cotiza más barato estos productos)"
+    return "; ".join(partes)
+
+
+def compromiso_volumen(items: list[ItemNegociado]) -> str:
+    equipos = [i.nombre for i in items if i.producto_id in EQUIPAMIENTO]
+    insumos = [i.nombre for i in items if i.producto_id not in EQUIPAMIENTO]
+    partes = []
+    if equipos:
+        partes.append(
+            "comprarle también lo de los próximos puestos que se equipen en los"
+            f" siguientes meses ({', '.join(equipos)})"
+        )
+    if insumos:
+        partes.append(f"repetir el pedido mensual ({', '.join(insumos)})")
+    return " y ".join(partes)
+
+
+def _texto_plazo(dias: int) -> str:
+    return "contado" if dias == 0 else f"a {_dias(dias)}"
+
+
+def _dias(dias: int) -> str:
+    return "1 día" if dias == 1 else f"{dias} días"
+
+
+def _lista(valor: object) -> str:
+    if isinstance(valor, (list, tuple)):
+        return ", ".join(str(v) for v in valor) or "nada en particular"
+    return str(valor or "nada en particular")
+
+
+def _system_gemelo(contexto: ContextoNegociacion, items: list[ItemNegociado]) -> str:
+    perfil = contexto.perfil_privado
+    return cargar_prompt(
+        "proveedor_gemelo_system",
+        nombre=contexto.proveedor.nombre,
+        rubro=contexto.proveedor.rubro,
+        personalidad=perfil.get("personalidad", ""),
+        negocio=contexto.negocio,
+        cotizacion_resumen="; ".join(resumen(contexto, items)),
+        precio_piso_pct=perfil.get("precio_piso_pct", 0),
+        perfil_concesion=perfil.get("perfil_concesion", ""),
+        sensible_a=_lista(perfil.get("sensible_a")),
+        insensible_a=_lista(perfil.get("insensible_a")),
+    )
+
+
+def _vista_abasto(apertura: str, transcripcion: list[dict]) -> list[dict]:
+    """La conversación desde Abasto: sus turnos son "assistant", los del proveedor "user"."""
+    return [{"role": "user", "content": apertura}] + [
+        {"role": "assistant" if t["rol"] == "abasto" else "user", "content": t["texto"]}
+        for t in transcripcion
+    ]
+
+
+def _vista_gemelo(transcripcion: list[dict]) -> list[dict]:
+    """La conversación desde el gemelo: los turnos de Abasto le llegan como "user"."""
+    return [
+        {"role": "user" if t["rol"] == "abasto" else "assistant", "content": t["texto"]}
+        for t in transcripcion
+    ]
+
+
+def _fmt(valor: Decimal | float) -> str:
+    """Monto en formato uruguayo, con centavos solo si los tiene: 10.900 · 178,69."""
+    d = Decimal(str(valor)).quantize(CENTAVO, ROUND_HALF_UP)
+    return fmt(d, 0 if d == d.to_integral_value() else 2)

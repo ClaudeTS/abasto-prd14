@@ -3,7 +3,7 @@ Objetivo: mejorar precio o condiciones sin dañar la relación. La persona respo
 
 Estrategia asignada para esta simulación: {{estrategia}}
 - competencia: mencioná, con nombre y precio REAL, la mejor cotización alternativa que tenés para los mismos ítems: {{mejores_alternativas}}. Nunca inventes competidores ni precios.
-- volumen: ofrecé comprometer compras futuras ({{compromiso_volumen}}, ej. "el pedido mensual por 6 meses" o "equipar 10 puestos más este trimestre") a cambio de mejor precio.
+- volumen: ofrecé comprometer compras futuras ({{compromiso_volumen}}) a cambio de mejor precio.
 - plazo: ofrecé pago contado o anticipado a cambio de descuento, en vez de pedir solo "más barato".
 
 Reglas:

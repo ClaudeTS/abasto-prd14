@@ -1,12 +1,15 @@
 # Prompts canónicos — Abasto
 
-Cada prompt vive en `backend/app/prompts/<nombre>.md` y se carga por nombre. Las variables van entre
-`{{ }}` y se reemplazan con `str.replace` o Jinja2. **No escribir prompts inline en el código.**
+Cada prompt vive en `backend/app/prompts/<nombre>.md` (o `<nombre>_system.md` y `<nombre>_user.md`
+cuando tiene las dos partes) y se carga por nombre con `llm.cargar_prompt`. Las variables van entre
+`{{ }}` y se reemplazan con `str.replace`. **No escribir prompts inline en el código.**
+`proveedor_responde.md` (del simulador) es la excepción: un solo archivo con las dos partes,
+separadas por la línea `=== USER ===`.
 
 Reglas comunes:
 - Todos los prompts que devuelven datos terminan con el esquema JSON y la frase "Respondé solo con el JSON, sin texto antes ni después, sin bloques de código."
-- Temperatura 0–0.2 para `extractor`, `explicar_plan`, `cierre_gemelo`; 0.7 para `proveedor_responde`, `proveedor_gemelo`, `negociador`, `redactar_mensaje`.
-- `max_tokens`: 1500 para extractor, 300 para turnos de negociación, 400 para explicaciones.
+- No se envía `temperature`: `claude-sonnet-5-5` no acepta parámetros de muestreo (devuelve error). Se usa `effort` `low` en todos los prompts.
+- `max_tokens`: 16000 en todas las llamadas. El thinking adaptativo cuenta dentro de ese límite, así que no sirve achicarlo para acortar la respuesta; el largo se pide en el prompt.
 
 ---
 
@@ -33,6 +36,9 @@ Reglas:
 Catálogo del pedido (producto_id → nombre, unidad canónica):
 {{catalogo}}
 
+Presentaciones con nombre (si el precio es por una de estas, escribí ese nombre exacto en unidad_original; si es por unidad, litro o kilo, escribí "unidad", "l" o "kg"; si es otra presentación, copiala tal como viene):
+{{unidades}}
+
 Proveedor: {{proveedor_nombre}} ({{rubro}})
 Canal: {{canal}}
 
@@ -47,18 +53,18 @@ Esquema de respuesta:
     {
       "producto_id": "string | null",
       "descripcion_original": "string",
-      "precio": number,
+      "precio": number | null,
       "moneda": "UYU" | "USD",
       "unidad_original": "string",
       "incluye_iva_original": boolean,
-      "cantidad_minima": number | null,
+      "cantidad_minima": number | null,      // en la misma unidad que unidad_original
       "evidencia": "string"
     }
   ],
-  "costo_envio": number,
+  "costo_envio": number | null,             // 0 si dice envío sin cargo
   "pedido_minimo_total": number | null,
-  "plazo_pago_dias": number,
-  "lead_time_dias": number,
+  "plazo_pago_dias": number | null,         // contado = 0
+  "lead_time_dias": number | null,
   "validez_dias": number | null,
   "observaciones": ["string"],
   "confianza": number,
@@ -68,8 +74,12 @@ Esquema de respuesta:
 Respondé solo con el JSON, sin texto antes ni después, sin bloques de código.
 ```
 
-Para `foto` y PDF rasterizado, el mensaje es la imagen adjunta y el texto del user dice
-"Mensaje: la imagen adjunta es el presupuesto."
+`{{unidades}}` son las presentaciones de la tabla `conversiones` de `pedido_demo.json`, para que la
+normalización de C las encuentre. Para `foto` el mensaje es la imagen adjunta y `{{mensaje}}` dice
+"(la imagen adjunta es el presupuesto)"; para un PDF escaneado (pdfplumber devuelve < 50 caracteres)
+el PDF va como documento y dice "(el PDF adjunto es el presupuesto)". Después de la respuesta, el
+código agrega `evidencia:<producto_id>` a `campos_dudosos` si la evidencia no aparece en el texto del
+mensaje (no bloquea la cotización).
 
 ---
 
@@ -114,7 +124,7 @@ Estás actuando como {{nombre}}, {{rubro}}, en una simulación de negociación. 
 Ya le pasaste a {{negocio}} esta cotización: {{cotizacion_resumen}}.
 Tu precio piso real (NUNCA lo reveles ni lo ofrezcas de entrada): hasta {{precio_piso_pct}}% por debajo de lo cotizado.
 Cómo negociás: {{perfil_concesion}}
-Sos sensible a: {{sensible_a}}  (ej. "que mencionen a un competidor con nombre y precio", "volumen comprometido por un mes", "pago contado")
+Sos sensible a: {{sensible_a}}
 No sos sensible a: {{insensible_a}}
 
 Reglas:
@@ -124,22 +134,26 @@ Reglas:
 - No digas que sos una IA.
 ```
 
+`{{sensible_a}}` llega con los valores reales del perfil (ej. "que mencionen a un competidor con
+nombre y precio", "pago contado"). Por eso el prompt no lleva ejemplos: el modelo los tomaría como
+parte de la persona.
+
 **User:** historial de la conversación como lista de turnos, terminando con el último mensaje de Abasto.
 
-### `cierre_gemelo` (misma persona, temperatura 0, al terminar las rondas)
+### `cierre_gemelo` (misma persona, al terminar las rondas)
 ```
 La conversación terminó. Como {{nombre}}, decidí tu oferta final coherente con lo que dijiste.
 Esquema:
 {
   "acepta_negociar": boolean,
-  "precio_final_por_item": [{ "producto_id": "string", "precio": number }],   // precio unitario sin IVA en tus unidades canónicas
-  "condicion": "string | null",                           // ej. "si pagan contado"
+  "precios_finales": [
+    { "producto_id": "string", "precio": number }   // uno por producto cotizado: precio unitario sin IVA, en la misma unidad que la cotización
+  ],
+  "condicion": "string | null",                     // ej. "si pagan contado"
   "animo": "cordial" | "neutral" | "molesto"
 }
 Respondé solo con el JSON, sin texto antes ni después, sin bloques de código.
 ```
-
-> `precio_final_por_item` es una lista y no un mapa: la salida estructurada necesita claves fijas en el esquema y los `producto_id` cambian con cada pedido.
 
 ---
 
@@ -152,7 +166,7 @@ Objetivo: mejorar precio o condiciones sin dañar la relación. La persona respo
 
 Estrategia asignada para esta simulación: {{estrategia}}
 - competencia: mencioná, con nombre y precio REAL, la mejor cotización alternativa que tenés para los mismos ítems: {{mejores_alternativas}}. Nunca inventes competidores ni precios.
-- volumen: ofrecé comprometer compras futuras ({{compromiso_volumen}}, ej. "el pedido mensual por 6 meses" o "equipar 10 puestos más este trimestre") a cambio de mejor precio.
+- volumen: ofrecé comprometer compras futuras ({{compromiso_volumen}}) a cambio de mejor precio.
 - plazo: ofrecé pago contado o anticipado a cambio de descuento, en vez de pedir solo "más barato".
 
 Reglas:
@@ -162,7 +176,18 @@ Reglas:
 - Si el proveedor ya cedió algo razonable, cerrá con cordialidad en vez de seguir apretando.
 ```
 
-**User:** contexto (cotización original resumida, cantidades del plan, mejores alternativas) + historial de turnos.
+`{{compromiso_volumen}}` lo arma el código según lo que el plan le compra al proveedor (ej. "repetir
+el pedido mensual", "equipar los próximos puestos"); sin ejemplos en el prompt, Abasto no ofrece un
+volumen que no salga del plan. `{{mejores_alternativas}}` solo trae proveedores que cotizan más barato;
+si no hay ninguno, dice "ninguna" y la estrategia competencia no se ensaya.
+
+**User:** el primer turno, y después el historial (los mensajes de Abasto como `assistant`, los del gemelo como `user`):
+```
+Cotización de {{proveedor_nombre}} y lo que el plan de compra le compra (precios sin IVA):
+{{cotizacion_resumen}}
+
+Escribí tu primer mensaje para {{proveedor_nombre}}.
+```
 
 ---
 
@@ -176,6 +201,8 @@ Formato: máximo 80 palabras, 1 o 2 párrafos cortos, tono cordial de responsabl
 Devolvé solo el texto del mensaje.
 ```
 
+**User:** `Escribí el mensaje.`
+
 ---
 
 ## 6. `explicar_plan` — Explicación del plan de compra
@@ -188,19 +215,26 @@ Recibís el resultado de un optimizador. NO cambies ningún número ni proveedor
 
 **User:**
 ```
-Plan calculado:
-{{asignaciones}}           // producto, proveedor, cantidad, precio, subtotal
+Plan calculado (producto, cantidad, proveedor, precio, subtotal):
+{{asignaciones}}
 Costo total: {{costo_total}} UYU (sin IVA, USD convertidos a {{tipo_cambio}}). Si compraba todo a {{habitual}}: {{baseline}}. Ahorro: {{ahorro}} ({{ahorro_pct}}%); sobre lo que el habitual vende: {{ahorro_pct_comparable}}%.
 Restricciones que influyeron: {{restricciones_activas}}
 Relajaciones (si hubo): {{relajaciones}}
-Casos donde NO se eligió al más barato: {{no_mas_barato}}   // ítem, más barato, elegido, motivo
+Casos donde NO se eligió al más barato (ítem, más barato, elegido, motivo): {{no_mas_barato}}
 
 Escribí 3 a 5 oraciones:
 1. Primero el ahorro y a cuántos proveedores se compra.
 2. Después, para cada caso donde no se eligió al más barato, el motivo en una frase (mínimo de pedido, plazo de entrega, envío, confiabilidad, plazo de pago).
 3. Si hubo relajaciones, decilo con transparencia.
-Sin listas, sin negritas, sin inventar datos.
+Sin listas, sin negritas, sin inventar datos. Copiá los montos y porcentajes tal como están arriba.
 ```
+
+Las aclaraciones de cada dato van en el prompt, no como comentario: el modelo las lee.
+
+Si la explicación trae un número que no está en los datos, ni siquiera redondeado, `explicar_plan`
+lo rechaza y C usa la plantilla. Un porcentaje tiene que ser uno de los porcentajes de los datos
+(`ahorro_pct`, `ahorro_pct_comparable`); "44 mil pesos" se compara como 44.000. Solo se toleran los
+enteros chicos que no son porcentajes ni montos, como "3 proveedores".
 
 ---
 
