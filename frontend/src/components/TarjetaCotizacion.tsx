@@ -17,7 +17,8 @@ const DUDOSOS: Record<string, string> = {
   producto: "si el producto es el pedido",
 };
 
-export const necesitaRevision = (c: Cotizacion) => c.confianza < 0.6 || c.campos_dudosos.length > 0;
+/** El backend decide qué hay que revisar (confianza baja o una duda que cambia el precio). */
+export const necesitaRevision = (c: Cotizacion) => c.estado === "revisar";
 
 export default function TarjetaCotizacion({
   cotizacion: c,
@@ -34,8 +35,8 @@ export default function TarjetaCotizacion({
 }) {
   const p = proveedor(c.proveedor_id);
   const canal = CANALES[p.canal_preferido];
-  const revisar = c.confianza < 0.6;
-  const ivaDudoso = c.campos_dudosos.includes("iva");
+  const revisar = necesitaRevision(c);
+  const ivaDudoso = revisar && c.campos_dudosos.includes("iva");
   const [confirmando, setConfirmando] = useState<boolean | null>(null);
   const ivas = new Set(c.items.map((i) => i.incluye_iva_original));
 

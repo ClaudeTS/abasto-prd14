@@ -184,7 +184,7 @@ function Comparativo({ demo, cotizaciones }: { demo: PedidoDemo; cotizaciones: C
                   {catalogo.find((p) => p.id === l.producto_id)?.nombre ?? l.producto_id}
                 </TableCell>
                 {items.map((item, k) => {
-                  const dudoso = !!item && cotizaciones[k].campos_dudosos.includes("iva");
+                  const dudoso = !!item && necesitaRevision(cotizaciones[k]) && cotizaciones[k].campos_dudosos.includes("iva");
                   return (
                     <TableCell
                       key={k}

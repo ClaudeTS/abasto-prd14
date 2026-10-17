@@ -151,7 +151,11 @@ function construirCotizacion(proveedorId: string, e: EstadoMock): Cotizacion {
   const x = EXTRACCIONES[proveedorId];
   const confirmado = e.ivaConfirmado[proveedorId];
   const dudosos = confirmado === undefined ? x.campos_dudosos : x.campos_dudosos.filter((c) => c !== "iva");
+  // Mismo criterio que el backend (CONTRATO_BACKEND.md): confianza < 0,6 o una duda que cambia el precio.
+  const estado =
+    confirmado !== undefined ? "confirmada" : x.confianza < 0.6 || dudosos.length > 0 ? "revisar" : "valida";
   return {
+    estado,
     id: `cot_${proveedorId}`,
     mensaje_id: `msg_${proveedorId}`,
     proveedor_id: proveedorId,
@@ -168,7 +172,7 @@ function construirCotizacion(proveedorId: string, e: EstadoMock): Cotizacion {
             ...x.observaciones.filter((o) => !/aclara.*IVA/i.test(o)),
             `IVA confirmado por quien compra: ${confirmado ? "precios con IVA incluido" : "precios más IVA"}`,
           ],
-    confianza: confirmado === undefined ? x.confianza : Math.max(x.confianza, 0.9),
+    confianza: confirmado === undefined ? x.confianza : 1,
     campos_dudosos: dudosos,
   };
 }

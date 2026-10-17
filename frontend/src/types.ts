@@ -103,6 +103,8 @@ export interface Cotizacion {
   observaciones: string[];
   confianza: number; // 0–1
   campos_dudosos: string[];
+  /** Lo decide el backend: "revisar" = borde amarillo y no entra al plan hasta confirmarla. */
+  estado: "valida" | "revisar" | "confirmada";
 }
 
 export interface Asignacion {

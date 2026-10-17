@@ -97,6 +97,7 @@ function normCotizacion(c: Cotizacion): Cotizacion {
     observaciones: c.observaciones ?? [],
     confianza: num(c.confianza ?? 1),
     campos_dudosos: c.campos_dudosos ?? [],
+    estado: c.estado ?? "valida",
   };
 }
 
@@ -134,15 +135,21 @@ function normNegociacion(n: Negociacion): Negociacion {
   };
 }
 
-/** Acepta {pedido, catalogo, config, conversiones} o un Pedido plano con esos campos adentro. */
+/** Acepta el PedidoCompleto del backend (plano, con tipo_cambio_usd e iva) o {pedido, catalogo, config, conversiones}. */
 function normPedidoDemo(raw: unknown): PedidoDemo {
   const r = raw as Partial<PedidoDemo> & Partial<Pedido> & Record<string, unknown>;
   const pedido = (r.pedido ?? r) as Pedido;
+  // El tipo de cambio lo manda el backend: es el que usó para convertir, así que es el que se muestra.
+  const config: ConfigCompra | undefined =
+    (r.config as ConfigCompra | undefined) ??
+    (r.tipo_cambio_usd != null
+      ? { moneda_base: "UYU", tipo_cambio_usd: num(r.tipo_cambio_usd), iva: num(r.iva ?? pedidoJson.config.iva) }
+      : undefined);
   return {
     pedido: { ...pedido, lineas: pedido.lineas.map((l) => ({ ...l, cantidad: num(l.cantidad) })) },
-    // Catálogo, config y conversiones son datos seedeados: si el backend no los manda, se usan los de data/.
+    // Catálogo y conversiones son datos seedeados: si el backend no los manda, se usan los de data/.
     catalogo: (r.catalogo as Producto[] | undefined) ?? (pedidoJson.catalogo as Producto[]),
-    config: (r.config as ConfigCompra | undefined) ?? (pedidoJson.config as ConfigCompra),
+    config: config ?? (pedidoJson.config as ConfigCompra),
     conversiones:
       (r.conversiones as Record<string, Conversion> | undefined) ??
       (pedidoJson.conversiones as Record<string, Conversion>),

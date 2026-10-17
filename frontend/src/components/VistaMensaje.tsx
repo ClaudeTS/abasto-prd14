@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ExternalLinkIcon, FileTextIcon, PlayIcon } from "lucide-react";
+import { ExternalLinkIcon, FileTextIcon, MicIcon } from "lucide-react";
 import { archivoUrl } from "@/api";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -36,10 +36,10 @@ export default function VistaMensaje({
           )}
         </div>
         {url ? (
+          // Sin sandbox: Chrome no abre su visor de PDF en iframes con sandbox. El archivo es de nuestro backend.
           <iframe
             title={`PDF de ${mensaje.proveedor_id}`}
-            src={url}
-            sandbox=""
+            src={url.startsWith("data:") ? url : `${url}#toolbar=0&navpanes=0&view=FitH`}
             className={cn("max-w-full rounded-md border bg-white", grande ? "h-[420px] w-full" : "h-64 w-[32rem]")}
           />
         ) : (
@@ -92,9 +92,15 @@ function Audio({ mensaje, evidencias, grande }: { mensaje: MensajeCrudo; evidenc
       {url ? (
         <audio controls src={url} className="w-72" />
       ) : (
-        <div className="flex w-72 items-center gap-3">
-          <span className="flex size-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
-            <PlayIcon className="ml-0.5 size-3.5 fill-current" />
+        // Sin archivo de audio (solo transcripción): nada de botón de play; el clic abre la transcripción.
+        <button
+          type="button"
+          onClick={() => setAbierto(!abierto)}
+          title="Audio transcripto por Abasto"
+          className="flex w-72 items-center gap-3 rounded-md text-left"
+        >
+          <span className="flex size-8 items-center justify-center rounded-full bg-muted text-muted-foreground">
+            <MicIcon className="size-4" />
           </span>
           <span className="flex h-7 flex-1 items-center gap-[3px]" aria-hidden>
             {Array.from({ length: 28 }, (_, i) => (
@@ -106,7 +112,7 @@ function Audio({ mensaje, evidencias, grande }: { mensaje: MensajeCrudo; evidenc
             ))}
           </span>
           <span className="text-xs text-muted-foreground tabular-nums">0:{String(segundos).padStart(2, "0")}</span>
-        </div>
+        </button>
       )}
       <Button variant="link" size="xs" className="h-auto px-0" onClick={() => setAbierto(!abierto)}>
         {abierto ? "Ocultar transcripción" : "Ver transcripción"}
