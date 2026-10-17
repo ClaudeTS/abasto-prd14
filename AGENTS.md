@@ -59,22 +59,31 @@ abasto/
 │   ├── PLAN_24H.md           ← cronograma y cortes
 │   ├── ARQUITECTURA.md       ← modelo de datos, endpoints, MILP
 │   ├── PROMPTS.md            ← prompts canónicos (copiar de acá, no inventar)
+│   ├── CONTRATO_BACKEND.md   ← endpoints reales y firmas que A implementa (leer antes de integrar)
 │   └── PITCH_Y_DEMO.md       ← guion de demo y pitch
 ├── data/
 │   ├── proveedores_sim.json  ← personas de los proveedores simulados
 │   ├── pedido_demo.json      ← compra mensual de la empresa demo (Tecnova S.A.)
-│   └── respuestas_fijas.json ← respuestas crudas de ejemplo (fixtures y fallback)
+│   ├── respuestas_fijas.json ← respuestas crudas de ejemplo (fixtures y fallback)
+│   └── extracciones_fijas.json ← salida esperada del extractor para esas respuestas
 ├── backend/
 │   ├── app/
 │   │   ├── main.py           ← FastAPI, routers
 │   │   ├── models.py         ← Pydantic: Producto, Proveedor, Cotizacion, Pedido, Plan, Negociacion
-│   │   ├── llm.py            ← cliente LLM único, helpers de JSON estructurado
-│   │   ├── extraccion.py     ← Capa 1
-│   │   ├── optimizacion.py   ← Capa 4 (PuLP)
-│   │   ├── negociacion.py    ← Capa 5
-│   │   ├── simulador.py      ← proveedores simulados
+│   │   ├── llm.py            ← (A) cliente LLM único, helpers de JSON estructurado
+│   │   ├── extraccion.py     ← (A) Capa 1: extraer_crudo()
+│   │   ├── explicacion.py    ← (A) explicar_plan()
+│   │   ├── negociacion.py    ← (A) Capa 5: ensayar()
+│   │   ├── config.py         ← (C) variables de entorno
+│   │   ├── normalizacion.py  ← (C) reglas post-LLM: moneda, IVA, unidades
+│   │   ├── pipeline.py       ← (C) mensaje → extracción → cotización (con fallback a fixtures)
+│   │   ├── optimizacion.py   ← (C) Capa 4 (PuLP)
+│   │   ├── integracion_a.py  ← (C) contexto de negociación y llamadas a las funciones de A
+│   │   ├── simulador.py      ← (C) proveedores simulados
+│   │   ├── archivos.py       ← (C) PDF y foto de los presupuestos simulados
+│   │   ├── pedidos.py        ← (C) pedido en runtime
 │   │   ├── prompts/          ← un .md por prompt, cargados por nombre
-│   │   └── store.py          ← lectura/escritura JSON
+│   │   └── store.py          ← (C) lectura/escritura JSON
 │   ├── tests/test_smoke.py
 │   ├── requirements.txt
 │   └── .env.example
@@ -109,7 +118,9 @@ ANTHROPIC_API_KEY=
 LLM_MODEL=claude-sonnet-5-5
 OPENAI_API_KEY=          # solo si ENABLE_AUDIO=1
 ENABLE_AUDIO=0
-SIM_DELAY_SECONDS=4      # demora simulada de respuesta de proveedores
+SIM_DELAY_SECONDS=4      # base 4 = demoras del guion (la papelera a los 40 s); 0 = instantáneo
+SIM_MODE=fijo            # fijo = respuestas de data/; llm = las genera el LLM y se cachean
+EXTRACCION_MODE=auto     # auto = LLM si está la Capa 1 y hay key, si no fixtures; fijo; llm
 ```
 
 ## 6. Reglas para trabajar con el LLM
