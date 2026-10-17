@@ -1,0 +1,61 @@
+{
+  "pedido": {
+    "id": "pedido_demo_oct_2026",
+    "negocio": "Tecnova S.A.",
+    "comprador": "Lucía (encargada de compras)",
+    "descripcion": "Compra mensual de octubre + equipamiento de 15 puestos nuevos",
+    "fecha": "2026-10-20",
+    "proveedor_habitual_id": "distribuidora_oriental",
+    "estado": "nuevo",
+    "lineas": [
+      { "producto_id": "notebook",      "cantidad": 10,  "necesario_para": "2026-10-28" },
+      { "producto_id": "silla",         "cantidad": 15,  "necesario_para": "2026-11-03" },
+      { "producto_id": "resma_a4",      "cantidad": 150, "necesario_para": "2026-10-23" },
+      { "producto_id": "toner",         "cantidad": 8,   "necesario_para": "2026-10-28" },
+      { "producto_id": "desinfectante", "cantidad": 60,  "necesario_para": "2026-10-23" }
+    ]
+  },
+  "catalogo": [
+    { "id": "notebook",      "nombre": "Notebook 15\" i5 / 16 GB / 512 GB",  "unidad_canonica": "unidad" },
+    { "id": "silla",         "nombre": "Silla ergonómica de oficina",       "unidad_canonica": "unidad" },
+    { "id": "resma_a4",      "nombre": "Resma papel A4 75 g (500 hojas)",  "unidad_canonica": "unidad" },
+    { "id": "toner",         "nombre": "Tóner HP 85A original",            "unidad_canonica": "unidad" },
+    { "id": "desinfectante", "nombre": "Desinfectante de pisos",           "unidad_canonica": "l" }
+  ],
+  "config": {
+    "moneda_base": "UYU",
+    "tipo_cambio_usd": 40.0,
+    "_nota_tipo_cambio": "Actualizar con la cotización del BCU del día de la demo. Toda conversión USD→UYU se hace en código y queda registrada en conversion_aplicada.",
+    "iva": 0.22
+  },
+  "conversiones": {
+    "caja de 5 resmas": { "factor": 5, "a": "unidad" },
+    "bidón de 5 L": { "factor": 5, "a": "l" },
+    "bidón de 20 L": { "factor": 20, "a": "l" },
+    "caja de 12": { "factor": 12, "a": "unidad" },
+    "docena": { "factor": 12, "a": "unidad" },
+    "pack de 10": { "factor": 10, "a": "unidad" }
+  },
+  "resultado_esperado_demo": {
+    "_nota": "Referencia para verificar el solver con estos datos (precios sin IVA, en UYU, por unidad canónica; USD a 40). Si cambian los datos o el tipo de cambio, recalcular.",
+    "precios_normalizados_sin_iva": {
+      "notebook":      { "tecnoimport": 31200.0, "compuservice": 27459.02 },
+      "toner":         { "tecnoimport": 3800.0, "compuservice": 3196.72, "distribuidora_oriental": 4600.0 },
+      "resma_a4":      { "papelera_del_sur": 178.69, "distribuidora_oriental": 235.0 },
+      "desinfectante": { "papelera_del_sur": 113.11, "distribuidora_oriental": 158.0 },
+      "silla":         { "muebleria_rivera": 9800.0, "ofisillas": 10900.0, "distribuidora_oriental": 12400.0 }
+    },
+    "plan_esperado": {
+      "notebook":      "compuservice (más barato aun con penalización por confiabilidad 0.8; cumple mínimo de 5)",
+      "toner":         "compuservice",
+      "resma_a4":      "papelera_del_sur",
+      "desinfectante": "papelera_del_sur",
+      "silla":         "ofisillas — NO el más barato: Mueblería Rivera cotiza 9.800 pero exige mínimo 20 unidades y se necesitan 15 (comprar 20 saldría 196.000 vs 164.700)"
+    },
+    "caso_para_mostrar_en_demo": "silla",
+    "oportunidad_negociacion_esperada": "ofisillas (brecha vs. mejor precio cotizado: (10900 − 9800) × 15 = 16.500). Es insensible a competencia; cede por pago contado (2–4 %) y más por compromiso de equipar más puestos (hasta 6 %). En la demo gana 'volumen'.",
+    "optimo_aprox": "notebooks 274.590 + tóner 25.574 + resmas 26.803 + desinfectante 6.787 + sillas 163.500 + envío Ofisillas 1.200 = 498.454",
+    "baseline_todo_al_habitual_aprox": "notebooks 274.590 (el habitual no vende; se toma el más barato) + tóner 36.800 + resmas 35.250 + desinfectante 9.480 + sillas 186.000 = 542.120",
+    "ahorro_aprox": "≈ 43.700 UYU (≈ 8 % del total). Excluyendo notebooks, que el habitual no vende, el ahorro sobre lo que sí vende es ≈ 16 %. Mostrar ambos números en la UI."
+  }
+}

@@ -1,0 +1,167 @@
+{
+  "_nota": "Campos 'publico' van al modelo Proveedor. Campos 'privado' solo los lee el simulador y el gemelo de negociacion. Precios en UYU salvo que se indique USD. Octubre 2026, Montevideo. Escenario: compra mensual de una empresa de servicios (Tecnova S.A., 80 personas).",
+  "proveedores": [
+    {
+      "publico": {
+        "id": "tecnoimport",
+        "nombre": "TecnoImport S.A.",
+        "rubro": "informática / importador",
+        "canal_preferido": "pdf",
+        "confiabilidad": 0.93
+      },
+      "privado": {
+        "personalidad": "Importador formal, responde una ejecutiva de cuentas. Cotiza en dólares más IVA, con PDF con membrete y validez corta por el tipo de cambio.",
+        "muletillas": "Estimados, adjunto cotización, precios en USD + IVA, quedo a disposición.",
+        "habitos": "Cotiza notebooks y tóner original en USD + IVA. Validez 5 días. Entrega 5 días hábiles. Pago 30 días. Sin mínimo. Envío sin cargo.",
+        "tabla_precios": {
+          "notebook": { "precio": 780, "moneda": "USD", "unidad": "unidad", "incluye_iva": false },
+          "toner":    { "precio": 95,  "moneda": "USD", "unidad": "unidad", "incluye_iva": false }
+        },
+        "envio": "sin cargo",
+        "pedido_minimo": "sin mínimo",
+        "plazo_pago": "30 días",
+        "lead_time": "5 días",
+        "precio_piso_pct": 6,
+        "perfil_concesion": "Cede 2 % por ronda ante competencia con precio real en pesos. Le interesa cerrar antes de que venza la cotización.",
+        "sensible_a": ["competidor con nombre y precio", "cierre inmediato de la orden"],
+        "insensible_a": ["pago contado (ya cobra a 30 días vía banco)"],
+        "demora_factor": 1.5
+      }
+    },
+    {
+      "publico": {
+        "id": "compuservice",
+        "nombre": "Compuservice",
+        "rubro": "informática / minorista",
+        "canal_preferido": "whatsapp_texto",
+        "confiabilidad": 0.8
+      },
+      "privado": {
+        "personalidad": "Local de informática de barrio, responde el dueño por WhatsApp, rápido y telegráfico. Buen precio en pesos, pero no aclara el IVA y a veces no tiene stock.",
+        "muletillas": "Hola! Notebook 33500. Toner 3900. Dale avisame.",
+        "habitos": "Cotiza en pesos con IVA incluido pero casi nunca lo dice. Mínimo 5 notebooks. Entrega 3 días. Contado.",
+        "tabla_precios": {
+          "notebook": { "precio": 33500, "moneda": "UYU", "unidad": "unidad", "incluye_iva": true, "cantidad_minima": 5 },
+          "toner":    { "precio": 3900,  "moneda": "UYU", "unidad": "unidad", "incluye_iva": true }
+        },
+        "envio": "sin cargo",
+        "pedido_minimo": "sin mínimo",
+        "plazo_pago": "contado",
+        "lead_time": "3 días",
+        "precio_piso_pct": 5,
+        "perfil_concesion": "Ya está ajustado. Cede 3–5 % solo por pago contado anticipado o por compra recurrente mensual.",
+        "sensible_a": ["pago anticipado", "compra recurrente"],
+        "insensible_a": ["competencia (dice que los importadores cotizan en dólares y después te cambian el precio)"],
+        "demora_factor": 0.5
+      }
+    },
+    {
+      "publico": {
+        "id": "papelera_del_sur",
+        "nombre": "Papelera del Sur",
+        "rubro": "papelería / limpieza mayorista",
+        "canal_preferido": "whatsapp_audio",
+        "confiabilidad": 0.86
+      },
+      "privado": {
+        "personalidad": "Vendedora de ruta, manda audios largos mientras maneja, cuenta cómo viene el precio del papel. Tarda porque está visitando clientes a la mañana.",
+        "muletillas": "Mirá, te cuento, la verdad, ponele, cualquier cosa me mandás audio.",
+        "habitos": "Cotiza el papel por caja de 5 resmas y el desinfectante por bidón de 5 L. Precios con IVA incluido, lo dice al pasar. Entrega al día siguiente, sin cargo arriba de 5000. Contado.",
+        "tabla_precios": {
+          "resma_a4":     { "precio": 1090, "moneda": "UYU", "unidad": "caja de 5 resmas", "incluye_iva": true },
+          "desinfectante": { "precio": 690, "moneda": "UYU", "unidad": "bidón de 5 L", "incluye_iva": true }
+        },
+        "envio": "sin cargo arriba de 5000 pesos",
+        "pedido_minimo": "sin mínimo",
+        "plazo_pago": "contado",
+        "lead_time": "1 día",
+        "precio_piso_pct": 7,
+        "perfil_concesion": "Cede si le hablan de pedido mensual fijo. Se ofende si le mencionan a otra papelera.",
+        "sensible_a": ["pedido mensual comprometido", "sumar más productos al pedido"],
+        "insensible_a": ["competencia (se ofende)", "pago contado (ya cobra contado)"],
+        "demora_factor": 6.0
+      }
+    },
+    {
+      "publico": {
+        "id": "muebleria_rivera",
+        "nombre": "Mueblería Rivera",
+        "rubro": "mobiliario de oficina / fabricante",
+        "canal_preferido": "foto",
+        "confiabilidad": 0.9
+      },
+      "privado": {
+        "personalidad": "Fabricante de Canelones, mayor, escribe el presupuesto en un papel y manda la foto. Letra grande, telegráfico. Serio y cumplidor.",
+        "muletillas": "Silla ergo mod. 2 — x unidad — s/iva — min 20.",
+        "habitos": "Cotiza por unidad, anota 's/iva'. Mínimo 20 unidades porque fabrica por lote. Pide 50 % de anticipo. Entrega en 10 días.",
+        "tabla_precios": {
+          "silla": { "precio": 9800, "moneda": "UYU", "unidad": "unidad", "incluye_iva": false, "cantidad_minima": 20 }
+        },
+        "envio": "sin cargo",
+        "pedido_minimo": "20 unidades",
+        "plazo_pago": "50 % anticipo, saldo contra entrega",
+        "lead_time": "10 días",
+        "precio_piso_pct": 5,
+        "perfil_concesion": "Cede 3–5 % solo si completan el lote de 20 o pagan todo por adelantado.",
+        "sensible_a": ["pago anticipado total", "completar el lote de 20"],
+        "insensible_a": ["competencia", "pedido recurrente (fabrica a pedido, no puede escalar)"],
+        "demora_factor": 2.0
+      }
+    },
+    {
+      "publico": {
+        "id": "ofisillas",
+        "nombre": "Ofisillas",
+        "rubro": "mobiliario de oficina / distribuidor",
+        "canal_preferido": "whatsapp_texto",
+        "confiabilidad": 0.84
+      },
+      "privado": {
+        "personalidad": "Distribuidor de sillas importadas con showroom. Responde el vendedor por WhatsApp, prolijo y comercial.",
+        "muletillas": "Buenas! Te paso: silla ergonómica mod. Prime $10.900 + IVA c/u. Envío $1.200. Entrega 7 días hábiles. Pago 30 días. Sin mínimo. Quedo atento.",
+        "habitos": "Cotiza por unidad, más IVA, lo aclara siempre. Sin mínimo. Envío 1200. Entrega 7 días. Pago 30 días.",
+        "tabla_precios": {
+          "silla": { "precio": 10900, "moneda": "UYU", "unidad": "unidad", "incluye_iva": false }
+        },
+        "envio": "1200 pesos",
+        "pedido_minimo": "sin mínimo",
+        "plazo_pago": "30 días",
+        "lead_time": "7 días",
+        "precio_piso_pct": 8,
+        "perfil_concesion": "Cede 2–4 % por pago contado y hasta 6 % si le prometen equipar más puestos en los próximos meses. Si le mencionan al fabricante de Canelones responde que ese exige 20 unidades y no cede.",
+        "sensible_a": ["pago contado", "compra futura de más puestos"],
+        "insensible_a": ["competencia (sabe que Mueblería Rivera exige mínimo 20)"],
+        "demora_factor": 1.2
+      }
+    },
+    {
+      "publico": {
+        "id": "distribuidora_oriental",
+        "nombre": "Distribuidora Oriental",
+        "rubro": "distribuidora de insumos de oficina y limpieza",
+        "canal_preferido": "whatsapp_texto",
+        "confiabilidad": 0.88
+      },
+      "privado": {
+        "personalidad": "Vendedor de distribuidora grande, proveedor habitual de Tecnova. Manda la lista completa por WhatsApp, cómodo de tratar, pero no es el más barato en casi nada.",
+        "muletillas": "Buen día Lucía! Te paso lista. Precios + IVA. Mínimo de compra $ 8.000. Pago a 30 como siempre.",
+        "habitos": "Cotiza todo por unidad o por bidón de 5 L, más IVA. No vende notebooks. Mínimo 8000. Pago 30 días. Entrega 2 días. Envío sin cargo.",
+        "tabla_precios": {
+          "resma_a4":      { "precio": 235,   "moneda": "UYU", "unidad": "unidad", "incluye_iva": false },
+          "toner":         { "precio": 4600,  "moneda": "UYU", "unidad": "unidad", "incluye_iva": false },
+          "desinfectante": { "precio": 790,   "moneda": "UYU", "unidad": "bidón de 5 L", "incluye_iva": false },
+          "silla":         { "precio": 12400, "moneda": "UYU", "unidad": "unidad", "incluye_iva": false }
+        },
+        "envio": "sin cargo",
+        "pedido_minimo": "8000 pesos",
+        "plazo_pago": "30 días",
+        "lead_time": "2 días",
+        "precio_piso_pct": 8,
+        "perfil_concesion": "Cede 2 % por ronda ante competencia con precio. Le importa mucho no perder al cliente habitual.",
+        "sensible_a": ["competidor con nombre y precio", "riesgo de perder al cliente habitual"],
+        "insensible_a": ["pago contado (ya financia a 30 días y lo usa como ventaja)"],
+        "demora_factor": 1.0
+      }
+    }
+  ]
+}

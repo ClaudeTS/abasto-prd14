@@ -1,0 +1,52 @@
+{
+  "_nota": "Respuestas crudas de los 6 proveedores al pedido_demo. Uso: (1) fixtures para probar el extractor, (2) fallback del simulador si se corta la generación con LLM. Para 'pdf' el contenido es HTML a renderizar; para 'foto' es el texto que va en la imagen generada (o usar data/img/rivera.jpg si existe); para 'whatsapp_audio' es la transcripción.",
+  "respuestas": [
+    {
+      "proveedor_id": "distribuidora_oriental",
+      "canal": "whatsapp_texto",
+      "demora_segundos": 4,
+      "contenido": "Buen día Lucía! Te paso lista de octubre. Precios + IVA.\nResma A4 75g $235\nTóner HP 85A original $4.600\nDesinfectante de pisos bidón 5L $790\nSilla ergonómica $12.400\nNotebooks no manejamos.\nMínimo de compra $8.000. Pago a 30 como siempre. Entrega en 48hs. Cualquier cosa me decís 👍"
+    },
+    {
+      "proveedor_id": "compuservice",
+      "canal": "whatsapp_texto",
+      "demora_segundos": 2,
+      "contenido": "Hola! Notebook 15 i5 16gb 512 33500. Toner 85a 3900. Minimo 5 notebooks. Entrego en 3 dias. Contado. Dale avisame",
+      "_nota": "Ambiguo a propósito: no dice si incluye IVA (incluye). El extractor debe marcar 'iva' en campos_dudosos y la UI mostrar 'Revisar'. En la demo, Lucía confirma con un clic o Abasto manda la repregunta automática ('¿Los precios son con IVA incluido?')."
+    },
+    {
+      "proveedor_id": "ofisillas",
+      "canal": "whatsapp_texto",
+      "demora_segundos": 5,
+      "contenido": "Buenas Lucía! Te paso: silla ergonómica mod. Prime, respaldo mesh, apoyabrazos regulables, $10.900 + IVA c/u. Envío $1.200. Entrega 7 días hábiles. Pago 30 días. Sin mínimo. Quedo atento, saludos!"
+    },
+    {
+      "proveedor_id": "tecnoimport",
+      "canal": "pdf",
+      "demora_segundos": 6,
+      "contenido": "<h2>TecnoImport S.A.</h2><p>RUT 21.xxx.xxx.0015 · Av. Italia 3850, Montevideo · Cotización N.º C-2026-0931 · Fecha: 20/10/2026</p><p>Cliente: Tecnova S.A. · Atn.: Lucía</p><table><tr><th>Ítem</th><th>Descripción</th><th>Cantidad</th><th>Precio unitario (USD)</th><th>Subtotal (USD)</th></tr><tr><td>1</td><td>Notebook 15.6\" Core i5 / 16 GB RAM / 512 GB SSD / Win 11 Pro</td><td>10</td><td>780,00</td><td>7.800,00</td></tr><tr><td>2</td><td>Tóner HP 85A original (CE285A)</td><td>8</td><td>95,00</td><td>760,00</td></tr></table><p>Precios expresados en dólares americanos, <b>más IVA</b>. Pagaderos en pesos uruguayos al tipo de cambio BCU del día de facturación. Envío sin cargo en Montevideo. Condición de pago: 30 días fecha factura. Plazo de entrega: 5 días hábiles. <b>Validez de la cotización: 5 días</b> (sujeto a variación del tipo de cambio).</p><p>Quedamos a disposición.</p>"
+    },
+    {
+      "proveedor_id": "muebleria_rivera",
+      "canal": "foto",
+      "demora_segundos": 8,
+      "contenido": "TECNOVA\nSilla ergo mod. 2 ... 9.800 x unidad s/iva\nminimo 20 unid (lote)\n50% anticipo, resto contra entrega\nentrega 10 dias\nRivera",
+      "_nota": "Generar imagen con PIL: fondo papel (#f4ecd8), fuente manuscrita (Caveat/Patrick Hand descargada en data/fonts/), leve rotación de 2°. O usar data/img/rivera.jpg precargada."
+    },
+    {
+      "proveedor_id": "papelera_del_sur",
+      "canal": "whatsapp_audio",
+      "demora_segundos": 40,
+      "contenido": "Hola Lucía cómo andás, mirá, te cuento, recién salgo de un cliente, el papel está más o menos esta semana eh, la caja de cinco resmas te la dejo a mil noventa, ponele, que te viene bien porque el mes que viene aumenta seguro por el dólar. El desinfectante de pisos, el bidón de cinco litros, seiscientos noventa. Todo con el IVA adentro ya, vos sabés que yo te paso el precio final. Te lo llevo mañana, sin cargo si pasás los cinco mil, que vas a pasar. Tóner no manejo, eso no. Cualquier cosa me mandás audio, dale, beso.",
+      "_nota": "La que tarda. En la demo, a los ~25 s mostrar 'Papelera del Sur no respondió todavía · Abasto va a insistir en 30 min' y a los 40 s llega el audio. Si hay TTS, generar mp3 con voz femenina rioplatense; si no, mostrar burbuja 🎤 con la transcripción."
+    }
+  ],
+  "cotizaciones_esperadas_resumen": {
+    "distribuidora_oriental": "4 ítems, sin IVA, envío 0, mínimo total 8000, plazo 30 días, lead 2, observación 'no maneja notebooks'",
+    "compuservice": "notebook 33500 y tóner 3900 con 'iva' en campos_dudosos (incluyen IVA), notebook cantidad_minima 5, contado, lead 3 → confianza < 0.6",
+    "ofisillas": "silla 10900 sin IVA, envío 1200, sin mínimo, plazo 30 días, lead 7",
+    "tecnoimport": "notebook USD 780 y tóner USD 95 sin IVA, moneda USD (convertir en código con tipo_cambio_usd), envío 0, plazo 30 días, lead 5, validez 5, observación 'sujeto a tipo de cambio'",
+    "muebleria_rivera": "silla 9800 sin IVA, cantidad_minima 20, plazo '50 % anticipo' (tratar como 0 días), lead 10",
+    "papelera_del_sur": "resma 1090 por caja de 5 con IVA, desinfectante 690 por bidón de 5 L con IVA, envío 0 sobre 5000, contado, lead 1, observación 'aumenta el mes que viene'"
+  }
+}
