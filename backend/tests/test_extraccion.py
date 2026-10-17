@@ -99,7 +99,7 @@ def test_salida_cruda_sin_convertir_y_c_la_normaliza_a_lo_esperado(llm, proveedo
     assert cotizacion.estado in ("valida", "confirmada")
 
 
-def test_el_prompt_lleva_catalogo_presentaciones_y_mensaje(llm):
+def test_el_prompt_lleva_catalogo_presentaciones_comprador_y_mensaje(llm):
     falso = llm(FIJAS["papelera_del_sur"])
     extraer("papelera_del_sur", texto=texto_de("papelera_del_sur"))
 
@@ -109,6 +109,7 @@ def test_el_prompt_lleva_catalogo_presentaciones_y_mensaje(llm):
     assert "- resma_a4 → Resma papel A4 75 g (500 hojas) (unidad)" in user
     assert "- caja de 5 resmas" in user and "- bidón de 5 L" in user
     assert "Proveedor: Papelera del Sur" in user
+    assert "Comprador: Tecnova S.A." in user
     assert "Canal: whatsapp_audio" in user
     assert RESPUESTAS["papelera_del_sur"]["contenido"].strip() in user
     assert "{{" not in user and "{{" not in falso.llamadas[0]["system"]

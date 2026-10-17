@@ -5,6 +5,7 @@ Presentaciones con nombre (si el precio es por una de estas, escribí ese nombre
 {{unidades}}
 
 Proveedor: {{proveedor_nombre}} ({{rubro}})
+Comprador: {{comprador}}
 Canal: {{canal}}
 
 Mensaje:
