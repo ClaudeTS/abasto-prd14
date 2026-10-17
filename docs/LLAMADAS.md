@@ -42,6 +42,11 @@ geográfico de Uruguay habilitado.
 
 ## 2. ElevenLabs: el agente
 
+> **Ya creado (17/10):** agente **"Abasto compras"**, `ELEVENLABS_AGENT_ID=agent_7201m560dk4mff6s7xypjpk5rgs7`.
+> Voz Melisa (rioplatense), LLM `claude-haiku-5-5` (temp. 0,3), zona `America/Montevideo`, End call habilitado,
+> data collection `acuerdo` / `precio_acordado` / `condicion`, resúmenes en español. Lo de abajo queda como
+> referencia para recrearlo.
+
 En ElevenLabs → **Agents** → crear un agente nuevo, por ejemplo "Abasto compras".
 
 - **Idioma:** Español. **Voz:** una voz en español (idealmente rioplatense).
@@ -60,6 +65,7 @@ En ElevenLabs → **Agents** → crear un agente nuevo, por ejemplo "Abasto comp
 
   Reglas:
   - No inventes precios, cantidades ni competidores: usá solo los datos de la tarea y lo que diga el proveedor.
+  - Cuando el proveedor te dé precios, repetilos para confirmar (producto, precio unitario, si incluye IVA).
   - No cierres compras: {{comprador}} confirma todo por escrito.
   - Si el proveedor no puede hablar, preguntá cuándo llamar y despedite.
   - Cuando termines, despedite y cortá la llamada.
