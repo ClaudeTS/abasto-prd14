@@ -49,10 +49,10 @@ npm install && npm run dev      # abre http://localhost:5173
 
 Con `make dev` se levantan los dos. `make reset` vuelve al estado inicial de la demo.
 
-**Frontend sin backend (modo mock):** por defecto la UI corre sola con `data/*.json` (badge "Mock" en
-la barra). Simula las demoras del simulador, la extracción con evidencia, el solver y la negociación.
-Para usar el backend real: `VITE_MOCK=0` en `frontend/.env` o abrir `http://localhost:5173/?modo=backend`
-(`?modo=mock` vuelve atrás; queda guardado en el navegador). Ver `frontend/.env.example`.
+**Frontend sin backend (modo mock):** por defecto la UI usa el backend real. Para que corra sola con
+`data/*.json` (badge "Mock" en la barra): `VITE_MOCK=1` en `frontend/.env` o abrir
+`http://localhost:5173/?modo=mock` (`?modo=backend` vuelve; el cambio vale solo para esa pestaña).
+Simula las demoras del simulador, la extracción con evidencia, el solver y la negociación. Ver `frontend/.env.example`.
 
 ## Recorrido de la demo
 

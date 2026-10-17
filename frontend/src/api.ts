@@ -18,19 +18,25 @@ import type {
 
 const API_URL = (import.meta.env.VITE_API_URL as string | undefined) || "/api";
 
+/**
+ * Por defecto la UI usa el backend real. El mock es opt-in: VITE_MOCK=1 o ?modo=mock.
+ * ?modo= se guarda en sessionStorage (solo esta pestaña): una sesión nueva vuelve al default, así un
+ * mock olvidado de una prueba anterior no aparece en la demo.
+ */
 function resolverModo(): "mock" | "backend" {
   try {
+    localStorage.removeItem("abasto_modo"); // versiones anteriores lo guardaban para siempre
     const param = new URLSearchParams(window.location.search).get("modo");
     if (param === "mock" || param === "backend") {
-      localStorage.setItem("abasto_modo", param);
+      sessionStorage.setItem("abasto_modo", param);
       return param;
     }
-    const guardado = localStorage.getItem("abasto_modo");
+    const guardado = sessionStorage.getItem("abasto_modo");
     if (guardado === "mock" || guardado === "backend") return guardado;
   } catch {
     /* sin storage: usar la variable de entorno */
   }
-  return import.meta.env.VITE_MOCK === "0" ? "backend" : "mock";
+  return import.meta.env.VITE_MOCK === "1" ? "mock" : "backend";
 }
 
 export const MODO = resolverModo();
