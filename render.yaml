@@ -13,6 +13,8 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.10
+      - key: TZ  # los timestamps del backend son hora local (datetime.now())
+        value: America/Montevideo
       - key: SIM_MODE
         value: fijo
       - key: EXTRACCION_MODE
@@ -24,4 +26,15 @@ services:
       - key: ANTHROPIC_CUSTOM_HEADERS # anthropic-workspace-id: …
         sync: false
       - key: CORS_ORIGINS # la URL de Vercel, ej. https://abasto.vercel.app
+        sync: false
+      # Llamadas (docs/LLAMADAS.md): simulada por defecto; real necesita las cuatro de abajo
+      - key: LLAMADAS_MODO
+        value: simulada
+      - key: ELEVENLABS_API_KEY
+        sync: false
+      - key: ELEVENLABS_AGENT_ID
+        sync: false
+      - key: ELEVENLABS_PHONE_NUMBER_ID
+        sync: false
+      - key: TELEFONOS_PROVEEDORES # proveedor_id:+598…, solo celulares del equipo
         sync: false

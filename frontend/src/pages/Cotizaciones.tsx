@@ -124,6 +124,7 @@ export default function Cotizaciones({ demo }: { demo: PedidoDemo }) {
                 catalogo={catalogo}
                 destacada={c.id === destacada}
                 onVerOriginal={() => setAbierto(mensajes.find((m) => m.id === c.mensaje_id) ?? null)}
+                canalMensaje={mensajes.find((m) => m.id === c.mensaje_id)?.canal}
                 onConfirmar={(campo, valor) => confirmar(c, campo, valor)}
               />
             ))}

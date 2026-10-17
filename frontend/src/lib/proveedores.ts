@@ -1,4 +1,4 @@
-import { CameraIcon, FileTextIcon, MessageSquareIcon, MicIcon, type LucideIcon } from "lucide-react";
+import { CameraIcon, FileTextIcon, MessageSquareIcon, MicIcon, PhoneIcon, type LucideIcon } from "lucide-react";
 import sim from "../../../data/proveedores_sim.json";
 import type { Canal, Proveedor } from "../types";
 
@@ -33,4 +33,5 @@ export const CANALES: Record<Canal, { icono: LucideIcon; etiqueta: string }> = {
   whatsapp_audio: { icono: MicIcon, etiqueta: "Audio de WhatsApp" },
   pdf: { icono: FileTextIcon, etiqueta: "PDF" },
   foto: { icono: CameraIcon, etiqueta: "Foto" },
+  llamada: { icono: PhoneIcon, etiqueta: "Llamada" },
 };

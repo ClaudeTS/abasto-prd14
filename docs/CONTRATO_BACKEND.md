@@ -54,6 +54,11 @@ Si el backend se reinicia a mitad de una cotización (por ejemplo `--reload` al 
 | POST | `/pedidos/{id}/negociar/{proveedor_id}` | `Negociacion` | Sin `ANTHROPIC_API_KEY` → 501. Si el LLM falla → 501 con el motivo legible. Plazo vencido → 504. |
 | GET | `/negociaciones/{id}` | `Negociacion` | |
 | POST | `/negociaciones/{id}/aprobar` | `Negociacion` | Body opcional `{"mensaje": "texto editado"}`. Estado → `enviada_simulada`. |
+| GET | `/llamadas/config` | `ConfigLlamadas` | Llamadas del agente (ElevenLabs + Twilio): modo, si está configurado, qué falta. Ver `docs/LLAMADAS.md`. |
+| POST | `/pedidos/{id}/llamar/{proveedor_id}` | `Llamada` | Llama para pedir la cotización. 409 si ya respondió o falta config. `?simulada=true` = respaldo. |
+| POST | `/negociaciones/{id}/llamar` | `Llamada` | "Aprobar y llamar". Body opcional `{"mensaje": "…"}`. |
+| GET | `/llamadas/{id}` | `Llamada` | Polling ~1 s: estado, transcripción que crece, resultado al terminar. |
+| GET | `/pedidos/{id}/llamadas` | `Llamada[]` | |
 | POST | `/reset` | `{ok}` | `?hard=true` también borra el cache. Cancela las respuestas en curso. `make reset` usa este endpoint si el backend está levantado. |
 
 ## Para B (frontend)

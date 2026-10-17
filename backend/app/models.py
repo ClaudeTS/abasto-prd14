@@ -21,7 +21,7 @@ Monto = Annotated[
 ]
 
 UnidadCanonica = Literal["unidad", "l", "kg"]
-Canal = Literal["whatsapp_texto", "whatsapp_audio", "pdf", "foto"]
+Canal = Literal["whatsapp_texto", "whatsapp_audio", "pdf", "foto", "llamada"]
 Moneda = Literal["UYU", "USD"]
 
 
@@ -199,6 +199,7 @@ class Negociacion(BaseModel):
     elegida: str
     mensaje_propuesto: str
     estado: Literal["simulada", "aprobada", "enviada_simulada"]
+    llamada_id: str | None = None  # si se aprobó para negociar por teléfono (docs/LLAMADAS.md)
 
 
 class AprobacionNegociacion(BaseModel):  # ext: el mensaje es editable antes de aprobar
@@ -231,3 +232,51 @@ class ContextoNegociacion(BaseModel):
 class ErrorRespuesta(BaseModel):
     error: str
     detalle: Any = None
+
+
+# ---------------------------------------------------------------- llamadas (docs/LLAMADAS.md)
+class TurnoLlamada(BaseModel):
+    rol: Literal["abasto", "proveedor"]
+    texto: str
+    segundo: int | None = None
+
+
+class ResultadoLlamada(BaseModel):
+    """Lo que se sacó de la llamada. En negociación: si hubo acuerdo y a qué precio."""
+
+    resumen: str | None = None
+    acuerdo: bool | None = None
+    precio_acordado: Monto | None = None  # por unidad canónica, sin IVA, si el proveedor lo dijo
+    condicion: str | None = None
+
+
+class Llamada(BaseModel):
+    id: str
+    pedido_id: str
+    proveedor_id: str
+    tipo: Literal["cotizacion", "negociacion"]
+    negociacion_id: str | None = None
+    modo: Literal["real", "simulada"]
+    estado: Literal["iniciando", "sonando", "en_curso", "procesando", "terminada", "fallida"]
+    telefono: str | None = None  # enmascarado: +598 9•• ••• 222
+    conversation_id: str | None = None
+    call_sid: str | None = None
+    transcripcion: list[TurnoLlamada] = Field(default_factory=list)
+    resultado: ResultadoLlamada | None = None
+    duracion_segundos: int | None = None
+    mensaje_id: str | None = None  # tipo cotizacion: el mensaje que entra al feed
+    error: str | None = None
+    iniciada_en: datetime
+
+
+class LlamarNegociacion(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    mensaje: str | None = None  # el mensaje aprobado (editable), que guía al agente
+
+
+class ConfigLlamadas(BaseModel):
+    modo: Literal["real", "simulada"]
+    lista: bool  # en modo real: si está todo configurado para llamar
+    faltan: list[str]  # variables de entorno que faltan
+    proveedores_con_telefono: list[str]
