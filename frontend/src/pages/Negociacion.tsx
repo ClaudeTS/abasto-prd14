@@ -27,6 +27,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, Encabezado, ErrorBanner, Etiqueta, type Tono } from "@/components/comunes";
+import EvaluacionNegociacion from "@/features/proveedores/EvaluacionNegociacion";
 import PanelLlamada, { BotonLlamar, ModoLlamadas, estaActiva, useConfigLlamadas, useLlamada } from "@/components/PanelLlamada";
 import type {
   Cotizacion,
@@ -275,6 +276,8 @@ export default function NegociacionPage({
             : neg!.estrategias.map((e) => <ColumnaEstrategia key={e.nombre} e={e} elegida={e.nombre === neg!.elegida} />)}
         </div>
       )}
+
+      {neg && !corriendo && <EvaluacionNegociacion negociacionId={neg.id} />}
 
       {neg && !corriendo && (
         <div className="grid gap-4 lg:grid-cols-[1fr_22rem]">
