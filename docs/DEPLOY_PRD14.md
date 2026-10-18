@@ -6,12 +6,13 @@ La demo sigue en `hacktaon.vercel.app` + `abasto-backend.onrender.com` + su base
 
 | | Demo del pitch (no se toca) | Preview del fork |
 |---|---|---|
-| Frontend | Vercel `hacktaon` → https://hacktaon.vercel.app | Vercel `abasto-prd14` → URL: _a completar al crear_ |
-| Backend | Render `abasto-backend` (Blueprint `render.yaml`) | Render `abasto-prd14-backend`, creado a mano → URL: _a completar_ |
+| Frontend | Vercel `hacktaon` → https://hacktaon.vercel.app | Vercel `abasto-prd14` → https://abasto-prd14.vercel.app |
+| Backend | Render `abasto-backend` (Blueprint `render.yaml`) → https://abasto-backend.onrender.com | Render, creado a mano → https://abasto-backend-dmyw.onrender.com |
 | Base | Supabase, proyecto de la demo | Supabase, **otro proyecto** |
 | Código | `Namzug/hacktaon` (copia de `main` del equipo) | `Namzug/abasto-prd14-preview` (copia privada de `main` del fork) |
 
-Las URLs se completan acá cuando se crean los servicios; los valores de las variables, nunca.
+Creados el 18/10. Acá van las URLs; los valores de las variables, nunca. La demo del pitch está suspendida en Render
+(`suspend-by-user`) desde el 18/10, porque probablemente la reemplace este entorno.
 
 ## 1. De dónde sale el código: una copia en la cuenta Namzug
 
@@ -116,6 +117,10 @@ Vercel (equipo HAIRBOX) → Add New → Project → `Namzug/abasto-prd14-preview
 | Root Directory | `frontend` |
 | Framework preset | Vite (build `npm run build`, salida `dist`) |
 | `VITE_API_URL` | URL del backend de preview, en Production y Preview |
+
+Creado con la CLI (`vercel api /v11/projects` y `/v9/projects/<id>/link`), porque el conector de Vercel no tiene
+permiso para crear proyectos. Id `prj_iuXTaDs1e5hNuPwk9wd9VBVzIfO9`, conectado a `Namzug/abasto-prd14-preview` rama
+`main`: cada push a la copia publica en producción.
 
 `VITE_API_URL` se fija al compilar: después de cambiarla hay que volver a publicar. `VITE_MOCK` no se carga (el modo
 mock queda opcional con `?modo=mock`).
