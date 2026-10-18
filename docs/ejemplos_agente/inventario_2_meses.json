@@ -1,0 +1,511 @@
+{
+  "fecha": "2026-10-20",
+  "horizonte_meses": 2,
+  "meses_pronostico": [
+    "2026-11",
+    "2026-12"
+  ],
+  "plazo_minimo_dias": 3,
+  "productos": [
+    {
+      "producto_id": "notebook",
+      "nombre": "Notebook 15\" i5 / 16 GB / 512 GB",
+      "nombre_corto": "notebooks",
+      "unidad": "unidad",
+      "tipo": "equipamiento",
+      "stock_actual": 0.0,
+      "stock_minimo": 0.0,
+      "en_camino": 0.0,
+      "multiplo_compra": 1.0,
+      "modo": "manual",
+      "tope_automatico_uyu": null,
+      "proveedores": [
+        {
+          "id": "tecnoimport",
+          "nombre": "TecnoImport S.A."
+        },
+        {
+          "id": "compuservice",
+          "nombre": "Compuservice"
+        }
+      ],
+      "historial": [],
+      "pronostico": null,
+      "reposicion": null,
+      "alerta": null
+    },
+    {
+      "producto_id": "silla",
+      "nombre": "Silla ergonómica de oficina",
+      "nombre_corto": "sillas",
+      "unidad": "unidad",
+      "tipo": "equipamiento",
+      "stock_actual": 0.0,
+      "stock_minimo": 0.0,
+      "en_camino": 0.0,
+      "multiplo_compra": 1.0,
+      "modo": "manual",
+      "tope_automatico_uyu": null,
+      "proveedores": [
+        {
+          "id": "muebleria_rivera",
+          "nombre": "Mueblería Rivera"
+        },
+        {
+          "id": "ofisillas",
+          "nombre": "Ofisillas"
+        },
+        {
+          "id": "distribuidora_oriental",
+          "nombre": "Distribuidora Oriental"
+        }
+      ],
+      "historial": [],
+      "pronostico": null,
+      "reposicion": null,
+      "alerta": null
+    },
+    {
+      "producto_id": "resma_a4",
+      "nombre": "Resma papel A4 75 g (500 hojas)",
+      "nombre_corto": "resmas",
+      "unidad": "unidad",
+      "tipo": "consumible",
+      "stock_actual": 10.0,
+      "stock_minimo": 40.0,
+      "en_camino": 0.0,
+      "multiplo_compra": 5.0,
+      "modo": "automatico",
+      "tope_automatico_uyu": 30000.0,
+      "proveedores": [
+        {
+          "id": "papelera_del_sur",
+          "nombre": "Papelera del Sur"
+        },
+        {
+          "id": "distribuidora_oriental",
+          "nombre": "Distribuidora Oriental"
+        }
+      ],
+      "historial": [
+        {
+          "mes": "2024-10",
+          "cantidad": 111.0
+        },
+        {
+          "mes": "2024-11",
+          "cantidad": 111.0
+        },
+        {
+          "mes": "2024-12",
+          "cantidad": 104.0
+        },
+        {
+          "mes": "2025-01",
+          "cantidad": 56.0
+        },
+        {
+          "mes": "2025-02",
+          "cantidad": 80.0
+        },
+        {
+          "mes": "2025-03",
+          "cantidad": 108.0
+        },
+        {
+          "mes": "2025-04",
+          "cantidad": 92.0
+        },
+        {
+          "mes": "2025-05",
+          "cantidad": 110.0
+        },
+        {
+          "mes": "2025-06",
+          "cantidad": 101.0
+        },
+        {
+          "mes": "2025-07",
+          "cantidad": 94.0
+        },
+        {
+          "mes": "2025-08",
+          "cantidad": 111.0
+        },
+        {
+          "mes": "2025-09",
+          "cantidad": 102.0
+        },
+        {
+          "mes": "2025-10",
+          "cantidad": 118.0
+        },
+        {
+          "mes": "2025-11",
+          "cantidad": 120.0
+        },
+        {
+          "mes": "2025-12",
+          "cantidad": 108.0
+        },
+        {
+          "mes": "2026-01",
+          "cantidad": 64.0
+        },
+        {
+          "mes": "2026-02",
+          "cantidad": 84.0
+        },
+        {
+          "mes": "2026-03",
+          "cantidad": 118.0
+        },
+        {
+          "mes": "2026-04",
+          "cantidad": 97.0
+        },
+        {
+          "mes": "2026-05",
+          "cantidad": 117.0
+        },
+        {
+          "mes": "2026-06",
+          "cantidad": 109.0
+        },
+        {
+          "mes": "2026-07",
+          "cantidad": 102.0
+        },
+        {
+          "mes": "2026-08",
+          "cantidad": 116.0
+        },
+        {
+          "mes": "2026-09",
+          "cantidad": 108.0
+        }
+      ],
+      "pronostico": {
+        "nivel": 105.1,
+        "consumo_diario": 3.5,
+        "meses": [
+          {
+            "mes": "2026-11",
+            "indice": 1.14,
+            "cantidad": 120.0
+          },
+          {
+            "mes": "2026-12",
+            "indice": 1.04,
+            "cantidad": 109.0
+          }
+        ],
+        "total": 229.0,
+        "evidencia": "Promedio de los últimos 12 meses (oct-25 a sep-26): 105,1 por mes. El índice de cada mes es su promedio en el historial contra el promedio de los 24 meses. noviembre: 105,1 × índice 1,14 = 120; diciembre: 105,1 × índice 1,04 = 109. Total: 229."
+      },
+      "reposicion": {
+        "cantidad": 260.0,
+        "necesario_para": "2026-10-23",
+        "cobertura_dias": null,
+        "evidencia": "Pronóstico 229 + mínimo 40 − stock 10 = 259 → 260 (se compra de a 5). Ya está bajo el mínimo: lo antes posible, el 23/10 (3 días)."
+      },
+      "alerta": "bajo_minimo"
+    },
+    {
+      "producto_id": "toner",
+      "nombre": "Tóner HP 85A original",
+      "nombre_corto": "tóner",
+      "unidad": "unidad",
+      "tipo": "consumible",
+      "stock_actual": 7.0,
+      "stock_minimo": 4.0,
+      "en_camino": 0.0,
+      "multiplo_compra": 1.0,
+      "modo": "automatico",
+      "tope_automatico_uyu": 20000.0,
+      "proveedores": [
+        {
+          "id": "tecnoimport",
+          "nombre": "TecnoImport S.A."
+        },
+        {
+          "id": "compuservice",
+          "nombre": "Compuservice"
+        },
+        {
+          "id": "distribuidora_oriental",
+          "nombre": "Distribuidora Oriental"
+        }
+      ],
+      "historial": [
+        {
+          "mes": "2024-10",
+          "cantidad": 11.0
+        },
+        {
+          "mes": "2024-11",
+          "cantidad": 10.0
+        },
+        {
+          "mes": "2024-12",
+          "cantidad": 10.0
+        },
+        {
+          "mes": "2025-01",
+          "cantidad": 6.0
+        },
+        {
+          "mes": "2025-02",
+          "cantidad": 9.0
+        },
+        {
+          "mes": "2025-03",
+          "cantidad": 11.0
+        },
+        {
+          "mes": "2025-04",
+          "cantidad": 9.0
+        },
+        {
+          "mes": "2025-05",
+          "cantidad": 11.0
+        },
+        {
+          "mes": "2025-06",
+          "cantidad": 10.0
+        },
+        {
+          "mes": "2025-07",
+          "cantidad": 9.0
+        },
+        {
+          "mes": "2025-08",
+          "cantidad": 11.0
+        },
+        {
+          "mes": "2025-09",
+          "cantidad": 10.0
+        },
+        {
+          "mes": "2025-10",
+          "cantidad": 12.0
+        },
+        {
+          "mes": "2025-11",
+          "cantidad": 11.0
+        },
+        {
+          "mes": "2025-12",
+          "cantidad": 10.0
+        },
+        {
+          "mes": "2026-01",
+          "cantidad": 8.0
+        },
+        {
+          "mes": "2026-02",
+          "cantidad": 9.0
+        },
+        {
+          "mes": "2026-03",
+          "cantidad": 12.0
+        },
+        {
+          "mes": "2026-04",
+          "cantidad": 10.0
+        },
+        {
+          "mes": "2026-05",
+          "cantidad": 12.0
+        },
+        {
+          "mes": "2026-06",
+          "cantidad": 11.0
+        },
+        {
+          "mes": "2026-07",
+          "cantidad": 11.0
+        },
+        {
+          "mes": "2026-08",
+          "cantidad": 12.0
+        },
+        {
+          "mes": "2026-09",
+          "cantidad": 11.0
+        }
+      ],
+      "pronostico": {
+        "nivel": 10.8,
+        "consumo_diario": 0.36,
+        "meses": [
+          {
+            "mes": "2026-11",
+            "indice": 1.02,
+            "cantidad": 11.0
+          },
+          {
+            "mes": "2026-12",
+            "indice": 0.98,
+            "cantidad": 11.0
+          }
+        ],
+        "total": 22.0,
+        "evidencia": "Promedio de los últimos 12 meses (oct-25 a sep-26): 10,8 por mes. El índice de cada mes es su promedio en el historial contra el promedio de los 24 meses. noviembre: 10,8 × índice 1,02 = 11; diciembre: 10,8 × índice 0,98 = 11. Total: 22."
+      },
+      "reposicion": {
+        "cantidad": 19.0,
+        "necesario_para": "2026-10-28",
+        "cobertura_dias": 8,
+        "evidencia": "Pronóstico 22 + mínimo 4 − stock 7 = 19. Con 0,36 por día, llega al mínimo en 8 días: para el 28/10."
+      },
+      "alerta": "reponer"
+    },
+    {
+      "producto_id": "desinfectante",
+      "nombre": "Desinfectante de pisos",
+      "nombre_corto": "desinfectante",
+      "unidad": "l",
+      "tipo": "consumible",
+      "stock_actual": 10.0,
+      "stock_minimo": 30.0,
+      "en_camino": 0.0,
+      "multiplo_compra": 5.0,
+      "modo": "automatico",
+      "tope_automatico_uyu": 10000.0,
+      "proveedores": [
+        {
+          "id": "papelera_del_sur",
+          "nombre": "Papelera del Sur"
+        },
+        {
+          "id": "distribuidora_oriental",
+          "nombre": "Distribuidora Oriental"
+        }
+      ],
+      "historial": [
+        {
+          "mes": "2024-10",
+          "cantidad": 39.0
+        },
+        {
+          "mes": "2024-11",
+          "cantidad": 35.0
+        },
+        {
+          "mes": "2024-12",
+          "cantidad": 32.0
+        },
+        {
+          "mes": "2025-01",
+          "cantidad": 28.0
+        },
+        {
+          "mes": "2025-02",
+          "cantidad": 35.0
+        },
+        {
+          "mes": "2025-03",
+          "cantidad": 40.0
+        },
+        {
+          "mes": "2025-04",
+          "cantidad": 42.0
+        },
+        {
+          "mes": "2025-05",
+          "cantidad": 49.0
+        },
+        {
+          "mes": "2025-06",
+          "cantidad": 54.0
+        },
+        {
+          "mes": "2025-07",
+          "cantidad": 57.0
+        },
+        {
+          "mes": "2025-08",
+          "cantidad": 54.0
+        },
+        {
+          "mes": "2025-09",
+          "cantidad": 42.0
+        },
+        {
+          "mes": "2025-10",
+          "cantidad": 43.0
+        },
+        {
+          "mes": "2025-11",
+          "cantidad": 40.0
+        },
+        {
+          "mes": "2025-12",
+          "cantidad": 34.0
+        },
+        {
+          "mes": "2026-01",
+          "cantidad": 34.0
+        },
+        {
+          "mes": "2026-02",
+          "cantidad": 38.0
+        },
+        {
+          "mes": "2026-03",
+          "cantidad": 46.0
+        },
+        {
+          "mes": "2026-04",
+          "cantidad": 46.0
+        },
+        {
+          "mes": "2026-05",
+          "cantidad": 55.0
+        },
+        {
+          "mes": "2026-06",
+          "cantidad": 61.0
+        },
+        {
+          "mes": "2026-07",
+          "cantidad": 65.0
+        },
+        {
+          "mes": "2026-08",
+          "cantidad": 59.0
+        },
+        {
+          "mes": "2026-09",
+          "cantidad": 46.0
+        }
+      ],
+      "pronostico": {
+        "nivel": 47.3,
+        "consumo_diario": 1.58,
+        "meses": [
+          {
+            "mes": "2026-11",
+            "indice": 0.84,
+            "cantidad": 40.0
+          },
+          {
+            "mes": "2026-12",
+            "indice": 0.74,
+            "cantidad": 35.0
+          }
+        ],
+        "total": 75.0,
+        "evidencia": "Promedio de los últimos 12 meses (oct-25 a sep-26): 47,3 por mes. El índice de cada mes es su promedio en el historial contra el promedio de los 24 meses. noviembre: 47,3 × índice 0,84 = 40; diciembre: 47,3 × índice 0,74 = 35. Total: 75."
+      },
+      "reposicion": {
+        "cantidad": 95.0,
+        "necesario_para": "2026-10-23",
+        "cobertura_dias": null,
+        "evidencia": "Pronóstico 75 + mínimo 30 − stock 10 = 95 L. Ya está bajo el mínimo: lo antes posible, el 23/10 (3 días)."
+      },
+      "alerta": "bajo_minimo"
+    }
+  ]
+}

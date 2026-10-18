@@ -1,0 +1,99 @@
+{
+  "id": "ag_ac1709",
+  "pedido_id": "pedido_demo_oct_2026",
+  "texto": "Abasto, armá la compra del mes. Entran diez personas nuevas el 28 y necesitan notebook. Y para la oficina nueva, quince sillas ergonómicas para el 3 de noviembre.",
+  "horizonte_meses": 1,
+  "opciones": {
+    "horizonte_meses": null,
+    "esperar_confirmacion": true,
+    "llamar_si_no_responde": true,
+    "negociar": true
+  },
+  "estado": "en_curso",
+  "pasos": [
+    {
+      "id": "entender",
+      "titulo": "Entender el pedido",
+      "estado": "pendiente",
+      "detalle": null,
+      "inicio": null,
+      "fin": null
+    },
+    {
+      "id": "inventario",
+      "titulo": "Revisar el inventario",
+      "estado": "pendiente",
+      "detalle": null,
+      "inicio": null,
+      "fin": null
+    },
+    {
+      "id": "confirmar",
+      "titulo": "Tu OK para cotizar",
+      "estado": "pendiente",
+      "detalle": null,
+      "inicio": null,
+      "fin": null
+    },
+    {
+      "id": "cotizar",
+      "titulo": "Pedir cotizaciones",
+      "estado": "pendiente",
+      "detalle": null,
+      "inicio": null,
+      "fin": null
+    },
+    {
+      "id": "insistir",
+      "titulo": "Llamar a quien no responde",
+      "estado": "pendiente",
+      "detalle": null,
+      "inicio": null,
+      "fin": null
+    },
+    {
+      "id": "revisar",
+      "titulo": "Revisar respuestas dudosas",
+      "estado": "pendiente",
+      "detalle": null,
+      "inicio": null,
+      "fin": null
+    },
+    {
+      "id": "optimizar",
+      "titulo": "Armar el plan de compra",
+      "estado": "pendiente",
+      "detalle": null,
+      "inicio": null,
+      "fin": null
+    },
+    {
+      "id": "negociar",
+      "titulo": "Ensayar la negociación",
+      "estado": "pendiente",
+      "detalle": null,
+      "inicio": null,
+      "fin": null
+    },
+    {
+      "id": "ordenes",
+      "titulo": "Órdenes de compra",
+      "estado": "pendiente",
+      "detalle": null,
+      "inicio": null,
+      "fin": null
+    }
+  ],
+  "interpretacion": null,
+  "propuesta": [],
+  "avisos": [],
+  "revision": [],
+  "llamada_ids": [],
+  "sin_respuesta": [],
+  "negociacion_id": null,
+  "ordenes": [],
+  "resumen": null,
+  "error": null,
+  "creada_en": "2026-10-17T23:34:24.933491",
+  "actualizada_en": "2026-10-17T23:34:24.933491"
+}

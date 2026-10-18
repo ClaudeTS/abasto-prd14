@@ -1,0 +1,204 @@
+{
+  "id": "ag_ac1709",
+  "pedido_id": "pedido_demo_oct_2026",
+  "texto": "Abasto, armá la compra del mes. Entran diez personas nuevas el 28 y necesitan notebook. Y para la oficina nueva, quince sillas ergonómicas para el 3 de noviembre.",
+  "horizonte_meses": 1,
+  "opciones": {
+    "horizonte_meses": null,
+    "esperar_confirmacion": true,
+    "llamar_si_no_responde": true,
+    "negociar": true
+  },
+  "estado": "esperando_revision",
+  "pasos": [
+    {
+      "id": "entender",
+      "titulo": "Entender el pedido",
+      "estado": "hecho",
+      "detalle": "Pediste 10 notebooks para el 28/10 y 15 sillas para el 03/11.",
+      "inicio": "2026-10-17T23:34:24.940556",
+      "fin": "2026-10-17T23:34:24.946101"
+    },
+    {
+      "id": "inventario",
+      "titulo": "Revisar el inventario",
+      "estado": "hecho",
+      "detalle": "Para cubrir noviembre hay que reponer 150 resmas, 8 tóner y 60 L de desinfectante (pronóstico con estacionalidad + stock mínimo − stock actual). De notebooks y sillas no hay nada en depósito.",
+      "inicio": "2026-10-17T23:34:24.946101",
+      "fin": "2026-10-17T23:34:24.946101"
+    },
+    {
+      "id": "confirmar",
+      "titulo": "Tu OK para cotizar",
+      "estado": "hecho",
+      "detalle": "Confirmaste 10 notebooks, 15 sillas, 150 resmas, 8 tóner y 60 L de desinfectante.",
+      "inicio": "2026-10-17T23:34:24.958081",
+      "fin": "2026-10-17T23:34:24.967580"
+    },
+    {
+      "id": "cotizar",
+      "titulo": "Pedir cotizaciones",
+      "estado": "hecho",
+      "detalle": "Respondieron los 6 proveedores.",
+      "inicio": "2026-10-17T23:34:25.020949",
+      "fin": "2026-10-17T23:34:25.584970"
+    },
+    {
+      "id": "insistir",
+      "titulo": "Llamar a quien no responde",
+      "estado": "omitido",
+      "detalle": "No hizo falta llamar a nadie.",
+      "inicio": "2026-10-17T23:34:25.584970",
+      "fin": "2026-10-17T23:34:25.584970"
+    },
+    {
+      "id": "revisar",
+      "titulo": "Revisar respuestas dudosas",
+      "estado": "esperando",
+      "detalle": "Compuservice no aclaró si sus precios incluyen IVA: ¿los incluyen?",
+      "inicio": "2026-10-17T23:34:25.636636",
+      "fin": null
+    },
+    {
+      "id": "optimizar",
+      "titulo": "Armar el plan de compra",
+      "estado": "pendiente",
+      "detalle": null,
+      "inicio": null,
+      "fin": null
+    },
+    {
+      "id": "negociar",
+      "titulo": "Ensayar la negociación",
+      "estado": "pendiente",
+      "detalle": null,
+      "inicio": null,
+      "fin": null
+    },
+    {
+      "id": "ordenes",
+      "titulo": "Órdenes de compra",
+      "estado": "pendiente",
+      "detalle": null,
+      "inicio": null,
+      "fin": null
+    }
+  ],
+  "interpretacion": {
+    "origen": "fijo",
+    "items": [
+      {
+        "producto_id": "notebook",
+        "descripcion": "notebook para las personas nuevas",
+        "cantidad": 10.0,
+        "necesario_para": "2026-10-28",
+        "evidencia": "Entran diez personas nuevas el 28 y necesitan notebook"
+      },
+      {
+        "producto_id": "silla",
+        "descripcion": "sillas ergonómicas para la oficina nueva",
+        "cantidad": 15.0,
+        "necesario_para": "2026-11-03",
+        "evidencia": "quince sillas ergonómicas para el 3 de noviembre"
+      }
+    ],
+    "no_entendido": [],
+    "excluir": [],
+    "horizonte_meses": null,
+    "evidencia_horizonte": null,
+    "dudas": []
+  },
+  "propuesta": [
+    {
+      "producto_id": "notebook",
+      "nombre": "Notebook 15\" i5 / 16 GB / 512 GB",
+      "nombre_corto": "notebooks",
+      "unidad": "unidad",
+      "cantidad": 10.0,
+      "necesario_para": "2026-10-28",
+      "origen": "pedido",
+      "modo": "manual",
+      "tope_automatico_uyu": null,
+      "stock_actual": 0.0,
+      "evidencia": "Lo pediste: «Entran diez personas nuevas el 28 y necesitan notebook». En depósito: 0.",
+      "dudas": []
+    },
+    {
+      "producto_id": "silla",
+      "nombre": "Silla ergonómica de oficina",
+      "nombre_corto": "sillas",
+      "unidad": "unidad",
+      "cantidad": 15.0,
+      "necesario_para": "2026-11-03",
+      "origen": "pedido",
+      "modo": "manual",
+      "tope_automatico_uyu": null,
+      "stock_actual": 0.0,
+      "evidencia": "Lo pediste: «quince sillas ergonómicas para el 3 de noviembre». En depósito: 0.",
+      "dudas": []
+    },
+    {
+      "producto_id": "resma_a4",
+      "nombre": "Resma papel A4 75 g (500 hojas)",
+      "nombre_corto": "resmas",
+      "unidad": "unidad",
+      "cantidad": 150.0,
+      "necesario_para": "2026-10-23",
+      "origen": "reposicion",
+      "modo": "automatico",
+      "tope_automatico_uyu": 30000.0,
+      "stock_actual": 10.0,
+      "evidencia": "Promedio de los últimos 12 meses (oct-25 a sep-26): 105,1 por mes. El índice de cada mes es su promedio en el historial contra el promedio de los 24 meses. noviembre: 105,1 × índice 1,14 = 120. Pronóstico 120 + mínimo 40 − stock 10 = 150. Ya está bajo el mínimo: lo antes posible, el 23/10 (3 días).",
+      "dudas": []
+    },
+    {
+      "producto_id": "toner",
+      "nombre": "Tóner HP 85A original",
+      "nombre_corto": "tóner",
+      "unidad": "unidad",
+      "cantidad": 8.0,
+      "necesario_para": "2026-10-28",
+      "origen": "reposicion",
+      "modo": "automatico",
+      "tope_automatico_uyu": 20000.0,
+      "stock_actual": 7.0,
+      "evidencia": "Promedio de los últimos 12 meses (oct-25 a sep-26): 10,8 por mes. El índice de cada mes es su promedio en el historial contra el promedio de los 24 meses. noviembre: 10,8 × índice 1,02 = 11. Pronóstico 11 + mínimo 4 − stock 7 = 8. Con 0,36 por día, llega al mínimo en 8 días: para el 28/10.",
+      "dudas": []
+    },
+    {
+      "producto_id": "desinfectante",
+      "nombre": "Desinfectante de pisos",
+      "nombre_corto": "desinfectante",
+      "unidad": "l",
+      "cantidad": 60.0,
+      "necesario_para": "2026-10-23",
+      "origen": "reposicion",
+      "modo": "automatico",
+      "tope_automatico_uyu": 10000.0,
+      "stock_actual": 10.0,
+      "evidencia": "Promedio de los últimos 12 meses (oct-25 a sep-26): 47,3 por mes. El índice de cada mes es su promedio en el historial contra el promedio de los 24 meses. noviembre: 47,3 × índice 0,84 = 40. Pronóstico 40 + mínimo 30 − stock 10 = 60 L. Ya está bajo el mínimo: lo antes posible, el 23/10 (3 días).",
+      "dudas": []
+    }
+  ],
+  "avisos": [],
+  "revision": [
+    {
+      "cotizacion_id": "cot_compuservice_2ab55b",
+      "proveedor_id": "compuservice",
+      "proveedor_nombre": "Compuservice",
+      "campos_dudosos": [
+        "iva"
+      ],
+      "pide_iva": true,
+      "pregunta": "Compuservice no aclaró si sus precios incluyen IVA: ¿los incluyen?"
+    }
+  ],
+  "llamada_ids": [],
+  "sin_respuesta": [],
+  "negociacion_id": null,
+  "ordenes": [],
+  "resumen": null,
+  "error": null,
+  "creada_en": "2026-10-17T23:34:24.933491",
+  "actualizada_en": "2026-10-17T23:34:25.636636"
+}

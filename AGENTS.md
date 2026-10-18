@@ -25,6 +25,10 @@ modelar proveedores y ensayar negociaciones SÍ lo es.
 3. **Capa 5 — Negociación ensayada:** simular estrategias contra el gemelo del proveedor, elegir la mejor, proponer mensaje. El humano aprueba.
 4. **Simulador de proveedores:** 6 proveedores con personalidad que responden al pedido de cotización en su formato preferido.
 5. **UI de demo:** feed en vivo de respuestas, tarjetas de cotización, plan de compra, panel de negociación, pantallas de "visión".
+6. **Agente de compras** (decidido el sábado a la noche): Lucía pide por voz o texto y el agente hace la compra entera.
+   Valida contra el inventario (stock, mínimo, pronóstico con estacionalidad a 1–6 meses), cotiza, llama a quien no
+   responde, optimiza, ensaya la negociación y emite las órdenes. Cada producto es automático (compra solo, hasta un
+   tope en pesos) o manual. Se construye encima de 1–5, que quedan como vistas de detalle. Ver `docs/AGENTE.md`.
 
 ### Fuera de alcance (NO implementar aunque parezca fácil)
 - Autenticación, multiusuario, roles.
@@ -34,6 +38,7 @@ modelar proveedores y ensayar negociaciones SÍ lo es.
 - Base de datos con esquema propio, migraciones u ORM. Se guardan documentos JSON: en archivos de `backend/data/runtime/`
   o, si hay `DATABASE_URL`, en Postgres (Supabase), que es lo que usa el deploy. Ver `store.py`.
 - Capas 2, 3, 6 y 7 (perfil histórico, predicción, índice de mercado, agente-a-agente): solo pantallas estáticas en `/vision`.
+  De la 3 hay una parte real: el pronóstico de consumo del inventario (promedio por índice estacional, en código, sin LLM).
 - Tests exhaustivos. Solo smoke tests de los endpoints críticos.
 - Más infraestructura de deploy que la que ya hay (Vercel + Render + Supabase, ver §5).
 
@@ -65,10 +70,13 @@ abasto/
 │   ├── ARQUITECTURA.md       ← modelo de datos, endpoints, MILP
 │   ├── PROMPTS.md            ← prompts canónicos (copiar de acá, no inventar)
 │   ├── CONTRATO_BACKEND.md   ← endpoints reales y firmas que A implementa (leer antes de integrar)
+│   ├── AGENTE.md             ← agente de compras e inventario: endpoints, tipos y pantallas (contrato para B)
+│   ├── ejemplos_agente/      ← JSON reales de cada estado de una compra del agente (para mocks)
 │   └── PITCH_Y_DEMO.md       ← guion de demo y pitch
 ├── data/
 │   ├── proveedores_sim.json  ← personas de los proveedores simulados
 │   ├── pedido_demo.json      ← compra mensual de la empresa demo (Tecnova S.A.)
+│   ├── inventario_demo.json  ← stock, mínimos, 24 meses de consumo, modo y tope por producto; la frase de la demo
 │   ├── respuestas_fijas.json ← respuestas crudas de ejemplo (fixtures y fallback)
 │   └── extracciones_fijas.json ← salida esperada del extractor para esas respuestas
 ├── backend/
@@ -79,6 +87,10 @@ abasto/
 │   │   ├── extraccion.py     ← (A) Capa 1: extraer_crudo()
 │   │   ├── explicacion.py    ← (A) explicar_plan()
 │   │   ├── negociacion.py    ← (A) Capa 5: ensayar()
+│   │   ├── interpretacion.py ← (A) pedido por voz o texto → ítems con evidencia (prompt interpretar_pedido)
+│   │   ├── inventario.py     ← (A) stock, pronóstico con estacionalidad y reposición, en código
+│   │   ├── agente.py         ← (A) la compra entera: pasos, espera de Lucía, órdenes automáticas o manuales
+│   │   ├── rutas_agente.py   ← (A) endpoints /inventario y /agente
 │   │   ├── config.py         ← (C) variables de entorno
 │   │   ├── normalizacion.py  ← (C) reglas post-LLM: moneda, IVA, unidades
 │   │   ├── pipeline.py       ← (C) mensaje → extracción → cotización (con fallback a fixtures)
@@ -89,7 +101,7 @@ abasto/
 │   │   ├── pedidos.py        ← (C) pedido en runtime
 │   │   ├── prompts/          ← un .md por prompt, cargados por nombre
 │   │   └── store.py          ← (C) lectura/escritura JSON (archivos, o Postgres si hay DATABASE_URL)
-│   ├── tests/test_smoke.py
+│   ├── tests/                ← test_smoke.py, test_agente.py, …
 │   ├── requirements.txt
 │   └── .env.example
 └── frontend/
@@ -169,6 +181,7 @@ Deploy de la demo (para desarrollar no hace falta):
 | Simulador | `POST /pedidos/{id}/cotizar` genera respuestas de los 6 proveedores con demoras distintas y el feed las muestra llegando. |
 | Optimización | `POST /pedidos/{id}/optimizar` devuelve plan factible, costo total, ahorro vs. "todo al proveedor habitual" y explicación de 3–5 oraciones. |
 | Negociación | `POST /pedidos/{id}/negociar/{proveedor_id}` devuelve 3 estrategias con ganancia esperada, la elegida y el mensaje propuesto; botón "Aprobar" cambia el estado. |
+| Agente | `POST /agente` con la frase de la demo arma el pedido de siempre (10 notebooks, 15 sillas, 150 resmas, 8 tóner, 60 L), cotiza, llama al que no responde, espera el OK del IVA, optimiza, negocia y emite 3 órdenes: Papelera sale sola; Compuservice y Ofisillas esperan a Lucía (`tests/test_agente.py`). |
 | Demo | El recorrido completo de `docs/PITCH_Y_DEMO.md` corre dos veces seguidas sin tocar código. |
 
 ## 9. Qué hacer cuando algo no funciona

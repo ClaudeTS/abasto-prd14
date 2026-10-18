@@ -1,0 +1,318 @@
+{
+  "id": "ag_ac1709",
+  "pedido_id": "pedido_demo_oct_2026",
+  "texto": "Abasto, armá la compra del mes. Entran diez personas nuevas el 28 y necesitan notebook. Y para la oficina nueva, quince sillas ergonómicas para el 3 de noviembre.",
+  "horizonte_meses": 1,
+  "opciones": {
+    "horizonte_meses": null,
+    "esperar_confirmacion": true,
+    "llamar_si_no_responde": true,
+    "negociar": true
+  },
+  "estado": "esperando_aprobacion",
+  "pasos": [
+    {
+      "id": "entender",
+      "titulo": "Entender el pedido",
+      "estado": "hecho",
+      "detalle": "Pediste 10 notebooks para el 28/10 y 15 sillas para el 03/11.",
+      "inicio": "2026-10-17T23:34:24.940556",
+      "fin": "2026-10-17T23:34:24.946101"
+    },
+    {
+      "id": "inventario",
+      "titulo": "Revisar el inventario",
+      "estado": "hecho",
+      "detalle": "Para cubrir noviembre hay que reponer 150 resmas, 8 tóner y 60 L de desinfectante (pronóstico con estacionalidad + stock mínimo − stock actual). De notebooks y sillas no hay nada en depósito.",
+      "inicio": "2026-10-17T23:34:24.946101",
+      "fin": "2026-10-17T23:34:24.946101"
+    },
+    {
+      "id": "confirmar",
+      "titulo": "Tu OK para cotizar",
+      "estado": "hecho",
+      "detalle": "Confirmaste 10 notebooks, 15 sillas, 150 resmas, 8 tóner y 60 L de desinfectante.",
+      "inicio": "2026-10-17T23:34:24.958081",
+      "fin": "2026-10-17T23:34:24.967580"
+    },
+    {
+      "id": "cotizar",
+      "titulo": "Pedir cotizaciones",
+      "estado": "hecho",
+      "detalle": "Respondieron los 6 proveedores.",
+      "inicio": "2026-10-17T23:34:25.020949",
+      "fin": "2026-10-17T23:34:25.584970"
+    },
+    {
+      "id": "insistir",
+      "titulo": "Llamar a quien no responde",
+      "estado": "omitido",
+      "detalle": "No hizo falta llamar a nadie.",
+      "inicio": "2026-10-17T23:34:25.584970",
+      "fin": "2026-10-17T23:34:25.584970"
+    },
+    {
+      "id": "revisar",
+      "titulo": "Revisar respuestas dudosas",
+      "estado": "hecho",
+      "detalle": "Confirmaste lo dudoso de Compuservice.",
+      "inicio": "2026-10-17T23:34:25.636636",
+      "fin": "2026-10-17T23:34:25.684783"
+    },
+    {
+      "id": "optimizar",
+      "titulo": "Armar el plan de compra",
+      "estado": "hecho",
+      "detalle": "Plan: $ 498.454 + IVA, comprando a Compuservice, Ofisillas y Papelera del Sur. Ahorro: $ 43.666 (8,1 %) contra comprarle todo a Distribuidora Oriental.",
+      "inicio": "2026-10-17T23:34:25.684783",
+      "fin": "2026-10-17T23:34:25.869322"
+    },
+    {
+      "id": "negociar",
+      "titulo": "Ensayar la negociación",
+      "estado": "hecho",
+      "detalle": "Con el gemelo de Ofisillas conviene «volumen»: −5,0 %, unos $ 8.175. El mensaje está listo para que lo apruebes.",
+      "inicio": "2026-10-17T23:34:25.869322",
+      "fin": "2026-10-17T23:34:25.890375"
+    },
+    {
+      "id": "ordenes",
+      "titulo": "Órdenes de compra",
+      "estado": "esperando",
+      "detalle": "Mandé solo la orden a Papelera del Sur ($ 33.590 + IVA). Esperan tu OK: Compuservice (notebooks en modo manual; tóner supera el tope) y Ofisillas (sillas en modo manual).",
+      "inicio": "2026-10-17T23:34:25.901100",
+      "fin": null
+    }
+  ],
+  "interpretacion": {
+    "origen": "fijo",
+    "items": [
+      {
+        "producto_id": "notebook",
+        "descripcion": "notebook para las personas nuevas",
+        "cantidad": 10.0,
+        "necesario_para": "2026-10-28",
+        "evidencia": "Entran diez personas nuevas el 28 y necesitan notebook"
+      },
+      {
+        "producto_id": "silla",
+        "descripcion": "sillas ergonómicas para la oficina nueva",
+        "cantidad": 15.0,
+        "necesario_para": "2026-11-03",
+        "evidencia": "quince sillas ergonómicas para el 3 de noviembre"
+      }
+    ],
+    "no_entendido": [],
+    "excluir": [],
+    "horizonte_meses": null,
+    "evidencia_horizonte": null,
+    "dudas": []
+  },
+  "propuesta": [
+    {
+      "producto_id": "notebook",
+      "nombre": "Notebook 15\" i5 / 16 GB / 512 GB",
+      "nombre_corto": "notebooks",
+      "unidad": "unidad",
+      "cantidad": 10.0,
+      "necesario_para": "2026-10-28",
+      "origen": "pedido",
+      "modo": "manual",
+      "tope_automatico_uyu": null,
+      "stock_actual": 0.0,
+      "evidencia": "Lo pediste: «Entran diez personas nuevas el 28 y necesitan notebook». En depósito: 0.",
+      "dudas": []
+    },
+    {
+      "producto_id": "silla",
+      "nombre": "Silla ergonómica de oficina",
+      "nombre_corto": "sillas",
+      "unidad": "unidad",
+      "cantidad": 15.0,
+      "necesario_para": "2026-11-03",
+      "origen": "pedido",
+      "modo": "manual",
+      "tope_automatico_uyu": null,
+      "stock_actual": 0.0,
+      "evidencia": "Lo pediste: «quince sillas ergonómicas para el 3 de noviembre». En depósito: 0.",
+      "dudas": []
+    },
+    {
+      "producto_id": "resma_a4",
+      "nombre": "Resma papel A4 75 g (500 hojas)",
+      "nombre_corto": "resmas",
+      "unidad": "unidad",
+      "cantidad": 150.0,
+      "necesario_para": "2026-10-23",
+      "origen": "reposicion",
+      "modo": "automatico",
+      "tope_automatico_uyu": 30000.0,
+      "stock_actual": 10.0,
+      "evidencia": "Promedio de los últimos 12 meses (oct-25 a sep-26): 105,1 por mes. El índice de cada mes es su promedio en el historial contra el promedio de los 24 meses. noviembre: 105,1 × índice 1,14 = 120. Pronóstico 120 + mínimo 40 − stock 10 = 150. Ya está bajo el mínimo: lo antes posible, el 23/10 (3 días).",
+      "dudas": []
+    },
+    {
+      "producto_id": "toner",
+      "nombre": "Tóner HP 85A original",
+      "nombre_corto": "tóner",
+      "unidad": "unidad",
+      "cantidad": 8.0,
+      "necesario_para": "2026-10-28",
+      "origen": "reposicion",
+      "modo": "automatico",
+      "tope_automatico_uyu": 20000.0,
+      "stock_actual": 7.0,
+      "evidencia": "Promedio de los últimos 12 meses (oct-25 a sep-26): 10,8 por mes. El índice de cada mes es su promedio en el historial contra el promedio de los 24 meses. noviembre: 10,8 × índice 1,02 = 11. Pronóstico 11 + mínimo 4 − stock 7 = 8. Con 0,36 por día, llega al mínimo en 8 días: para el 28/10.",
+      "dudas": []
+    },
+    {
+      "producto_id": "desinfectante",
+      "nombre": "Desinfectante de pisos",
+      "nombre_corto": "desinfectante",
+      "unidad": "l",
+      "cantidad": 60.0,
+      "necesario_para": "2026-10-23",
+      "origen": "reposicion",
+      "modo": "automatico",
+      "tope_automatico_uyu": 10000.0,
+      "stock_actual": 10.0,
+      "evidencia": "Promedio de los últimos 12 meses (oct-25 a sep-26): 47,3 por mes. El índice de cada mes es su promedio en el historial contra el promedio de los 24 meses. noviembre: 47,3 × índice 0,84 = 40. Pronóstico 40 + mínimo 30 − stock 10 = 60 L. Ya está bajo el mínimo: lo antes posible, el 23/10 (3 días).",
+      "dudas": []
+    }
+  ],
+  "avisos": [],
+  "revision": [],
+  "llamada_ids": [],
+  "sin_respuesta": [],
+  "negociacion_id": "neg_ofisillas_e2ed20",
+  "ordenes": [
+    {
+      "id": "oc_compuservice",
+      "numero": "OC-1001",
+      "proveedor_id": "compuservice",
+      "proveedor_nombre": "Compuservice",
+      "lineas": [
+        {
+          "producto_id": "notebook",
+          "nombre": "Notebook 15\" i5 / 16 GB / 512 GB",
+          "nombre_corto": "notebooks",
+          "unidad": "unidad",
+          "cantidad": 10.0,
+          "precio_unitario_sin_iva": 27459.02,
+          "subtotal": 274590.2,
+          "aprobacion": "manual",
+          "motivo": "Está en modo manual, la aprobás vos.",
+          "cotizacion_id": "cot_compuservice_2ab55b",
+          "evidencia": "Notebook 15 i5 16gb 512 33500"
+        },
+        {
+          "producto_id": "toner",
+          "nombre": "Tóner HP 85A original",
+          "nombre_corto": "tóner",
+          "unidad": "unidad",
+          "cantidad": 8.0,
+          "precio_unitario_sin_iva": 3196.72,
+          "subtotal": 25573.76,
+          "aprobacion": "supera_tope",
+          "motivo": "$ 25.574 supera el tope automático de $ 20.000.",
+          "cotizacion_id": "cot_compuservice_2ab55b",
+          "evidencia": "Toner 85a 3900"
+        }
+      ],
+      "envio": 0.0,
+      "total_sin_iva": 300163.96,
+      "total_con_iva": 366200.03,
+      "requiere_aprobacion": true,
+      "motivos": [
+        "Notebooks: está en modo manual, la aprobás vos.",
+        "Tóner: $ 25.574 supera el tope automático de $ 20.000."
+      ],
+      "estado": "esperando_aprobacion",
+      "aprobada_por": null,
+      "negociacion_id": null,
+      "mensaje": "Hola, ¿cómo va? Te confirmo la orden de compra OC-1001 de Tecnova S.A.:\n- 10 Notebook 15\" i5 / 16 GB / 512 GB a $ 27.459,02 + IVA c/u\n- 8 Tóner HP 85A original a $ 3.196,72 + IVA c/u\nTotal: $ 300.164 + IVA.\nEntrega: para el 28/10.\nGracias, Lucía.",
+      "enviada_en": null
+    },
+    {
+      "id": "oc_ofisillas",
+      "numero": "OC-1002",
+      "proveedor_id": "ofisillas",
+      "proveedor_nombre": "Ofisillas",
+      "lineas": [
+        {
+          "producto_id": "silla",
+          "nombre": "Silla ergonómica de oficina",
+          "nombre_corto": "sillas",
+          "unidad": "unidad",
+          "cantidad": 15.0,
+          "precio_unitario_sin_iva": 10900.0,
+          "subtotal": 163500.0,
+          "aprobacion": "manual",
+          "motivo": "Está en modo manual, la aprobás vos.",
+          "cotizacion_id": "cot_ofisillas_8090bf",
+          "evidencia": "$10.900 + IVA c/u"
+        }
+      ],
+      "envio": 1200.0,
+      "total_sin_iva": 164700.0,
+      "total_con_iva": 200934.0,
+      "requiere_aprobacion": true,
+      "motivos": [
+        "Sillas: está en modo manual, la aprobás vos."
+      ],
+      "estado": "esperando_aprobacion",
+      "aprobada_por": null,
+      "negociacion_id": "neg_ofisillas_e2ed20",
+      "mensaje": "Hola, ¿cómo va? Te confirmo la orden de compra OC-1002 de Tecnova S.A.:\n- 15 Silla ergonómica de oficina a $ 10.900,00 + IVA c/u\nTotal: $ 164.700 + IVA, con $ 1.200 de envío.\nEntrega: para el 03/11.\nGracias, Lucía.",
+      "enviada_en": null
+    },
+    {
+      "id": "oc_papelera_del_sur",
+      "numero": "OC-1003",
+      "proveedor_id": "papelera_del_sur",
+      "proveedor_nombre": "Papelera del Sur",
+      "lineas": [
+        {
+          "producto_id": "resma_a4",
+          "nombre": "Resma papel A4 75 g (500 hojas)",
+          "nombre_corto": "resmas",
+          "unidad": "unidad",
+          "cantidad": 150.0,
+          "precio_unitario_sin_iva": 178.69,
+          "subtotal": 26803.5,
+          "aprobacion": "automatica",
+          "motivo": "Modo automático y $ 26.804 no supera el tope de $ 30.000.",
+          "cotizacion_id": "cot_papelera_del_sur_de0502",
+          "evidencia": "la caja de cinco resmas te la dejo a mil noventa"
+        },
+        {
+          "producto_id": "desinfectante",
+          "nombre": "Desinfectante de pisos",
+          "nombre_corto": "desinfectante",
+          "unidad": "l",
+          "cantidad": 60.0,
+          "precio_unitario_sin_iva": 113.11,
+          "subtotal": 6786.6,
+          "aprobacion": "automatica",
+          "motivo": "Modo automático y $ 6.787 no supera el tope de $ 10.000.",
+          "cotizacion_id": "cot_papelera_del_sur_de0502",
+          "evidencia": "el bidón de cinco litros, seiscientos noventa"
+        }
+      ],
+      "envio": 0.0,
+      "total_sin_iva": 33590.1,
+      "total_con_iva": 40979.92,
+      "requiere_aprobacion": false,
+      "motivos": [],
+      "estado": "enviada_simulada",
+      "aprobada_por": "agente",
+      "negociacion_id": null,
+      "mensaje": "Hola, ¿cómo va? Te confirmo la orden de compra OC-1003 de Tecnova S.A.:\n- 150 Resma papel A4 75 g (500 hojas) a $ 178,69 + IVA c/u\n- 60 L de Desinfectante de pisos a $ 113,11 + IVA el litro\nTotal: $ 33.590 + IVA.\nEntrega: para el 23/10.\nGracias, Lucía.",
+      "enviada_en": "2026-10-17T23:34:25.901100"
+    }
+  ],
+  "resumen": null,
+  "error": null,
+  "creada_en": "2026-10-17T23:34:24.933491",
+  "actualizada_en": "2026-10-17T23:34:25.901100"
+}

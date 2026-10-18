@@ -1,0 +1,16 @@
+{
+  "409_ya_cotizado": {
+    "error": "Este pedido ya se cotizó. Para empezar otra compra, reseteá la demo.",
+    "detalle": {
+      "estado_pedido": "aprobado"
+    }
+  },
+  "404": {
+    "error": "No existe la corrida 'zzz'",
+    "detalle": null
+  },
+  "409_orden": {
+    "error": "La orden OC-1002 ya no espera aprobación (enviada_simulada)",
+    "detalle": null
+  }
+}
