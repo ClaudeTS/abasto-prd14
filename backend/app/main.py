@@ -20,6 +20,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app import config, integracion_a, llamadas, pedidos, pipeline, simulador, store
+from app import agente, rutas_agente  # agente de compras e inventario (docs/AGENTE.md)
 from app.models import (
     AprobacionNegociacion,
     Canal,
@@ -60,6 +61,7 @@ async def lifespan(_: FastAPI):
     yield
     simulador.cancelar_todo()
     llamadas.cancelar_todo()
+    agente.cancelar_todo()
 
 
 app = FastAPI(title="Abasto API", version="0.1.0", lifespan=lifespan)
@@ -99,6 +101,9 @@ async def _validacion(_: Request, exc: RequestValidationError) -> JSONResponse:
         status_code=422,
         content={"error": "Datos de entrada inválidos", "detalle": jsonable_encoder(exc.errors())},
     )
+
+
+app.include_router(rutas_agente.router)  # /inventario y /agente
 
 
 # ---------------------------------------------------------------- helpers
@@ -462,5 +467,6 @@ async def llamadas_del_pedido(pedido_id: str) -> list[Llamada]:
 async def reset(hard: bool = Query(False, description="También borra el cache")) -> dict:
     simulador.cancelar_todo()
     llamadas.cancelar_todo()
+    agente.cancelar_todo()
     store.reset(borrar_cache=hard)
     return {"ok": True, "cache_borrado": hard}
