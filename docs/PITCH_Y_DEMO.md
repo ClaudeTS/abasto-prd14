@@ -20,7 +20,10 @@ tienen un departamento de compras y software de cien mil dólares al año. Las d
 un WhatsApp."
 
 **[0:50 – 1:35] Qué es Abasto.**
-"Abasto es un director de compras con IA. Hace tres cosas que sin IA no se pueden hacer.
+"Abasto es un agente de compras con IA. Lucía le dice qué necesita, por voz o por escrito, y Abasto hace
+la compra entera: revisa el inventario, pide cotizaciones, llama a quien no contesta, arma el plan, ensaya
+la negociación y emite las órdenes. Lucía decide qué se compra solo y qué espera su OK.
+Por dentro hace tres cosas que sin IA no se pueden hacer.
 Uno: **entiende** las cotizaciones como llegan: texto, PDF, foto, audio, en pesos o en dólares, con o
 sin IVA, y las normaliza con evidencia de cada número.
 Dos: **optimiza** la compra con un solver matemático: reparte el pedido entre proveedores considerando
@@ -30,14 +33,15 @@ digital del proveedor con tres estrategias distintas, mide cuál funciona mejor 
 el mensaje. Lucía aprueba. Nada se manda sin ella."
 
 **[1:35 – 1:45] Transición a la demo.**
-"Les muestro la compra de octubre de Tecnova."
+"Lucía le pide a Abasto la compra de octubre de Tecnova. Por voz."
 
 → **DEMO (ver abajo)**
 
 **[post-demo, 0:40] Hacia dónde va.**
-"Lo que vieron son tres de siete capas. Con cada compra, Abasto aprende cómo se comporta cada
-proveedor: cuánto cede, cuándo sube, si cumple. Con el historial, predice precios y consumo: 'comprá
-el tóner del trimestre ahora, el importador sube cuando sube el dólar'. Y con muchas empresas, arma
+"Lo que vieron son tres de siete capas, y la mitad de una cuarta: el pronóstico de consumo ya funciona.
+Con cada compra, Abasto aprende cómo se comporta cada proveedor: cuánto cede, cuándo sube, si cumple. Con
+el historial, también va a predecir precios: 'comprá el tóner del trimestre ahora, el importador sube cuando
+sube el dólar'. Y con muchas empresas, arma
 un índice de precios de mercado: 'estás pagando 14 % sobre la mediana por las resmas'. Eso es lo que
 nadie puede copiar sin los datos."
 
@@ -48,8 +52,45 @@ pagar."
 
 ## Demo en vivo (2 minutos)
 
-Preparación: `make reset` hecho, navegador al 125 %, pestaña única, modo no molestar, video de
-respaldo abierto en otra ventana. Tipo de cambio del día cargado en `config.tipo_cambio_usd`.
+Preparación: `make reset` hecho (también vuelve el Inventario a los modos de siempre), navegador al 125 %,
+pestaña única en la pantalla **Agente**, Chrome o Edge con el permiso de micrófono dado, modo no molestar,
+video de respaldo abierto en otra ventana. Tipo de cambio del día cargado en `config.tipo_cambio_usd`.
+
+El recorrido usa las pantallas Agente e Inventario (`docs/AGENTE.md` §6). Hasta que estén en el front, se
+hace el plan B de más abajo.
+
+Con `data/inventario_demo.json`, la frase de la demo arma el pedido de siempre: 10 notebooks y 15 sillas (lo
+pedido) más 150 resmas, 8 tóner y 60 L de desinfectante (reposición). Por eso el plan y el ahorro son los de
+siempre: $ 498.454 + IVA y 8,1 %.
+
+| Paso | Qué hacés | Qué decís |
+|---|---|---|
+| 1. El pedido, por voz | En **Agente**, clic en el micrófono y decir: "Abasto, armá la compra del mes. Entran diez personas nuevas el 28 y necesitan notebook. Y para la oficina nueva, quince sillas ergonómicas para el 3 de noviembre." Revisar el texto dictado y clic en **Comprar**. Sin micrófono: **Usar el ejemplo**. | "Lucía no llena una planilla: le dice a Abasto qué necesita, como se lo diría a alguien del equipo." |
+| 2. La propuesta | La línea de tiempo llega a **Tu OK para cotizar**. Mostrar la propuesta: lo que pidió (notebooks y sillas) y la reposición (resmas, tóner y desinfectante). Señalar la evidencia de las resmas. Clic en **Confirmar y pedir cotizaciones**. | "Lo que pidió, y lo que se le va a terminar. Las resmas: noviembre viene 14 % arriba y ya están bajo el mínimo. Cada línea dice por qué está ahí." |
+| 3. Las respuestas | Desde el paso **Pedir cotizaciones**, abrir el feed. Llegan texto, PDF y foto. A los 25 s el agente llama solo a Papelera del Sur (paso **Llamar a quien no responde**): seguir la transcripción. | "Llegan como llegan de verdad: un PDF en dólares más IVA, una foto escrita a mano. La papelera no contestó, y Abasto no espera: la llama." |
+| 4. La duda | El agente se frena en **Revisar respuestas dudosas**: Compuservice no aclara el IVA. Clic en **Incluyen IVA**. | "Cuando no sabe, no adivina: pregunta. Un clic y sigue solo." |
+| 5. El plan | Desde el paso **Armar el plan de compra**, abrir el Plan. Mostrar el ahorro y señalar las sillas. | "Reparte entre tres proveedores: $ 498.454 más IVA, 8 % menos que comprarle todo al de siempre, casi 44 mil pesos, y 16 % en lo que el habitual vende. Las sillas no van al más barato: el fabricante exige un lote de 20 y necesitamos 15. Eso lo decide un solver, no el modelo de lenguaje." |
+| 6. Negociación y órdenes | El agente ensaya la negociación con Ofisillas y emite las órdenes. Mostrar que **OC-1003 (Papelera del Sur) salió sola** y que OC-1001 (Compuservice) y OC-1002 (Ofisillas) esperan. En OC-1002, **Ver negociación** y después **Aprobar**. | "La orden de la papelera salió sola: resmas y desinfectante están en automático y no pasan su tope. Las otras esperan a Lucía: notebooks y sillas están en manual, y el tóner supera su tope de 20 mil. Con Ofisillas ensayó tres estrategias y la de volumen consiguió 5 % menos. Lucía decide qué se compra solo; lo demás no sale sin ella." |
+| 7. Visión | 10 segundos en las próximas capas. En Predicción, mostrar que el pronóstico de consumo ya es real (el del Inventario); el de precios sigue siendo diseño. | "Y esto es lo que se construye con el tiempo y los datos. El pronóstico de consumo ya lo vieron funcionar; el de precios es lo que sigue." |
+
+Las órdenes que tienen que aparecer en el paso 6:
+
+| Orden | Proveedor | Qué lleva | Sale |
+|---|---|---|---|
+| OC-1001 | Compuservice | Notebooks (manual) y tóner ($ 25.574, supera su tope de $ 20.000) | Espera a Lucía |
+| OC-1002 | Ofisillas | Sillas (manual) y la negociación | Espera a Lucía |
+| OC-1003 | Papelera del Sur | Resmas ($ 26.804, tope $ 30.000) y desinfectante ($ 6.787, tope $ 10.000) | **Sola** |
+
+Para mostrar el control, si sobra tiempo: mientras llegan las respuestas (paso 3), ir a **Inventario** y cambiar
+un modo. Tiene que ser antes de que el agente emita las órdenes:
+
+- Desinfectante a manual: en el paso 6, la orden de Papelera también espera.
+- Tóner "sin tope": la orden de Compuservice sigue esperando, por las notebooks.
+
+### Plan B: recorrido paso a paso, sin el agente
+
+Las pantallas de siempre siguen funcionando con el mismo pedido. Si el agente falla en vivo, o mientras no
+estén las pantallas nuevas:
 
 | Paso | Qué hacés | Qué decís |
 |---|---|---|
@@ -64,7 +105,8 @@ Las llamadas alargan la demo. En modo simulado, la de la papelera dura unos 15 s
 la charla ensayada); en real, lo que dure la charla. Si no entran en el tiempo, dejar una sola. Cómo configurarlas:
 `docs/LLAMADAS.md`.
 
-Si algo falla en vivo: "Les muestro la corrida de hace un rato" y abrir el video. Sin disculpas largas. Si una
+Si algo falla en vivo: "Les muestro la corrida de hace un rato" y abrir el video. Sin disculpas largas. Si
+falla solo el agente, seguir con el plan B desde el paso donde se quedó. Si una
 llamada no sale o el celular no suena: **Simular llamada** (la misma llamada, simulada) y seguir.
 
 ## Slides (máximo 8)
@@ -74,7 +116,7 @@ llamada no sale o el celular no suena: **Simular llamada** (la misma llamada, si
 3. El problema en dos frases: "nadie cotiza bien porque lleva horas" (quien compra) / "no sé si pago de más" (quien paga).
 4. Las tres capacidades (entiende · optimiza · ensaya).
 5. "Sin IA no existe" (qué pasa si sacamos el modelo: queda una planilla vacía).
-6. Las 7 capas (las 3 construidas resaltadas, las 4 de visión en gris).
+6. Las 7 capas: la 1, la 4 y la 5 resaltadas; la 3 a medias (el pronóstico de consumo ya funciona); las demás en gris.
 7. Mercado y competencia: SAP Ariba, Pactum, Mandel AI → empresas grandes con ERP y equipo de compras. Nosotros: la empresa que compra por WhatsApp y mail.
 8. Modelo de negocio + equipo + pedido (qué necesitamos: 10 empresas piloto).
 
@@ -125,14 +167,20 @@ Los datos de cada empresa son suyos. El índice de mercado se construye solo con
 y agregados, y la empresa elige participar a cambio de ver el índice.
 
 **"¿Cuánto de esto funciona de verdad?"**
-Lo que vieron corre: extracción de cuatro formatos y dos monedas, el solver y la negociación simulada.
+Lo que vieron corre: el agente que entiende el pedido por voz y revisa el inventario con un pronóstico
+de consumo estacional, la extracción de cuatro formatos y dos monedas, el solver, la negociación simulada y
+las órdenes de compra (su envío es simulado).
 Los proveedores son simulados porque en 24 horas nadie contesta. Las llamadas salen de verdad (ElevenLabs +
 Twilio), pero solo a celulares del equipo, que hacen de proveedores (si la demo fue con llamadas simuladas,
-decirlo). Las capas de predicción e índice son diseño, no código. Lo decimos con claridad.
+decirlo). La predicción de precios y el índice de mercado son diseño, no código. Lo decimos con claridad.
 
 ## Checklist de la hora previa
 
 - [ ] `make reset` ejecutado; recorrido probado una vez más.
+- [ ] Micrófono: Chrome o Edge, permiso dado, probado con la frase de la demo. Sin LLM, el back solo entiende
+      esa frase: decirla tal cual o usar **Usar el ejemplo**.
+- [ ] Inventario con los modos de siempre (el reset los vuelve): notebooks y sillas en manual; resmas, tóner y
+      desinfectante en automático, con topes de $ 30.000, $ 20.000 y $ 10.000.
 - [ ] Si la demo va contra el deploy: abrir https://abasto-backend.onrender.com/health para despertarlo (se duerme
       a los 15 min) y resetear con el botón de la UI.
 - [ ] Llamadas: decidir real o simulada (`LLAMADAS_MODO`). En real: `GET /llamadas/config` responde `lista: true`,
