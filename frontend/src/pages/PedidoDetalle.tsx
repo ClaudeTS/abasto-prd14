@@ -14,6 +14,7 @@ import { BadgeEstado, CLIENTE, EtiquetaEjemplo, fechaHoraLarga, fechaLarga } fro
 import { Cotizaciones, Negociacion, Resumen } from "@/features/pedidos/Secciones";
 import { TarjetaInforme, TarjetaOrdenes, TarjetaProductos } from "@/features/pedidos/TarjetasLaterales";
 import type { DetallePedido, OrigenPedido } from "@/features/pedidos/types";
+import RankingProveedores from "@/features/proveedores/RankingProveedores";
 import { ContenidoPestana, ListaPestanas, Pestana, Pestanas } from "@/features/pedidos/ui";
 import { mensajeError } from "@/lib/errores";
 import { usePolling } from "@/lib/usePolling";
@@ -165,7 +166,8 @@ export default function PedidoDetalle() {
               <Resumen pedido={pedido} />
             </ContenidoPestana>
             <ContenidoPestana value="cotizaciones">
-              {/* RANKING: el Bloque 4 agrega <RankingProveedores pedidoId=... /> */}
+              {/* RF-07: el ranking se calcula sobre las cotizaciones guardadas; los pedidos de ejemplo no las tienen. */}
+              {!pedido.ejemplo && pedido.cotizaciones.length > 0 && <RankingProveedores pedidoId={pedido.id} />}
               <Cotizaciones pedido={pedido} />
             </ContenidoPestana>
             <ContenidoPestana value="negociacion">

@@ -223,4 +223,39 @@ export interface Llamada {
   mensaje_id: string | null;
   error: string | null;
   iniciada_en: string;
+  /** RF-06 (opcionales): intento 1 o 2, si atendió, hasta cuándo se guarda el audio y la secuencia de contacto. */
+  intento?: number | null;
+  atendida?: boolean | null;
+  audio_disponible_hasta?: string | null;
+  secuencia?: SecuenciaContacto | null;
+}
+
+export type EstadoPasoContacto =
+  | "pendiente"
+  | "programado"
+  | "en_curso"
+  | "atendida"
+  | "no_atendida"
+  | "enviado"
+  | "omitido"
+  | "cancelado"
+  | "error";
+
+export interface PasoContacto {
+  paso: "llamada" | "reintento" | "whatsapp" | "email";
+  estado: EstadoPasoContacto;
+  programado_para: string | null;
+  hecho_en: string | null;
+  detalle: string | null;
+}
+
+/** Si no atiende: reintento a los 30 min, después WhatsApp con el motivo (o email si no tiene WhatsApp). */
+export interface SecuenciaContacto {
+  id: string;
+  estado: "en_curso" | "reintento_programado" | "atendida" | "respondio" | "aviso_enviado" | "interrumpida";
+  intento: number;
+  reintento_minutos: number;
+  reintento_en: string | null;
+  tiene_whatsapp: boolean;
+  pasos: PasoContacto[];
 }

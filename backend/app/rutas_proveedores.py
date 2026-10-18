@@ -6,9 +6,10 @@ nuevas. Las rutas fijas (`/proveedores/listado`, `/proveedores/alta…`) van ant
 
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app import perfiles, ranking
+from app.auth import Usuario, requiere_admin
 from app.perfiles import AltaAgente, AltaManual, AprobacionAlta, PerfilEdicion
 
 router = APIRouter()
@@ -44,10 +45,12 @@ async def ver_perfil(proveedor_id: str) -> dict:
 
 
 @router.patch("/proveedores/{proveedor_id}/perfil")
-async def editar_perfil(proveedor_id: str, cambios: PerfilEdicion) -> dict:
-    """Solo el administrador (la UI lo oculta al resto; el control en el backend llega con el bloque 3)."""
+async def editar_perfil(
+    proveedor_id: str, cambios: PerfilEdicion, usuario: Usuario = Depends(requiere_admin)
+) -> dict:
+    """Solo el administrador: 401 sin sesión, 403 con rol consulta. Quién editó sale de la sesión."""
     _proveedor(proveedor_id)
-    return perfiles.editar(proveedor_id, cambios)
+    return perfiles.editar(proveedor_id, cambios.model_copy(update={"usuario": usuario.nombre}))
 
 
 # ---------------------------------------------------------------- RF-19: altas
@@ -63,9 +66,13 @@ async def alta_agente(datos: AltaAgente) -> dict:
 
 
 @router.post("/proveedores/{proveedor_id}/aprobar-alta")
-async def aprobar_alta(proveedor_id: str, datos: AprobacionAlta | None = None) -> dict:
+async def aprobar_alta(
+    proveedor_id: str, datos: AprobacionAlta | None = None, usuario: Usuario = Depends(requiere_admin)
+) -> dict:
+    """Solo el administrador aprueba o rechaza el alta que dejó el agente."""
     try:
-        return perfiles.aprobar_alta(proveedor_id, datos or AprobacionAlta())
+        datos = (datos or AprobacionAlta()).model_copy(update={"usuario": usuario.nombre})
+        return perfiles.aprobar_alta(proveedor_id, datos)
     except KeyError as exc:
         raise _error(404, f"No hay un alta pendiente para '{proveedor_id}'") from exc
     except ValueError as exc:

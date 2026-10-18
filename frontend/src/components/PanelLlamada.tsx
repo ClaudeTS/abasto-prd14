@@ -19,13 +19,16 @@ import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle }
 import { Spinner } from "@/components/ui/spinner";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Avatar, Etiqueta, Puntos } from "@/components/comunes";
-import type { ConfigLlamadas, EstadoLlamada, Llamada } from "@/types";
+import type { ConfigLlamadas, EstadoLlamada, EstadoPasoContacto, Llamada, PasoContacto, SecuenciaContacto } from "@/types";
 
 // Llamadas telefónicas del agente (ElevenLabs + Twilio, o simuladas). Un panel reutilizable para
 // "llamar al que no respondió" (feed) y "Aprobar y llamar" (negociación).
 
 export const LLAMADA_ACTIVA: EstadoLlamada[] = ["iniciando", "sonando", "en_curso", "procesando"];
 export const estaActiva = (l: Llamada | null | undefined) => !!l && LLAMADA_ACTIVA.includes(l.estado);
+/** La secuencia de contacto sigue viva (en curso o con el reintento programado): se sigue consultando. */
+const secuenciaAbierta = (l: Llamada | null | undefined) =>
+  !!l?.secuencia && (l.secuencia.estado === "en_curso" || l.secuencia.estado === "reintento_programado");
 
 // ─────────── Configuración (GET /llamadas/config) ───────────
 
@@ -154,7 +157,7 @@ export function useLlamada(clave: string, iniciarFn: (simulada: boolean) => Prom
       }
     },
     1000,
-    estaActiva(llamada),
+    estaActiva(llamada) || secuenciaAbierta(llamada),
   );
 
   const correr = async (accion: (simulada: boolean) => Promise<Llamada>, simulada: boolean) => {
@@ -323,6 +326,8 @@ export default function PanelLlamada({
           </div>
         )}
 
+        {llamada?.secuencia && <Secuencia secuencia={llamada.secuencia} />}
+
         {errorConsulta && (
           <p className="text-xs text-muted-foreground">
             No pude consultar la llamada ({errorConsulta}). Sigo intentando…
@@ -422,4 +427,62 @@ function EstadoVisible({
 
 function Fila({ className, children }: { className?: string; children: ReactNode }) {
   return <p className={cn("flex items-center gap-2 text-sm font-medium", className)}>{children}</p>;
+}
+
+// ─────────── Secuencia de contacto (RF-06) ───────────
+
+const NOMBRE_PASO: Record<PasoContacto["paso"], string> = {
+  llamada: "Llamada",
+  reintento: "Reintento",
+  whatsapp: "WhatsApp con el motivo",
+  email: "Email con la solicitud",
+};
+
+const ESTADO_PASO: Record<EstadoPasoContacto, { texto: string; tono: ComponentProps<typeof Etiqueta>["tono"] }> = {
+  pendiente: { texto: "Pendiente", tono: "neutro" },
+  programado: { texto: "Programado", tono: "azul" },
+  en_curso: { texto: "En curso", tono: "azul" },
+  atendida: { texto: "Atendió", tono: "verde" },
+  no_atendida: { texto: "No atendió", tono: "ambar" },
+  enviado: { texto: "Enviado", tono: "verde" },
+  omitido: { texto: "No hizo falta", tono: "neutro" },
+  cancelado: { texto: "Cancelado", tono: "neutro" },
+  error: { texto: "Error", tono: "rojo" },
+};
+
+function hora(iso: string | null): string | null {
+  if (!iso) return null;
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? null : d.toLocaleTimeString("es-UY", { hour: "2-digit", minute: "2-digit" });
+}
+
+function Secuencia({ secuencia }: { secuencia: SecuenciaContacto }) {
+  // Solo aporta si hubo algo más que la primera llamada atendida.
+  const visibles = secuencia.pasos.filter((p) => p.estado !== "omitido" || p.paso === "llamada");
+  if (secuencia.estado === "atendida" && secuencia.intento === 1) return null;
+  return (
+    <div className="mt-3 rounded-lg border px-3 py-2">
+      <p className="mb-1.5 text-xs font-medium text-muted-foreground">
+        Si no atiende: reintento a los {Math.round(secuencia.reintento_minutos)} min y después{" "}
+        {secuencia.tiene_whatsapp ? "WhatsApp" : "email"}
+      </p>
+      <ol className="space-y-1">
+        {visibles.map((p, k) => {
+          const e = ESTADO_PASO[p.estado] ?? ESTADO_PASO.pendiente;
+          const cuando = hora(p.hecho_en) ?? (p.estado === "programado" ? hora(p.programado_para) : null);
+          return (
+            <li key={k} className="flex items-center justify-between gap-3 text-sm">
+              <span className="min-w-0 truncate" title={p.detalle ?? undefined}>
+                {NOMBRE_PASO[p.paso]}
+                {cuando && <span className="ml-1.5 text-xs text-muted-foreground tabular-nums">{cuando}</span>}
+              </span>
+              <Etiqueta tono={e.tono} className="h-4.5 shrink-0 text-[11px]">
+                {e.texto}
+              </Etiqueta>
+            </li>
+          );
+        })}
+      </ol>
+    </div>
+  );
 }

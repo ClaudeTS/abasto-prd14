@@ -11,7 +11,7 @@ from datetime import datetime
 import pytest
 from fastapi.testclient import TestClient
 
-from app import config, perfiles, pipeline, ranking, store
+from app import auth, config, perfiles, pipeline, ranking, store
 from app.main import app
 from app.models import Llamada, ResultadoLlamada
 
@@ -20,7 +20,8 @@ PEDIDO = "pedido_demo_oct_2026"
 
 @pytest.fixture()
 def client():
-    with TestClient(app) as c:
+    # Editar perfiles y aprobar altas pide sesión de administrador (RF-21): el cliente entra como Lucía.
+    with TestClient(app, headers={"Authorization": f"Bearer {auth.emitir_token('u_lucia')}"}) as c:
         c.post("/reset")
         yield c
         c.post("/reset")
@@ -263,3 +264,11 @@ def test_riesgo_plazo_regla_15_dias():
     assert ranking._riesgo_plazo(17, ref)["nivel"] == "aceptable"
     assert ranking._riesgo_plazo(18, ref)["nivel"] == "alto"
     assert ranking._riesgo_plazo(5, None)["nivel"] == "sin_dato"
+
+
+def test_editar_perfil_y_aprobar_alta_piden_administrador():
+    with TestClient(app) as c:
+        assert c.patch("/proveedores/ofisillas/perfil", json={"precio_piso_pct": 6}).status_code == 401
+        consulta = {"Authorization": f"Bearer {auth.emitir_token('u_martin')}"}
+        assert c.patch("/proveedores/ofisillas/perfil", json={"precio_piso_pct": 6}, headers=consulta).status_code == 403
+        assert c.post("/proveedores/x/aprobar-alta", headers=consulta).status_code == 403
