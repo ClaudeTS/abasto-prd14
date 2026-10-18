@@ -1,0 +1,85 @@
+{
+  "_nota": "Datos de ejemplo del bloque 4 (PRD 1.4, tabla proveedor y simulacion_negociacion). La demo no tiene antigüedad, garantía ni historial de negociaciones reales: estos valores son ilustrativos y la UI los muestra con la leyenda 'Datos de ejemplo'. El cumplimiento histórico es la confiabilidad del proveedor (proveedores_sim.json) expresada en %, la misma que usa el optimizador.",
+  "ejemplo": true,
+  "proveedores": {
+    "tecnoimport": {
+      "fecha_alta": "2023-08-14",
+      "cumplimiento_historico_pct": 93,
+      "garantia_meses": 12,
+      "email": "cuentas@tecnoimport.com.uy",
+      "whatsapp": false,
+      "alta_por": "usuario",
+      "ejemplo": true
+    },
+    "compuservice": {
+      "fecha_alta": "2025-09-02",
+      "cumplimiento_historico_pct": 80,
+      "garantia_meses": 6,
+      "email": null,
+      "whatsapp": true,
+      "alta_por": "usuario",
+      "ejemplo": true
+    },
+    "papelera_del_sur": {
+      "fecha_alta": "2024-06-20",
+      "cumplimiento_historico_pct": 86,
+      "garantia_meses": null,
+      "email": "ventas@papeleradelsur.com.uy",
+      "whatsapp": true,
+      "alta_por": "usuario",
+      "ejemplo": true
+    },
+    "muebleria_rivera": {
+      "fecha_alta": "2024-03-11",
+      "cumplimiento_historico_pct": 90,
+      "garantia_meses": 24,
+      "email": "muebleriarivera@gmail.com",
+      "whatsapp": false,
+      "alta_por": "usuario",
+      "ejemplo": true
+    },
+    "ofisillas": {
+      "fecha_alta": "2022-07-05",
+      "cumplimiento_historico_pct": 84,
+      "garantia_meses": 12,
+      "email": "ventas@ofisillas.com.uy",
+      "whatsapp": true,
+      "alta_por": "usuario",
+      "ejemplo": true
+    },
+    "distribuidora_oriental": {
+      "fecha_alta": "2020-04-01",
+      "cumplimiento_historico_pct": 88,
+      "garantia_meses": 6,
+      "email": "pedidos@distoriental.com.uy",
+      "whatsapp": true,
+      "alta_por": "usuario",
+      "ejemplo": true
+    }
+  },
+  "negociaciones_historicas": [
+    { "proveedor_id": "ofisillas", "pedido": "PED-0142", "fecha": "2026-09-17", "estrategia": "volumen", "concesion_simulada_pct": 5.0, "concesion_real_pct": 5.0, "ejemplo": true },
+    { "proveedor_id": "ofisillas", "pedido": "PED-0135", "fecha": "2026-08-12", "estrategia": "plazo", "concesion_simulada_pct": 3.0, "concesion_real_pct": 2.0, "ejemplo": true },
+    { "proveedor_id": "ofisillas", "pedido": "PED-0120", "fecha": "2026-06-30", "estrategia": "competencia", "concesion_simulada_pct": 4.0, "concesion_real_pct": 0.0, "ejemplo": true },
+    { "proveedor_id": "ofisillas", "pedido": "PED-0101", "fecha": "2026-04-08", "estrategia": "volumen", "concesion_simulada_pct": 6.0, "concesion_real_pct": 2.6, "ejemplo": true },
+
+    { "proveedor_id": "distribuidora_oriental", "pedido": "PED-0139", "fecha": "2026-09-05", "estrategia": "competencia", "concesion_simulada_pct": 3.0, "concesion_real_pct": 2.0, "ejemplo": true },
+    { "proveedor_id": "distribuidora_oriental", "pedido": "PED-0128", "fecha": "2026-07-22", "estrategia": "competencia", "concesion_simulada_pct": 2.0, "concesion_real_pct": 2.0, "ejemplo": true },
+    { "proveedor_id": "distribuidora_oriental", "pedido": "PED-0115", "fecha": "2026-06-10", "estrategia": "volumen", "concesion_simulada_pct": 1.0, "concesion_real_pct": 3.0, "ejemplo": true },
+    { "proveedor_id": "distribuidora_oriental", "pedido": "PED-0098", "fecha": "2026-03-18", "estrategia": "competencia", "concesion_simulada_pct": 4.0, "concesion_real_pct": 2.4, "ejemplo": true },
+    { "proveedor_id": "distribuidora_oriental", "pedido": "PED-0087", "fecha": "2026-02-04", "estrategia": "competencia", "concesion_simulada_pct": 2.0, "concesion_real_pct": 2.0, "ejemplo": true },
+
+    { "proveedor_id": "tecnoimport", "pedido": "PED-0131", "fecha": "2026-08-01", "estrategia": "competencia", "concesion_simulada_pct": 4.0, "concesion_real_pct": 2.0, "ejemplo": true },
+    { "proveedor_id": "tecnoimport", "pedido": "PED-0110", "fecha": "2026-05-19", "estrategia": "competencia", "concesion_simulada_pct": 2.0, "concesion_real_pct": 2.3, "ejemplo": true },
+    { "proveedor_id": "tecnoimport", "pedido": "PED-0094", "fecha": "2026-03-02", "estrategia": "volumen", "concesion_simulada_pct": 3.0, "concesion_real_pct": 0.0, "ejemplo": true },
+
+    { "proveedor_id": "papelera_del_sur", "pedido": "PED-0137", "fecha": "2026-08-28", "estrategia": "volumen", "concesion_simulada_pct": 5.0, "concesion_real_pct": 2.0, "ejemplo": true },
+    { "proveedor_id": "papelera_del_sur", "pedido": "PED-0122", "fecha": "2026-07-03", "estrategia": "volumen", "concesion_simulada_pct": 4.0, "concesion_real_pct": 0.0, "ejemplo": true },
+    { "proveedor_id": "papelera_del_sur", "pedido": "PED-0109", "fecha": "2026-05-12", "estrategia": "plazo", "concesion_simulada_pct": 3.0, "concesion_real_pct": 8.0, "ejemplo": true },
+
+    { "proveedor_id": "compuservice", "pedido": "PED-0133", "fecha": "2026-08-20", "estrategia": "plazo", "concesion_simulada_pct": 3.0, "concesion_real_pct": 2.0, "ejemplo": true },
+    { "proveedor_id": "compuservice", "pedido": "PED-0118", "fecha": "2026-06-24", "estrategia": "volumen", "concesion_simulada_pct": 2.0, "concesion_real_pct": 1.0, "ejemplo": true },
+
+    { "proveedor_id": "muebleria_rivera", "pedido": "PED-0126", "fecha": "2026-07-15", "estrategia": "plazo", "concesion_simulada_pct": 4.0, "concesion_real_pct": 3.0, "ejemplo": true }
+  ]
+}

@@ -44,7 +44,9 @@ def proveedores() -> dict[str, Proveedor]:
 def perfil_privado(proveedor_id: str) -> dict[str, Any]:
     for p in store.semilla("proveedores_sim")["proveedores"]:
         if p["publico"]["id"] == proveedor_id:
-            return p["privado"]
+            from app.perfiles import para_gemelo  # PRD 1.4 RF-17: lo que edita el admin llega al gemelo
+
+            return para_gemelo(proveedor_id, p["privado"])
     raise KeyError(proveedor_id)
 
 
