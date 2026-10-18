@@ -21,6 +21,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app import config, integracion_a, llamadas, pedidos, pipeline, simulador, store
 from app import agente, rutas_agente  # agente de compras e inventario (docs/AGENTE.md)
+from app import rutas_auth, rutas_dashboard, rutas_pedidos, rutas_proveedores, rutas_reglas  # PRD 1.4
 from app.models import (
     AprobacionNegociacion,
     Canal,
@@ -104,6 +105,9 @@ async def _validacion(_: Request, exc: RequestValidationError) -> JSONResponse:
 
 
 app.include_router(rutas_agente.router)  # /inventario y /agente
+# PRD 1.4 (docs/PRD-1.4.md): un router por área para que cada bloque se trabaje por separado.
+for _r in (rutas_auth, rutas_dashboard, rutas_pedidos, rutas_proveedores, rutas_reglas):
+    app.include_router(_r.router)
 
 
 # ---------------------------------------------------------------- helpers

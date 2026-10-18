@@ -30,15 +30,10 @@ export default function Layout({
   children: ReactNode;
 }) {
   return (
-    <div className="min-h-svh bg-background">
-      <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur supports-backdrop-filter:bg-background/60">
-        <div className="mx-auto flex h-14 max-w-7xl items-center gap-6 px-4 sm:px-6">
-          <NavLink to="/pedido" className="flex items-center gap-2">
-            <span className="flex size-7 items-center justify-center rounded-md bg-primary text-sm font-bold text-primary-foreground">
-              A
-            </span>
-            <span className="font-semibold tracking-tight">Abasto</span>
-          </NavLink>
+    // Dentro del AppShell (PRD 1.4): la barra de pasos del recorrido guiado del pitch.
+    <div className="mx-auto max-w-7xl">
+      <header className="mb-8 rounded-xl border bg-background">
+        <div className="flex min-h-12 flex-wrap items-center gap-x-6 gap-y-2 px-4 py-2">
 
           <nav className="flex min-w-0 items-center gap-5 overflow-x-auto text-sm">
             {PASOS.map((p, i) => (
@@ -80,7 +75,7 @@ export default function Layout({
           </div>
         </div>
       </header>
-      <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6">{children}</main>
+      <div>{children}</div>
     </div>
   );
 }

@@ -45,14 +45,30 @@ function resolverModo(): "mock" | "backend" {
 }
 
 export const MODO = resolverModo();
+
+/** Token de sesión (RF-21). Lo guarda src/lib/auth.tsx; acá solo se adjunta a cada pedido. */
+export const CLAVE_TOKEN = "token_abasto";
+function tokenHeader(): Record<string, string> {
+  try {
+    const t = localStorage.getItem(CLAVE_TOKEN);
+    return t ? { Authorization: `Bearer ${t}` } : {};
+  } catch {
+    return {};
+  }
+}
 const MOCK = MODO === "mock";
 
-async function http<T>(metodo: "GET" | "POST", ruta: string, body?: unknown): Promise<T> {
+/** Exportado para los módulos por área (src/features/<area>/api.ts), que no tocan este archivo. */
+export type Metodo = "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
+export async function http<T>(metodo: Metodo, ruta: string, body?: unknown): Promise<T> {
   let res: Response;
   try {
     res = await fetch(API_URL + ruta, {
       method: metodo,
-      headers: body === undefined ? undefined : { "Content-Type": "application/json" },
+      headers: {
+        ...(body === undefined ? {} : { "Content-Type": "application/json" }),
+        ...tokenHeader(),
+      },
       body: body === undefined ? undefined : JSON.stringify(body),
     });
   } catch {
