@@ -3,7 +3,8 @@
 - Datos semilla (solo lectura): pedido_demo.json, proveedores_sim.json, respuestas_fijas.json,
   extracciones_fijas.json. Siempre de archivos: vienen con el repo.
 - Runtime (lectura/escritura): una colección por archivo, `{id: objeto}`; en Postgres, filas de
-  `documentos (coleccion, id, datos)`. `reset()` la borra.
+  `documentos (coleccion, id, datos)`. `reset()` la borra, salvo las colecciones registradas con
+  `registrar_persistente()` (configuración, reglas, sesiones): esas solo las borra `reset(total=True)`.
 - Cache (sobrevive a `make reset`): respuestas generadas por el simulador y extracciones del LLM;
   en Postgres, la tabla `cache`.
 - Archivos (PDF y fotos): siempre en disco (runtime/archivos), porque se leen por ruta. En Postgres
@@ -31,6 +32,7 @@ _seed_cache: dict[str, Any] = {}
 COLECCIONES = (
     "pedidos", "mensajes", "cotizaciones", "extracciones", "planes", "negociaciones", "llamadas",
 )
+_persistentes: set[str] = set()  # sobreviven a reset(); ver registrar_persistente()
 
 
 # ---------------------------------------------------------------- semilla
@@ -250,14 +252,49 @@ def cache_guardar(clave: str, valor: Any) -> None:
 
 
 # ---------------------------------------------------------------- reset
-def reset(borrar_cache: bool = False) -> None:
+def registrar_persistente(coleccion: str) -> None:
+    """La colección sobrevive a "Reiniciar demo" (reset()). Solo la borra reset(total=True)."""
     with _lock:
+        _persistentes.add(coleccion)
+
+
+def colecciones_persistentes() -> frozenset[str]:
+    with _lock:
+        return frozenset(_persistentes)
+
+
+def _vaciar_runtime(conservar: frozenset[str]) -> None:
+    """Borra runtime/ (colecciones y archivos) menos los <coleccion>.json de `conservar`."""
+    runtime = config.settings.runtime_dir
+    if not conservar:
+        shutil.rmtree(runtime, ignore_errors=True)
+        return
+    for ruta in runtime.iterdir() if runtime.is_dir() else ():
+        if ruta.is_file() and ruta.suffix == ".json" and ruta.stem in conservar:
+            continue
+        if ruta.is_dir():
+            shutil.rmtree(ruta, ignore_errors=True)
+        else:
+            ruta.unlink(missing_ok=True)
+
+
+def reset(borrar_cache: bool = False, total: bool = False) -> None:
+    """Borra lo operativo (pedidos, corridas, archivos…) y conserva las colecciones persistentes.
+
+    `total=True` borra también las persistentes (lo que hacía reset() antes del PRD 1.4).
+    El cache se conserva salvo con `borrar_cache=True`.
+    """
+    with _lock:
+        conservar = frozenset() if total else frozenset(_persistentes)
         if _con_db():
-            _sql("delete from documentos")
+            if conservar:
+                _sql("delete from documentos where coleccion <> all(%s)", (sorted(conservar),))
+            else:
+                _sql("delete from documentos")
             _sql("delete from archivos")
             if borrar_cache:
                 _sql("delete from cache")
-        shutil.rmtree(config.settings.runtime_dir, ignore_errors=True)
+        _vaciar_runtime(conservar)
         if borrar_cache:
             shutil.rmtree(config.settings.cache_dir, ignore_errors=True)
         config.settings.runtime_dir.mkdir(parents=True, exist_ok=True)
