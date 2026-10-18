@@ -5,6 +5,7 @@ import {
   ClipboardListIcon,
   HomeIcon,
   LogOutIcon,
+  PackageIcon,
   PlayCircleIcon,
   Settings2Icon,
   SlidersHorizontalIcon,
@@ -25,6 +26,7 @@ interface Item {
 const PRINCIPAL: Item[] = [
   { to: "/inicio", label: "Inicio", icon: HomeIcon },
   { to: "/pedidos", label: "Pedidos", icon: ClipboardListIcon },
+  { to: "/stock", label: "Depósito", icon: PackageIcon },
   { to: "/proveedores", label: "Proveedores", icon: TruckIcon },
 ];
 const ADMIN: Item[] = [

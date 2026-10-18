@@ -23,6 +23,7 @@ import Pedidos from "./pages/Pedidos";
 import Proveedores from "./pages/Proveedores";
 import Registro from "./pages/Registro";
 import Reglas from "./pages/Reglas";
+import Stock from "./pages/Stock";
 import type { Negociacion, PedidoDemo, Plan } from "./types";
 
 export interface EnCurso {
@@ -131,6 +132,7 @@ export default function App() {
                 <Route path="/inicio" element={<Inicio />} />
                 <Route path="/pedidos" element={<Pedidos />} />
                 <Route path="/pedidos/nuevo" element={<NuevoPedido />} />
+                <Route path="/stock" element={<Stock />} />
                 <Route path="/pedidos/:pedidoId" element={<PedidoDetalle />} />
                 <Route path="/proveedores" element={<Proveedores />} />
                 <Route path="/proveedores/:proveedorId" element={<Proveedores />} />
