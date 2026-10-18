@@ -15,19 +15,28 @@ Modos (`LLAMADAS_MODO`):
 El agente se configura una vez en la consola de ElevenLabs con un prompt base; lo de cada llamada
 llega en variables dinámicas (`instrucciones`, `primer_mensaje`, …), sin overrides.
 Solo se llama a los números de `TELEFONOS_PROVEEDORES`.
+
+RF-06 (PRD 1.4): en el primer mensaje el agente se presenta como asistente de inteligencia artificial
+y avisa que la llamada se graba; no hay duración máxima. Las llamadas de cotización siguen la
+secuencia de contacto (§11.1): si el proveedor no atiende, se reintenta a los
+`LLAMADA_REINTENTO_MINUTOS` (30); si tampoco, se le escribe por WhatsApp con el motivo y, si no tiene
+WhatsApp, se le manda un email con la solicitud de cotización. Cada contacto enviado queda en la
+colección `contactos`; el estado de la secuencia, en `secuencias` (y en `GET /llamadas/{id}`).
 """
 
 from __future__ import annotations
 
 import asyncio
 import logging
+import os
 import time
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
-from typing import Any
+from typing import Any, Literal
 
 import httpx
+from pydantic import BaseModel, Field
 
 from app import config, pedidos, store
 from app.models import (
@@ -44,9 +53,17 @@ from app.pipeline import catalogo, modo_extraccion, perfil_privado, procesar_men
 
 log = logging.getLogger("abasto.llamadas")
 INTERVALO_CONSULTA_S = 2.5
-DURACION_MAXIMA_S = 15 * 60
+# No es una duración máxima de la llamada (RF-06: no hay): el agente no corta. Es hasta cuándo se
+# sigue consultando a ElevenLabs una conversación que nunca informa que terminó.
+SEGUIMIENTO_MAXIMO_S = 4 * 60 * 60
 ACTIVAS = ("iniciando", "sonando", "en_curso", "procesando")
+REINTENTO_MINUTOS = 30  # RF-06; se cambia con LLAMADA_REINTENTO_MINUTOS
+# En simulado, cada minuto de espera dura 1 s × SIM_DELAY_SECONDS / 4 (30 min → 30 s con la base 4).
+SEGUNDOS_SIMULADOS_POR_MINUTO = 1.0
+DIAS_AUDIO = 60  # RF-06: la transcripción se guarda siempre; el audio, 60 días (retención en ElevenLabs)
 _tareas: set[asyncio.Task] = set()
+_reintentos: dict[str, asyncio.Task] = {}  # secuencia_id → reintento programado
+_no_atendidas: set[str] = set()  # llamadas que terminaron sin que el proveedor atienda
 
 
 class LlamadaNoPosible(ValueError):
@@ -99,21 +116,39 @@ def _variables_base(pedido: Any, proveedor_id: str) -> dict[str, str]:
     }
 
 
-def instrucciones_cotizacion(pedido: Any, proveedor_id: str) -> dict[str, str]:
-    """Variables dinámicas para pedir la cotización a quien no respondió."""
-    base = _variables_base(pedido, proveedor_id)
+def _presentacion(negocio: str) -> str:
+    """RF-06: se identifica como IA y avisa que graba, en el primer mensaje."""
+    return f"Soy el asistente de inteligencia artificial de {negocio} y te aviso que esta llamada se graba."
+
+
+_REGLAS_IDENTIDAD = (
+    "Ya te presentaste como asistente de inteligencia artificial y avisaste que la llamada se graba: "
+    "si te lo preguntan, confirmalo, nunca lo niegues. La llamada no tiene duración máxima: no apures "
+    "al proveedor. "
+)
+
+
+def lista_pedido(pedido: Any, proveedor_id: str) -> str:
+    """Las líneas del pedido que vende ese proveedor, una por renglón (para llamadas y avisos)."""
     nombres = _nombres()
     vende = set(perfil_privado(proveedor_id).get("tabla_precios", {}))
     lineas = [l for l in pedido.lineas if not vende or l.producto_id in vende] or pedido.lineas
     unidades = {p.id: p.unidad_canonica for p in catalogo()}
-    lista = "\n".join(
+    return "\n".join(
         f"- {fmt(l.cantidad)} {'litros' if unidades.get(l.producto_id) == 'l' else 'unidades'} "
         f"de {nombres[l.producto_id]} (para el {l.necesario_para.strftime('%d/%m')})"
         for l in lineas
     )
+
+
+def instrucciones_cotizacion(pedido: Any, proveedor_id: str) -> dict[str, str]:
+    """Variables dinámicas para pedir la cotización a quien no respondió."""
+    base = _variables_base(pedido, proveedor_id)
+    lista = lista_pedido(pedido, proveedor_id)
     instrucciones = (
         f"Llamás a {base['proveedor_nombre']} de parte de {base['comprador']}, de {base['negocio']}. "
-        "Les pidieron cotización por WhatsApp y todavía no respondieron. Pedí precio de:\n"
+        + _REGLAS_IDENTIDAD
+        + "Les pidieron cotización por WhatsApp y todavía no respondieron. Pedí precio de:\n"
         f"{lista}\n"
         "Para cada producto preguntá el precio y en qué unidad cotiza (por unidad, por caja, por "
         "bidón), y si incluye IVA. Preguntá también plazo de entrega, forma de pago y costo de envío. "
@@ -125,8 +160,9 @@ def instrucciones_cotizacion(pedido: Any, proveedor_id: str) -> dict[str, str]:
         "tipo_llamada": "cotizacion",
         "instrucciones": instrucciones,
         "primer_mensaje": (
-            f"Hola, ¿hablo con {base['proveedor_nombre']}? Te llamo de parte de {base['comprador']}, "
-            f"de {base['negocio']}, por la cotización que les pedimos por WhatsApp. ¿Tenés un minuto?"
+            f"Hola, ¿hablo con {base['proveedor_nombre']}? {_presentacion(base['negocio'])} "
+            f"Te llamo de parte de {base['comprador']} por la cotización que les pedimos por WhatsApp. "
+            "¿Tenés un minuto?"
         ),
     }
 
@@ -150,6 +186,8 @@ def instrucciones_negociacion(
     instrucciones = (
         f"Llamás a {base['proveedor_nombre']} de parte de {base['comprador']}, de {base['negocio']}, "
         f"para negociar esta compra:\n{items}\n"
+        + _REGLAS_IDENTIDAD
+        + "\n"
         f"Estrategia aprobada por {base['comprador']}: {negociacion.elegida} ({descripcion}).\n"
         f"Mensaje aprobado, usalo como guion pero no lo leas textual: «{mensaje}»\n"
         "Reglas: no reveles cuánto están dispuestos a pagar, no inventes competidores ni precios, no "
@@ -162,9 +200,9 @@ def instrucciones_negociacion(
         "tipo_llamada": "negociacion",
         "instrucciones": instrucciones,
         "primer_mensaje": (
-            f"Hola, ¿hablo con {base['proveedor_nombre']}? Te llamo de parte de {base['comprador']}, "
-            f"de {base['negocio']}, por la cotización de {nombres[asignado[0].producto_id].lower()}. "
-            "¿Tenés un minuto?"
+            f"Hola, ¿hablo con {base['proveedor_nombre']}? {_presentacion(base['negocio'])} "
+            f"Te llamo de parte de {base['comprador']} por la cotización de "
+            f"{nombres[asignado[0].producto_id].lower()}. ¿Tenés un minuto?"
         ),
     }
 
@@ -200,7 +238,13 @@ async def _consultar(conversation_id: str) -> dict[str, Any]:
 
 
 _ESTADOS = {"initiated": "sonando", "in-progress": "en_curso", "processing": "procesando"}
-_SIN_ATENDER = {"busy": "ocupado", "no_answer": "no atendió", "failed": "la llamada falló"}
+# `call_result` de ElevenLabs que cuentan como "no atendió" para la secuencia de contacto.
+_SIN_ATENDER = {
+    "busy": "El proveedor no atendió: daba ocupado",
+    "no_answer": "El proveedor no atendió",
+    "no-answer": "El proveedor no atendió",
+    "failed": "El proveedor no atendió: la llamada no se pudo completar",
+}
 
 
 def _aplicar(llamada: Llamada, datos: dict[str, Any]) -> None:
@@ -226,7 +270,8 @@ def _aplicar(llamada: Llamada, datos: dict[str, Any]) -> None:
     resultado_llamada = (meta.get("phone_call") or {}).get("call_result")
     if estado == "failed" or resultado_llamada in _SIN_ATENDER:
         llamada.estado = "fallida"
-        llamada.error = f"El proveedor {_SIN_ATENDER.get(resultado_llamada, 'no pudo ser contactado')}"
+        llamada.error = _SIN_ATENDER.get(resultado_llamada, "El proveedor no atendió: no se pudo contactar")
+        _no_atendidas.add(llamada.id)
         return
     if estado == "done":
         llamada.estado = "terminada"
@@ -252,7 +297,7 @@ def _resultado(analisis: dict[str, Any]) -> ResultadoLlamada:
 
 
 async def _seguir_real(llamada: Llamada) -> None:
-    limite = time.time() + DURACION_MAXIMA_S
+    limite = time.time() + SEGUIMIENTO_MAXIMO_S
     while llamada.estado in ACTIVAS and time.time() < limite:
         await asyncio.sleep(INTERVALO_CONSULTA_S)
         try:
@@ -308,7 +353,12 @@ def _guion_simulado(llamada: Llamada, variables: dict[str, str]) -> tuple[list[T
     )
 
 
-async def _seguir_simulada(llamada: Llamada, variables: dict[str, str]) -> None:
+async def _seguir_simulada(llamada: Llamada, variables: dict[str, str], no_atiende: bool = False) -> None:
+    if no_atiende:  # ?simular_no_atiende=true: suena y nadie atiende (secuencia de contacto)
+        await asyncio.sleep(6.0 * _escala())
+        llamada.estado, llamada.error = "fallida", "El proveedor no atendió (llamada simulada)"
+        _no_atendidas.add(llamada.id)
+        return
     turnos, resultado = _guion_simulado(llamada, variables)
     await asyncio.sleep(2.0 * _escala())
     llamada.estado = "en_curso"
@@ -363,12 +413,12 @@ async def _al_terminar(llamada: Llamada) -> None:
         pedidos.cambiar_estado(llamada.pedido_id, "aprobado")
 
 
-async def _seguir(llamada: Llamada, variables: dict[str, str]) -> None:
+async def _seguir(llamada: Llamada, variables: dict[str, str], no_atiende: bool = False) -> None:
     try:
         if llamada.modo == "real":
             await _seguir_real(llamada)
         else:
-            await _seguir_simulada(llamada, variables)
+            await _seguir_simulada(llamada, variables, no_atiende)
     except asyncio.CancelledError:
         raise
     except Exception as exc:  # noqa: BLE001 — el error queda en la llamada, la UI lo muestra
@@ -376,7 +426,312 @@ async def _seguir(llamada: Llamada, variables: dict[str, str]) -> None:
         llamada.estado, llamada.error = "fallida", str(exc)
     store.guardar("llamadas", llamada)
     await _al_terminar(llamada)
+    await _continuar_secuencia(llamada)
     log.info("Llamada %s %s (%s)", llamada.id, llamada.estado, llamada.modo)
+
+
+# ---------------------------------------------------------------- secuencia de contacto (RF-06, §11.1)
+MotivoContacto = Literal["solicitud_cotizacion", "reintento", "aviso_no_atendio", "negociacion"]
+EstadoPaso = Literal[
+    "pendiente", "programado", "en_curso", "atendida", "no_atendida", "enviado", "omitido", "cancelado", "error"
+]
+
+
+class Contacto(BaseModel):
+    """Contacto enviado a un proveedor. Esquema compartido: lo lee el detalle del pedido (bloque 1)."""
+
+    id: str
+    pedido_id: str
+    proveedor_id: str
+    canal: Literal["whatsapp", "email", "llamada"]
+    sentido: Literal["enviado"] = "enviado"
+    texto: str
+    enviado_en: str  # ISO sin zona
+    motivo: MotivoContacto
+
+
+class PasoSecuencia(BaseModel):
+    paso: Literal["llamada", "reintento", "whatsapp", "email"]
+    estado: EstadoPaso = "pendiente"
+    llamada_id: str | None = None
+    contacto_id: str | None = None
+    programado_para: datetime | None = None
+    hecho_en: datetime | None = None
+    detalle: str | None = None
+
+
+class SecuenciaContacto(BaseModel):
+    id: str
+    pedido_id: str
+    proveedor_id: str
+    estado: Literal["en_curso", "reintento_programado", "atendida", "respondio", "aviso_enviado", "interrumpida"]
+    intento: int = 1  # llamada en curso o última hecha (1 o 2)
+    reintento_minutos: float = REINTENTO_MINUTOS
+    reintento_en: datetime | None = None
+    tiene_whatsapp: bool
+    simular_no_atiende: bool = False
+    pasos: list[PasoSecuencia]
+    llamada_ids: list[str] = Field(default_factory=list)
+    contacto_ids: list[str] = Field(default_factory=list)
+    creada_en: datetime
+    actualizada_en: datetime
+
+
+class LlamadaDetalle(Llamada):
+    """`GET /llamadas/{id}`: la llamada de siempre más campos opcionales de la secuencia de contacto."""
+
+    intento: int | None = None
+    atendida: bool | None = None
+    audio_disponible_hasta: datetime | None = None  # llamadas reales: el audio se borra a los 60 días
+    secuencia: SecuenciaContacto | None = None
+
+
+ABIERTAS = ("en_curso", "reintento_programado")
+
+
+def reintento_minutos() -> float:
+    try:
+        return max(float(os.environ.get("LLAMADA_REINTENTO_MINUTOS", "") or REINTENTO_MINUTOS), 0.0)
+    except ValueError:
+        return float(REINTENTO_MINUTOS)
+
+
+def _espera_reintento_s(minutos: float, modo: str) -> float:
+    if modo == "real":
+        return minutos * 60
+    return minutos * SEGUNDOS_SIMULADOS_POR_MINUTO * _escala()
+
+
+def contacto_proveedor(proveedor_id: str) -> dict[str, Any]:
+    """WhatsApp (sí/no) y email del proveedor: de data/historial_compras.json (datos de ejemplo del
+    bloque 5) y, si no está, se deduce del canal preferido."""
+    try:
+        datos = store.semilla("historial_compras").get("contacto_proveedores", {}).get(proveedor_id) or {}
+    except FileNotFoundError:
+        datos = {}
+    if "whatsapp" not in datos:
+        canal = proveedores()[proveedor_id].canal_preferido if proveedor_id in proveedores() else ""
+        datos = {**datos, "whatsapp": canal in ("whatsapp_texto", "whatsapp_audio", "foto")}
+    return datos
+
+
+def registrar_contacto(
+    pedido_id: str, proveedor_id: str, canal: str, texto: str, motivo: MotivoContacto
+) -> Contacto:
+    contacto = Contacto(
+        id=f"con_{uuid.uuid4().hex[:8]}",
+        pedido_id=pedido_id,
+        proveedor_id=proveedor_id,
+        canal=canal,  # type: ignore[arg-type]
+        texto=texto,
+        enviado_en=datetime.now().replace(microsecond=0).isoformat(),
+        motivo=motivo,
+    )
+    store.guardar("contactos", contacto)
+    return contacto
+
+
+def _guardar_secuencia(sec: SecuenciaContacto) -> None:
+    sec.actualizada_en = datetime.now()
+    store.guardar("secuencias", sec)
+
+
+def _paso(sec: SecuenciaContacto, nombre: str) -> PasoSecuencia:
+    return next(p for p in sec.pasos if p.paso == nombre)
+
+
+def secuencia_de(llamada_id: str) -> SecuenciaContacto | None:
+    return next(
+        (SecuenciaContacto.model_validate(s) for s in store.valores("secuencias") if llamada_id in s.get("llamada_ids", [])),
+        None,
+    )
+
+
+def secuencia_abierta(pedido_id: str, proveedor_id: str) -> SecuenciaContacto | None:
+    return next(
+        (s for s in store.listar("secuencias", SecuenciaContacto, pedido_id=pedido_id, proveedor_id=proveedor_id)
+         if s.estado in ABIERTAS),
+        None,
+    )
+
+
+def _nueva_secuencia(pedido_id: str, proveedor_id: str, simular_no_atiende: bool) -> SecuenciaContacto:
+    ahora = datetime.now()
+    return SecuenciaContacto(
+        id=f"sec_{proveedor_id}_{uuid.uuid4().hex[:6]}",
+        pedido_id=pedido_id,
+        proveedor_id=proveedor_id,
+        estado="en_curso",
+        reintento_minutos=reintento_minutos(),
+        tiene_whatsapp=bool(contacto_proveedor(proveedor_id).get("whatsapp")),
+        simular_no_atiende=simular_no_atiende,
+        pasos=[PasoSecuencia(paso=p) for p in ("llamada", "reintento", "whatsapp", "email")],
+        creada_en=ahora,
+        actualizada_en=ahora,
+    )
+
+
+def _respondio(pedido_id: str, proveedor_id: str) -> str | None:
+    """Canal por el que ya respondió el proveedor (si respondió)."""
+    m = next(
+        (m for m in store.valores("mensajes") if m["pedido_id"] == pedido_id and m["proveedor_id"] == proveedor_id),
+        None,
+    )
+    return m["canal"] if m else None
+
+
+def _cerrar(sec: SecuenciaContacto, estado: str, detalle_resto: str) -> None:
+    sec.estado = estado  # type: ignore[assignment]
+    sec.reintento_en = None
+    for p in sec.pasos:
+        if p.estado in ("pendiente", "programado"):
+            p.estado, p.detalle = "omitido", detalle_resto
+    _guardar_secuencia(sec)
+
+
+async def _continuar_secuencia(llamada: Llamada) -> None:
+    """Después de cada llamada de cotización: decide el próximo paso de la secuencia."""
+    if llamada.tipo != "cotizacion":
+        return
+    sec = secuencia_de(llamada.id)
+    if sec is None or sec.estado not in ABIERTAS:
+        return
+    paso = _paso(sec, "llamada" if sec.intento == 1 else "reintento")
+    paso.hecho_en = datetime.now()
+    if llamada.estado == "terminada":
+        paso.estado, paso.detalle = "atendida", "El proveedor atendió y pasó la cotización por teléfono."
+        _cerrar(sec, "atendida", "No hizo falta: atendió la llamada.")
+        return
+    no_atendio = llamada.id in _no_atendidas
+    if sec.intento == 1 and not no_atendio:  # falla técnica: no es "no atendió", no se reintenta solo
+        paso.estado, paso.detalle = "error", llamada.error or "La llamada falló"
+        _cerrar(sec, "interrumpida", "La primera llamada falló por un problema técnico.")
+        return
+    paso.estado = "no_atendida" if no_atendio else "error"
+    paso.detalle = llamada.error or "El proveedor no atendió"
+    if sec.intento == 1:
+        _programar_reintento(sec, llamada.modo)
+    else:
+        await _avisar(sec)
+
+
+def _programar_reintento(sec: SecuenciaContacto, modo: str) -> None:
+    espera = _espera_reintento_s(sec.reintento_minutos, modo)
+    sec.estado = "reintento_programado"
+    sec.reintento_en = datetime.now() + timedelta(seconds=espera)
+    paso = _paso(sec, "reintento")
+    paso.estado, paso.programado_para = "programado", sec.reintento_en
+    paso.detalle = f"Reintento a los {fmt(sec.reintento_minutos)} minutos" + (
+        f" (simulado: {fmt(espera, 1)} s)" if modo != "real" else ""
+    )
+    _guardar_secuencia(sec)
+    tarea = asyncio.create_task(_reintentar(sec.id, espera, modo))
+    _reintentos[sec.id] = tarea
+    _tareas.add(tarea)
+    tarea.add_done_callback(_tareas.discard)
+    tarea.add_done_callback(lambda _t, sid=sec.id: _reintentos.pop(sid, None))
+    log.info("Secuencia %s: reintento en %.1f s", sec.id, espera)
+
+
+async def _reintentar(sec_id: str, espera: float, modo: str) -> None:
+    await asyncio.sleep(espera)
+    sec = store.obtener("secuencias", sec_id, SecuenciaContacto)
+    if sec is None or sec.estado != "reintento_programado":
+        return
+    if (canal := _respondio(sec.pedido_id, sec.proveedor_id)) is not None:
+        _paso(sec, "reintento").estado = "omitido"
+        _cerrar(sec, "respondio", f"Ya respondió (canal {canal}) antes del reintento.")
+        return
+    pedido = pedidos.obtener(sec.pedido_id)
+    try:
+        await iniciar(
+            pedido_id=sec.pedido_id,
+            proveedor_id=sec.proveedor_id,
+            tipo="cotizacion",
+            variables=instrucciones_cotizacion(pedido, sec.proveedor_id),
+            simulada=modo != "real",
+            simular_no_atiende=sec.simular_no_atiende,
+            _secuencia_id=sec.id,
+        )
+    except LlamadaNoPosible as exc:  # p. ej. se cambió la configuración entre la llamada y el reintento
+        sec = store.obtener("secuencias", sec_id, SecuenciaContacto)
+        if sec is None:
+            return
+        paso = _paso(sec, "reintento")
+        paso.estado, paso.detalle, paso.hecho_en = "error", str(exc), datetime.now()
+        sec.intento = 2
+        await _avisar(sec)
+
+
+def texto_aviso(pedido: Any, proveedor_id: str, canal: str) -> str:
+    base = _variables_base(pedido, proveedor_id)
+    lista = lista_pedido(pedido, proveedor_id)
+    if canal == "whatsapp":
+        return (
+            f"Hola, ¿cómo va? Soy el asistente de inteligencia artificial de {base['negocio']}. "
+            f"Te llamamos dos veces de parte de {base['comprador']} y no pudimos hablar: era para pedirte "
+            f"cotización de:\n{lista}\n"
+            "¿Nos pasás por acá el precio (aclarando si incluye IVA), el plazo de entrega, la forma de pago "
+            "y el costo de envío? ¡Gracias!"
+        )
+    email = contacto_proveedor(proveedor_id).get("email") or "(sin email cargado)"
+    return (
+        f"Para: {email}\n"
+        f"Asunto: Solicitud de cotización — {base['negocio']}\n\n"
+        f"Hola, equipo de {base['proveedor_nombre']}:\n\n"
+        f"Soy el asistente de inteligencia artificial de compras de {base['negocio']}. Los llamamos dos veces "
+        f"de parte de {base['comprador']} sin poder comunicarnos, así que les enviamos la solicitud por esta vía.\n\n"
+        f"Les pedimos cotización de:\n{lista}\n\n"
+        "Para cada producto, ¿nos indican el precio unitario y en qué unidad cotizan, si incluye IVA, el plazo "
+        "de entrega, la forma de pago, el costo de envío y la vigencia de la cotización?\n\n"
+        f"Muchas gracias,\n{base['comprador']} · {base['negocio']}"
+    )
+
+
+async def _avisar(sec: SecuenciaContacto) -> None:
+    """Tampoco atendió el reintento: WhatsApp con el motivo o, si no tiene, email con la solicitud."""
+    if (canal_resp := _respondio(sec.pedido_id, sec.proveedor_id)) is not None:
+        _cerrar(sec, "respondio", f"Ya respondió (canal {canal_resp}).")
+        return
+    pedido = pedidos.obtener(sec.pedido_id)
+    canal = "whatsapp" if sec.tiene_whatsapp else "email"
+    contacto = registrar_contacto(
+        sec.pedido_id, sec.proveedor_id, canal, texto_aviso(pedido, sec.proveedor_id, canal), "aviso_no_atendio"
+    )
+    sec.contacto_ids.append(contacto.id)
+    enviado = _paso(sec, canal)
+    enviado.estado, enviado.contacto_id, enviado.hecho_en = "enviado", contacto.id, datetime.now()
+    if canal == "whatsapp":
+        enviado.detalle = "WhatsApp con el motivo del llamado (simulado)."
+        _paso(sec, "email").estado, _paso(sec, "email").detalle = "omitido", "No hizo falta: se avisó por WhatsApp."
+    else:
+        enviado.detalle = "Email con la solicitud de cotización (simulado)."
+        _paso(sec, "whatsapp").estado, _paso(sec, "whatsapp").detalle = "omitido", "El proveedor no tiene WhatsApp."
+    sec.estado, sec.reintento_en = "aviso_enviado", None
+    _guardar_secuencia(sec)
+    log.info("Secuencia %s: aviso por %s (%s)", sec.id, canal, contacto.id)
+
+
+def detalle(llamada: Llamada) -> LlamadaDetalle:
+    sec = secuencia_de(llamada.id)
+    intento = None
+    if sec is not None:
+        intento = 1 if sec.llamada_ids and sec.llamada_ids[0] == llamada.id else 2
+    if llamada.estado == "terminada":
+        atendida: bool | None = True
+    elif llamada.id in _no_atendidas or (
+        sec is not None and _paso(sec, "llamada" if intento == 1 else "reintento").estado == "no_atendida"
+    ):
+        atendida = False
+    else:
+        atendida = None
+    return LlamadaDetalle(
+        **llamada.model_dump(),
+        intento=intento,
+        atendida=atendida,
+        audio_disponible_hasta=llamada.iniciada_en + timedelta(days=DIAS_AUDIO) if llamada.modo == "real" else None,
+        secuencia=sec,
+    )
 
 
 # ---------------------------------------------------------------- entrada pública
@@ -388,6 +743,25 @@ def activa(pedido_id: str, proveedor_id: str) -> Llamada | None:
     )
 
 
+def _vincular_secuencia(llamada: Llamada, simular_no_atiende: bool, secuencia_id: str | None) -> None:
+    """Toda llamada de cotización es un paso de una secuencia: la primera la crea; el reintento (o una
+    llamada manual con el reintento programado, que lo adelanta) es el segundo intento."""
+    sec = store.obtener("secuencias", secuencia_id, SecuenciaContacto) if secuencia_id else None
+    if sec is None:
+        sec = secuencia_abierta(llamada.pedido_id, llamada.proveedor_id)
+        if sec is not None and sec.estado == "reintento_programado":
+            if (tarea := _reintentos.pop(sec.id, None)) is not None:
+                tarea.cancel()
+        elif sec is None or sec.estado != "en_curso":
+            sec = _nueva_secuencia(llamada.pedido_id, llamada.proveedor_id, simular_no_atiende)
+    sec.intento = 1 if not sec.llamada_ids else 2
+    sec.estado, sec.reintento_en = "en_curso", None
+    sec.llamada_ids.append(llamada.id)
+    paso = _paso(sec, "llamada" if sec.intento == 1 else "reintento")
+    paso.estado, paso.llamada_id, paso.detalle = "en_curso", llamada.id, None
+    _guardar_secuencia(sec)
+
+
 async def iniciar(
     *,
     pedido_id: str,
@@ -396,8 +770,14 @@ async def iniciar(
     variables: dict[str, str],
     negociacion_id: str | None = None,
     simulada: bool = False,
+    simular_no_atiende: bool = False,
+    _secuencia_id: str | None = None,
 ) -> Llamada:
-    """Crea la llamada, la dispara (real) o la arranca (simulada) y la sigue en segundo plano."""
+    """Crea la llamada, la dispara (real) o la arranca (simulada) y la sigue en segundo plano.
+
+    `simular_no_atiende` (solo simulada): suena y nadie atiende, en la llamada y en su reintento, para
+    mostrar la secuencia de contacto entera.
+    """
     if (en_curso := activa(pedido_id, proveedor_id)) is not None:
         return en_curso
     cfg = configuracion()
@@ -422,6 +802,8 @@ async def iniciar(
         iniciada_en=datetime.now(),
     )
     store.guardar("llamadas", llamada)
+    if tipo == "cotizacion":
+        _vincular_secuencia(llamada, simular_no_atiende and modo == "simulada", _secuencia_id)
     if modo == "real":
         try:
             datos = await _disparar(numero, variables)  # type: ignore[arg-type]
@@ -429,16 +811,25 @@ async def iniciar(
             llamada.estado, llamada.error = "fallida", str(exc)
             store.guardar("llamadas", llamada)
             log.warning("No se pudo iniciar la llamada a %s: %s", proveedor_id, exc)
+            await _continuar_secuencia(llamada)
             return llamada
         llamada.conversation_id = datos.get("conversation_id")
         llamada.call_sid = datos.get("callSid")
         if not llamada.conversation_id:
             llamada.estado, llamada.error = "fallida", "ElevenLabs no devolvió conversation_id"
             store.guardar("llamadas", llamada)
+            await _continuar_secuencia(llamada)
             return llamada
     llamada.estado = "sonando"
     store.guardar("llamadas", llamada)
-    tarea = asyncio.create_task(_seguir(llamada, variables))
+    if tipo == "negociacion":
+        motivo: MotivoContacto = "negociacion"
+    else:
+        sec = secuencia_de(llamada.id)
+        motivo = "reintento" if sec is not None and sec.intento == 2 else "solicitud_cotizacion"
+    registrar_contacto(pedido_id, proveedor_id, "llamada", variables.get("primer_mensaje", ""), motivo)
+    no_atiende = simular_no_atiende and modo == "simulada"
+    tarea = asyncio.create_task(_seguir(llamada, variables, no_atiende))
     _tareas.add(tarea)
     tarea.add_done_callback(_tareas.discard)
     log.info("Llamada %s (%s, %s) a %s", llamada.id, tipo, modo, llamada.telefono or proveedor_id)
@@ -446,6 +837,9 @@ async def iniciar(
 
 
 def cancelar_todo() -> None:
-    for tarea in list(_tareas):
+    """Cancela las llamadas en seguimiento y los reintentos programados (POST /reset)."""
+    for tarea in list(_tareas) + list(_reintentos.values()):
         tarea.cancel()
     _tareas.clear()
+    _reintentos.clear()
+    _no_atendidas.clear()

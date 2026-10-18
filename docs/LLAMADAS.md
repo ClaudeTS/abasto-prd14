@@ -61,9 +61,12 @@ En ElevenLabs → **Agents** → crear un agente nuevo, por ejemplo "Abasto comp
   ```
 - **System prompt:**
   ```
-  Sos el asistente de compras de {{negocio}} y llamás por teléfono a proveedores en nombre de {{comprador}}.
-  Hablás en español rioplatense, con frases cortas y naturales, como alguien de compras que conoce al proveedor.
-  Si te preguntan, decís que sos un asistente virtual de {{negocio}}; nunca lo negás.
+  Sos el asistente de compras con inteligencia artificial de {{negocio}} y llamás por teléfono a proveedores en
+  nombre de {{comprador}}. Hablás en español rioplatense, con frases cortas y naturales, como alguien de compras
+  que conoce al proveedor.
+  Al empezar (en el primer mensaje) te presentás como asistente de inteligencia artificial de {{negocio}} y avisás
+  que la llamada se graba. Si te preguntan, confirmás que sos una inteligencia artificial; nunca lo negás.
+  La llamada no tiene duración máxima: no apures al proveedor.
 
   Tarea de esta llamada ({{tipo_llamada}}) con {{proveedor_nombre}}:
   {{instrucciones}}
@@ -75,6 +78,12 @@ En ElevenLabs → **Agents** → crear un agente nuevo, por ejemplo "Abasto comp
   - Si el proveedor no puede hablar, preguntá cuándo llamar y despedite.
   - Cuando termines, despedite y cortá la llamada.
   ```
+  El `primer_mensaje` que manda el backend ya trae la presentación, por ejemplo: *"Hola, ¿hablo con Papelera del
+  Sur? Soy el asistente de inteligencia artificial de Tecnova S.A. y te aviso que esta llamada se graba. Te llamo
+  de parte de Lucía por la cotización que les pedimos por WhatsApp. ¿Tenés un minuto?"*
+- **Duración y grabación (RF-06):** en Advanced, la duración máxima de la conversación al máximo que permita la
+  cuenta (no hay duración máxima). En Privacy/retención: transcripción sin vencimiento y audio **60 días**
+  (`GET /llamadas/{id}` informa `audio_disponible_hasta` en las llamadas reales).
 - **Variables dinámicas:** el backend manda `negocio`, `comprador`, `proveedor_nombre`, `tipo_llamada`,
   `instrucciones` y `primer_mensaje`. Para probar desde la consola, cargá valores por defecto.
 - **Tools:** habilitar la herramienta de sistema **End call** (para que el agente corte al terminar).
@@ -103,6 +112,7 @@ ELEVENLABS_API_KEY=sk_...
 ELEVENLABS_AGENT_ID=agent_...
 ELEVENLABS_PHONE_NUMBER_ID=phnum_...
 TELEFONOS_PROVEEDORES=papelera_del_sur:+59899111222,ofisillas:+59899333444
+LLAMADA_REINTENTO_MINUTOS=30   # opcional: espera del reintento si no atiende (sección 6)
 ```
 
 - `ELEVENLABS_PHONE_NUMBER_ID`: lo da `python -m scripts.probar_llamada --numeros`.
@@ -132,12 +142,36 @@ desde la UI con `LLAMADAS_MODO=real`.
 - **Respaldo:** si falla la red o el celular no suena, **Simular llamada**; si no, `LLAMADAS_MODO=simulada` y
   reiniciar el backend.
 
+## 6. Secuencia de contacto (RF-06, PRD 1.4 §11.1)
+
+Las llamadas de **cotización** siguen esta secuencia; las de negociación no (las aprueba Lucía una por una).
+
+1. **Llamada.** Si atiende, la secuencia termina (`atendida`).
+2. **No atiende** (real: `call_result` `busy`, `no_answer` o `failed`, o la conversación `failed`; simulada:
+   `?simular_no_atiende=true`) → **reintento** a los `LLAMADA_REINTENTO_MINUTOS` (30 por defecto). En simulado cada
+   minuto dura 1 s × `SIM_DELAY_SECONDS` / 4 (30 min → 30 s con la base 4, 7,5 s con `SIM_DELAY_SECONDS=1`). Si
+   antes del reintento el proveedor respondió por otro canal, no se lo vuelve a llamar (`respondio`). Si alguien
+   aprieta **Llamar** con el reintento programado, esa llamada es el reintento.
+3. **Tampoco atiende** → **WhatsApp** (simulado) con el motivo del llamado; si el proveedor **no tiene WhatsApp**,
+   **email** (simulado) con la solicitud de cotización (`aviso_enviado`). Quién tiene WhatsApp y el email salen de
+   `contacto_proveedores` en `data/historial_compras.json` (datos de ejemplo); si un proveedor no está, se deduce
+   de su canal preferido. En la demo, TecnoImport no tiene WhatsApp.
+
+Una falla técnica en la primera llamada (ElevenLabs rechaza el pedido) no es "no atendió": la secuencia queda
+`interrumpida` y se ofrece la llamada simulada como hasta ahora. `POST /reset` cancela los reintentos programados.
+
+Cada contacto enviado queda en la colección `contactos` (la lee el detalle del pedido):
+`{id, pedido_id, proveedor_id, canal: "whatsapp"|"email"|"llamada", sentido: "enviado", texto, enviado_en (ISO sin
+zona), motivo: "solicitud_cotizacion"|"reintento"|"aviso_no_atendio"|"negociacion"}`. La primera llamada es
+`solicitud_cotizacion`, la segunda `reintento`, el WhatsApp o el email `aviso_no_atendio` y la llamada de
+negociación `negociacion`; en las llamadas, `texto` es el primer mensaje del agente.
+
 ## Endpoints
 
 | Método | Ruta | Qué hace |
 |---|---|---|
 | GET | `/llamadas/config` | Modo, si está todo configurado, qué falta y qué proveedores tienen teléfono. |
-| POST | `/pedidos/{id}/llamar/{proveedor_id}` | Llama para pedir la cotización. 409 si ya respondió o falta configuración. `?simulada=true` fuerza la simulada. |
+| POST | `/pedidos/{id}/llamar/{proveedor_id}` | Llama para pedir la cotización. 409 si ya respondió o falta configuración. `?simulada=true` fuerza la simulada; `?simular_no_atiende=true` (simulada) hace que nadie atienda, ni la llamada ni el reintento. |
 | POST | `/negociaciones/{id}/llamar` | "Aprobar y llamar". Body opcional `{"mensaje": "…"}`. Deja la negociación `aprobada` con `llamada_id`. |
-| GET | `/llamadas/{id}` | Estado y transcripción (polling ~1 s): `iniciando → sonando → en_curso → procesando → terminada` (o `fallida` con `error`). |
+| GET | `/llamadas/{id}` | Estado y transcripción (polling ~1 s): `iniciando → sonando → en_curso → procesando → terminada` (o `fallida` con `error`). Campos opcionales: `intento` (1 o 2), `atendida`, `audio_disponible_hasta` (reales) y `secuencia` (estado, `reintento_en`, pasos `llamada`/`reintento`/`whatsapp`/`email` con su estado, `contacto_ids`). |
 | GET | `/pedidos/{id}/llamadas` | Llamadas del pedido. |
