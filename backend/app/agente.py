@@ -141,8 +141,12 @@ class OpcionesCorrida(BaseModel):
     negociar: bool = True
 
 
+ClienteInterno = Literal["ventas", "personal"]  # PRD 1.4 RF-05: quién hizo el pedido
+
+
 class NuevaCorrida(OpcionesCorrida):
     texto: str | None = None
+    cliente_interno: ClienteInterno = "personal"
 
 
 class LineaConfirmada(BaseModel):
@@ -158,6 +162,7 @@ class CorridaAgente(BaseModel):
     id: str
     pedido_id: str
     texto: str | None
+    cliente_interno: ClienteInterno = "personal"  # default: corridas guardadas antes del PRD 1.4
     horizonte_meses: int
     opciones: OpcionesCorrida
     estado: EstadoCorrida
@@ -302,8 +307,9 @@ def iniciar(nueva: NuevaCorrida) -> CorridaAgente:
         id=f"ag_{uuid.uuid4().hex[:6]}",
         pedido_id=pedido.id,
         texto=(nueva.texto or "").strip() or None,
+        cliente_interno=nueva.cliente_interno,
         horizonte_meses=nueva.horizonte_meses or inventario.horizonte_por_defecto(),
-        opciones=OpcionesCorrida.model_validate(nueva.model_dump(exclude={"texto"})),
+        opciones=OpcionesCorrida.model_validate(nueva.model_dump(exclude={"texto", "cliente_interno"})),
         estado="en_curso",
         pasos=[PasoAgente(id=i, titulo=t) for i, t in PASOS],
         creada_en=ahora,
