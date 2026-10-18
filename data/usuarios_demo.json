@@ -1,0 +1,35 @@
+{
+  "_nota": "Usuarios de ejemplo de Tecnova S.A. para el ingreso (RF-21). Contraseña de todos: abasto2026 (ver AGENTS.md). Hash PBKDF2-SHA256 de hashlib: pbkdf2_sha256$iteraciones$sal$hash. Lucía es la administradora de compras; Martín (Ventas) y Sofía (Personal) solo consultan.",
+  "usuarios": [
+    {
+      "id": "u_lucia",
+      "usuario": "lucia",
+      "nombre": "Lucía",
+      "email": "lucia@tecnova.com.uy",
+      "rol": "administrador",
+      "cliente_interno": "personal",
+      "activo": true,
+      "contrasena_hash": "pbkdf2_sha256$120000$07e0534e52e16ec728a039191587ec91$eae4e57e0c185a59a1d95158e3419616efcb1b592e0d6534bb430feeef6291d5"
+    },
+    {
+      "id": "u_martin",
+      "usuario": "martin",
+      "nombre": "Martín",
+      "email": "martin@tecnova.com.uy",
+      "rol": "consulta",
+      "cliente_interno": "ventas",
+      "activo": true,
+      "contrasena_hash": "pbkdf2_sha256$120000$b50abb893dccc04a9f54a4fb70ca36ac$b4295f9f90cb760196ba44519048738a18bd1a364e679cd696c465c03b4d8260"
+    },
+    {
+      "id": "u_sofia",
+      "usuario": "sofia",
+      "nombre": "Sofía",
+      "email": "sofia@tecnova.com.uy",
+      "rol": "consulta",
+      "cliente_interno": "personal",
+      "activo": true,
+      "contrasena_hash": "pbkdf2_sha256$120000$293ed9c43ba65fe86f5a7b2c44d2d41e$27fa9f41211275e8b10bcf7088b8eda2a243aafa36af78657c9dd54975b6bb2c"
+    }
+  ]
+}

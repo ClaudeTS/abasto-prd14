@@ -1,7 +1,9 @@
 // Sesión del usuario (RF-21). INTERFAZ ESTABLE: el resto de la app usa solo useAuth().
-// Hoy es un stub (siempre Lucía, administradora); el bloque de auth lo reemplaza por el real sin cambiar
-// la forma de Usuario ni de useAuth().
-import { createContext, useContext, type ReactNode } from "react";
+// Con backend: token en localStorage (clave CLAVE_TOKEN de src/api.ts, que lo adjunta en cada pedido) y
+// GET /auth/yo al cargar. En modo mock no hay backend: entra Lucía, administradora, como antes.
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { CLAVE_TOKEN, MODO } from "@/api";
+import * as api from "@/features/reglas/api";
 
 export type Rol = "administrador" | "consulta";
 export type ClienteInterno = "ventas" | "personal";
@@ -30,7 +32,7 @@ const LUCIA: Usuario = {
   cliente_interno: "personal",
 };
 
-const STUB: Auth = {
+const MOCK: Auth = {
   usuario: LUCIA,
   esAdmin: true,
   cargando: false,
@@ -38,10 +40,69 @@ const STUB: Auth = {
   salir: () => {},
 };
 
-const Ctx = createContext<Auth>(STUB);
+const Ctx = createContext<Auth>(MOCK);
+
+function leerToken(): string | null {
+  try {
+    return localStorage.getItem(CLAVE_TOKEN);
+  } catch {
+    return null;
+  }
+}
+
+function guardarToken(token: string | null) {
+  try {
+    if (token) localStorage.setItem(CLAVE_TOKEN, token);
+    else localStorage.removeItem(CLAVE_TOKEN);
+  } catch {
+    /* sin storage: la sesión dura lo que la pestaña */
+  }
+}
+
+/** Errores de conexión: el token puede seguir siendo bueno (el backend estaba dormido). */
+const esDeConexion = (e: unknown) => e instanceof Error && /No se pudo conectar|no responde/.test(e.message);
+
+function AuthReal({ children }: { children: ReactNode }) {
+  const [usuario, setUsuario] = useState<Usuario | null>(null);
+  const [cargando, setCargando] = useState(() => leerToken() !== null);
+
+  useEffect(() => {
+    if (!leerToken()) return;
+    let vivo = true;
+    api
+      .yo()
+      .then((u) => vivo && setUsuario(u))
+      .catch((e) => {
+        if (!esDeConexion(e)) guardarToken(null); // vencido, revocado o trucho
+      })
+      .finally(() => vivo && setCargando(false));
+    return () => {
+      vivo = false;
+    };
+  }, []);
+
+  const ingresar = useCallback(async (u: string, contrasena: string) => {
+    const sesion = await api.login(u, contrasena);
+    guardarToken(sesion.token);
+    setUsuario(sesion.usuario);
+  }, []);
+
+  const salir = useCallback(() => {
+    if (leerToken()) api.logout().catch(() => {}); // el token se borra igual
+    guardarToken(null);
+    setUsuario(null);
+  }, []);
+
+  const valor = useMemo<Auth>(
+    () => ({ usuario, esAdmin: usuario?.rol === "administrador", cargando, ingresar, salir }),
+    [usuario, cargando, ingresar, salir],
+  );
+  return <Ctx.Provider value={valor}>{children}</Ctx.Provider>;
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  return <Ctx.Provider value={STUB}>{children}</Ctx.Provider>;
+  if (MODO === "mock") return <Ctx.Provider value={MOCK}>{children}</Ctx.Provider>;
+  return <AuthReal>{children}</AuthReal>;
 }
 
 export function useAuth(): Auth {

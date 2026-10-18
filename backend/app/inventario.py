@@ -56,6 +56,8 @@ class Reposicion(BaseModel):
     necesario_para: date
     cobertura_dias: int | None  # días hasta tocar el mínimo; None si ya está por debajo
     evidencia: str
+    # Qué regla la calculó (PRD 1.4, RF-03): el pronóstico de siempre, el stock base o la zafra.
+    motivo: Literal["pronostico", "stock_base", "zafra"] = "pronostico"
 
 
 class ProveedorRef(BaseModel):
@@ -192,6 +194,27 @@ def _multiplo(cantidad: float, multiplo: float) -> float:
     return math.ceil(round(cantidad / multiplo, 9)) * multiplo
 
 
+# ---------------------------------------------------------------- reglas del PRD 1.4 (app/reglas.py)
+# Stock base y zafra viven en la colección "reglas" (las edita el panel de reglas); se leen acá
+# directo del store para no importar app.reglas (que importa este módulo). Sin reglas nuevas, la
+# reposición es la de siempre: pronóstico + mínimo − stock − en camino.
+def _reglas(producto_id: str) -> dict[str, Any]:
+    guardadas = store.obtener_dict("reglas", producto_id) or {}
+    return {k: guardadas.get(k) for k in ("stock_base", "zafra")}
+
+
+def en_zafra(zafra: dict[str, Any] | None, hoy: date) -> bool:
+    """Zafra = período del año "MM-DD" a "MM-DD" (puede cruzar el fin de año)."""
+    if not zafra or not zafra.get("inicio") or not zafra.get("fin"):
+        return False
+    dia, inicio, fin = f"{hoy:%m-%d}", zafra["inicio"], zafra["fin"]
+    return inicio <= dia <= fin if inicio <= fin else (dia >= inicio or dia <= fin)
+
+
+def _dd_mm(mm_dd: str) -> str:
+    return f"{mm_dd[3:]}/{mm_dd[:2]}"
+
+
 def reponer(
     *,
     pronostico: Pronostico,
@@ -202,19 +225,49 @@ def reponer(
     unidad: str,
     hoy: date,
     plazo_minimo_dias: int,
+    stock_base: float | None = None,
+    zafra: dict[str, Any] | None = None,
 ) -> Reposicion:
     disponible = stock + en_camino
-    falta = pronostico.total + minimo - disponible
-    cantidad = _multiplo(falta, multiplo)
     u = " L" if unidad == "l" else ""
-    cuenta = f"Pronóstico {fmt(pronostico.total)} + mínimo {fmt(minimo)} − stock {fmt(stock)}"
-    if en_camino:
-        cuenta += f" − en camino {fmt(en_camino)}"
-    cuenta += f" = {fmt(falta)}{u}"
+    motivo = "pronostico"
+    if en_zafra(zafra, hoy) and float(zafra["cantidad"]) > en_camino:  # type: ignore[index]
+        # Zafra (RF-03 b): se pide la cantidad de zafra, rectificada con lo que ya está en camino.
+        motivo = "zafra"
+        cantidad_zafra = float(zafra["cantidad"])  # type: ignore[index]
+        falta = cantidad_zafra - en_camino
+        cuenta = (
+            f"Zafra ({_dd_mm(zafra['inicio'])} a {_dd_mm(zafra['fin'])}): cantidad de zafra "  # type: ignore[index]
+            f"{fmt(cantidad_zafra)}"
+        )
+        if en_camino:
+            cuenta += f" − en camino {fmt(en_camino)}"
+        cuenta += f" = {fmt(falta)}{u}"
+    elif stock_base is not None:
+        # Stock mínimo y stock base (RF-03 a): al llegar al mínimo se repone hasta el stock base.
+        motivo = "stock_base"
+        llego = disponible <= minimo
+        falta = stock_base - disponible if llego else 0.0
+        cuenta = f"Stock {fmt(stock)}" + (f" + en camino {fmt(en_camino)}" if en_camino else "")
+        if llego:
+            cuenta += (
+                f" llegó al mínimo {fmt(minimo)}: stock base {fmt(stock_base)} − stock {fmt(stock)}"
+                + (f" − en camino {fmt(en_camino)}" if en_camino else "")
+                + f" = {fmt(falta)}{u}"
+            )
+        else:
+            cuenta += f" no llegó al mínimo {fmt(minimo)}"
+    else:
+        falta = pronostico.total + minimo - disponible
+        cuenta = f"Pronóstico {fmt(pronostico.total)} + mínimo {fmt(minimo)} − stock {fmt(stock)}"
+        if en_camino:
+            cuenta += f" − en camino {fmt(en_camino)}"
+        cuenta += f" = {fmt(falta)}{u}"
+    cantidad = _multiplo(falta, multiplo)
     if cantidad and cantidad != falta:
         cuenta += f" → {fmt(cantidad)}{u} (se compra de a {fmt(multiplo)})"
     if cantidad <= 0:
-        cuenta += ": alcanza, no hay que comprar"
+        cuenta += ": no hay que comprar" if motivo == "stock_base" else ": alcanza, no hay que comprar"
     plazo = hoy + timedelta(days=plazo_minimo_dias)
     if disponible < minimo:
         cobertura, necesario = None, plazo
@@ -233,6 +286,7 @@ def reponer(
         necesario_para=necesario,
         cobertura_dias=cobertura,
         evidencia=f"{cuenta}. {cuando}",
+        motivo=motivo,  # type: ignore[arg-type]
     )
 
 
@@ -248,8 +302,15 @@ def en_camino() -> dict[str, float]:
     return total
 
 
-def item(producto_id: str, horizonte_meses: int, *, camino: dict[str, float] | None = None) -> ItemInventario:
-    datos = _producto(producto_id)
+def item(
+    producto_id: str,
+    horizonte_meses: int,
+    *,
+    camino: dict[str, float] | None = None,
+    simular: dict[str, Any] | None = None,
+) -> ItemInventario:
+    """`simular`: valores propuestos que no se guardan (vista previa del panel de reglas)."""
+    datos = {**_producto(producto_id), **_reglas(producto_id), **(simular or {})}
     catalogo = {p.id: p for p in pipeline.catalogo()}
     provs = pipeline.proveedores()
     hoy = fecha_hoy()
@@ -270,6 +331,8 @@ def item(producto_id: str, horizonte_meses: int, *, camino: dict[str, float] | N
             unidad=producto.unidad_canonica,
             hoy=hoy,
             plazo_minimo_dias=plazo,
+            stock_base=float(datos["stock_base"]) if datos.get("stock_base") is not None else None,
+            zafra=datos.get("zafra"),
         )
         if pron
         else None

@@ -5,7 +5,8 @@ Una corrida por pedido, con estos pasos: entender (LLM, `app/interpretacion.py`)
 no responde) → revisar (Lucía confirma lo dudoso) → optimizar (solver) → negociar (gemelo) → órdenes.
 
 El agente manda solo la orden de un proveedor si todos sus productos están en modo automático y
-ninguno supera su tope (sin IVA); el resto espera el OK de Lucía. Nada sale de verdad: las órdenes
+ninguno supera su tope (sin IVA), ni el del total ni el de precio unitario del panel de reglas
+(PRD 1.4, RF-04); el resto espera el OK de Lucía. Nada sale de verdad: las órdenes
 quedan en "enviada_simulada".
 
 Corre en una tarea de asyncio y guarda la corrida en la colección "agentes" en cada cambio; la UI
@@ -28,7 +29,7 @@ from typing import Literal
 from fastapi import HTTPException
 from pydantic import BaseModel, Field
 
-from app import config, interpretacion, inventario, llamadas, pedidos, pipeline, simulador, store
+from app import config, interpretacion, inventario, llamadas, pedidos, pipeline, reglas, simulador, store
 from app.interpretacion import Interpretacion, ItemInterpretado
 from app.inventario import ItemInventario, Modo
 from app.models import Cotizacion, LineaPedido, Llamada, MensajeCrudo, Monto, Negociacion, Plan
@@ -844,20 +845,30 @@ def _emitir_ordenes(corrida_id: str) -> None:
     _guardar(corrida)
 
 
-def _aprobacion(item: ItemInventario, subtotal: Decimal) -> tuple[str, str]:
+def _aprobacion(item: ItemInventario, subtotal: Decimal, precio_unitario: Decimal | None = None) -> tuple[str, str]:
     if item.modo == "manual":
         return "manual", "Está en modo manual, la aprobás vos."
     tope = item.tope_automatico_uyu
     if tope is not None and subtotal > tope:
         return "supera_tope", f"$ {fmt(subtotal)} supera el tope automático de $ {fmt(tope)}."
+    # PRD 1.4, RF-04: tope de precio unitario sin IVA del panel de reglas (app/reglas.py), si está.
+    tope_u = reglas.tope_unitario_uyu(item.producto_id)
+    unitario = ""
+    if tope_u is not None and precio_unitario is not None:
+        por = "el litro" if item.unidad == "l" else "por unidad"
+        if precio_unitario > tope_u:
+            return "supera_tope", (
+                f"$ {fmt(precio_unitario, 2)} {por} supera el tope de precio unitario de $ {fmt(tope_u, 2)}."
+            )
+        unitario = f" y $ {fmt(precio_unitario, 2)} {por} no supera el tope unitario de $ {fmt(tope_u, 2)}"
     if tope is None:
-        return "automatica", f"Modo automático y sin tope: $ {fmt(subtotal)}."
-    return "automatica", f"Modo automático y $ {fmt(subtotal)} no supera el tope de $ {fmt(tope)}."
+        return "automatica", f"Modo automático y sin tope: $ {fmt(subtotal)}" + unitario + "."
+    return "automatica", f"Modo automático y $ {fmt(subtotal)} no supera el tope de $ {fmt(tope)}" + unitario + "."
 
 
 def armar_ordenes(corrida: CorridaAgente, plan: Plan) -> list[OrdenCompra]:
     """Una orden por proveedor del plan. Va sola si ninguna línea necesita a Lucía."""
-    iva = Decimal(str(pipeline.datos_pedido()["config"]["iva"]))
+    iva = Decimal(str(pipeline.config_vigente()["iva"]))  # RF-20: el del panel de configuración
     nombres = _proveedores()
     items = {p.producto_id: p for p in inventario.inventario(corrida.horizonte_meses).productos}
     cotizaciones = _cotizaciones_usadas(corrida.pedido_id)
@@ -874,7 +885,7 @@ def armar_ordenes(corrida: CorridaAgente, plan: Plan) -> list[OrdenCompra]:
         lineas = []
         for a in (a for a in plan.asignaciones if a.proveedor_id == proveedor_id):
             item = items[a.producto_id]
-            aprobacion, motivo = _aprobacion(item, por_producto[a.producto_id])
+            aprobacion, motivo = _aprobacion(item, por_producto[a.producto_id], a.precio_unitario_sin_iva)
             evidencia = next((i.evidencia for i in cot.items if i.producto_id == a.producto_id), None) if cot else None
             lineas.append(
                 LineaOrden(
