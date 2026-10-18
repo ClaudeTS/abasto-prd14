@@ -267,6 +267,7 @@ def perfil(proveedor_id: str) -> dict[str, Any]:
         "historial_ediciones": edicion.get("historial", []),
         "historial_negociaciones": historial,
         "tiempo_respuesta": tiempos_respuesta(proveedor_id),
+        "alta": alta(proveedor_id),  # solo proveedores dados de alta en Abasto (con la conversación del agente)
     }
 
 
@@ -523,7 +524,8 @@ CANAL_ALTA = {"whatsapp": "whatsapp_texto", "email": "pdf", "llamada": "llamada"
 def texto_condiciones(c: dict[str, Any]) -> str:
     partes = []
     if c.get("pedido_minimo"):
-        partes.append(f"mínimo {c['pedido_minimo']}")
+        minimo = str(c["pedido_minimo"])
+        partes.append(minimo if minimo.lower().startswith(("sin", "mínimo")) else f"mínimo {minimo}")
     if c.get("envio"):
         partes.append(f"envío {c['envio']}")
     if c.get("plazo_pago_dias") is not None:
@@ -604,7 +606,7 @@ def alta_por_agente(datos: AltaAgente) -> dict[str, Any]:
                    + f"Estamos buscando proveedores de {lista_prod} y nos gustaría darte de alta. ¿Me pasás unos datos?"),
         ("proveedor", "¡Hola! Sí, claro. ¿Qué necesitás?"),
         ("abasto", "Primero, la razón social y un contacto de ventas."),
-        ("proveedor", f"Somos {razon_social}. Te atiende {contacto['nombre'].split(' ')[0]}, de ventas; el mail es {contacto['email']}."),
+        ("proveedor", f"Somos {razon_social.rstrip('.')}. Te atiende {contacto['nombre'].split(' ')[0]}, de ventas; el mail es {contacto['email']}."),
         ("abasto", f"Perfecto. ¿Por qué canales te podemos pedir cotización? ¿Tenés WhatsApp?"),
         ("proveedor", f"Por WhatsApp a este mismo número o por mail. Cotizamos en el día."),
         ("abasto", "¿Cuáles son tus condiciones habituales? Plazo de pago, entrega, mínimo de compra y envío."),

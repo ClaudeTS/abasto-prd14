@@ -95,6 +95,11 @@ def _unidad(unidad: str) -> str:
     return {"unidad": "por unidad", "l": "por litro", "kg": "por kg"}.get(unidad, "por unidad")
 
 
+def _punto(texto: str) -> str:
+    """Evita el ".." cuando la oración termina en un nombre como "TecnoImport S.A."."""
+    return texto[:-1] if texto.endswith("..") else texto
+
+
 def motivo_exclusion(
     c: Cotizacion, item: ItemCotizado, cantidad: float, dias_requeridos: int
 ) -> tuple[str, str] | None:
@@ -194,7 +199,7 @@ def ordenar(candidatos: list[dict[str, Any]], unidad: str = "unidad") -> list[di
     for pos, c in enumerate(ordenados, start=1):
         c["posicion"] = pos
     for c in ordenados:
-        c["motivo"] = _motivo(c, c["posicion"], lider, ordenados, unidad)
+        c["motivo"] = _punto(_motivo(c, c["posicion"], lider, ordenados, unidad))
     return ordenados
 
 

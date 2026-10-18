@@ -160,7 +160,10 @@ def test_alta_por_agente_queda_en_revision_y_se_aprueba(client):
     nuevo = provs[alta["id"]]
     assert nuevo["estado"] == "en_revision" and nuevo["confianza"]["nivel"] == "sin_datos"
     assert nuevo["antiguedad"]["texto"] == "nuevo"
-    assert client.get(f"/proveedores/{alta['id']}/perfil").status_code == 200
+    perfil = client.get(f"/proveedores/{alta['id']}/perfil").json()
+    assert perfil["alta"]["conversacion"] and perfil["confianza"]["nivel"] == "sin_datos"
+    assert "mínimo sin mínimo" not in perfil["condiciones_habituales"]
+    assert client.get("/proveedores/ofisillas/perfil").json()["alta"] is None
 
     aprobada = client.post(f"/proveedores/{alta['id']}/aprobar-alta", json={"usuario": "Lucía"}).json()
     assert aprobada["estado"] == "activo" and aprobada["aprobado_por"] == "Lucía"
@@ -191,6 +194,8 @@ def test_ranking_sillas_en_cascada(client):
     (rivera,) = silla["excluidos"]
     assert rivera["proveedor_id"] == "muebleria_rivera" and rivera["tipo_exclusion"] == "minimo"
     assert "mínimo" in rivera["motivo"] and "20" in rivera["motivo"]
+    notebook = client.get(f"/pedidos/{PEDIDO}/ranking", params={"producto_id": "notebook"}).json()["productos"][0]
+    assert not any(c["motivo"].endswith("..") for c in notebook["ranking"])  # "TecnoImport S.A."
     assert silla["pocos_proveedores"] is True and silla["sugerencia_alta"]
 
 
