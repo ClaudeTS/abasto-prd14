@@ -104,3 +104,30 @@ export function detalle409(e: unknown): { corrida_id?: string; estado_pedido?: s
   if (!(e instanceof ApiError) || !e.detalle || typeof e.detalle !== "object") return null;
   return e.detalle as { corrida_id?: string; estado_pedido?: string | null };
 }
+
+/** Lo mínimo del inventario que muestra el panel de stock (docs/AGENTE.md §3, `ItemInventario`). */
+export interface ItemStock {
+  producto_id: string;
+  nombre: string;
+  nombre_corto: string;
+  unidad: string;
+  tipo: "consumible" | "equipamiento";
+  stock_actual: number;
+  stock_minimo: number;
+  modo: "automatico" | "manual";
+}
+
+const normItem = (i: ItemStock): ItemStock => ({ ...i, stock_actual: num(i.stock_actual), stock_minimo: num(i.stock_minimo) });
+
+export async function inventario(): Promise<ItemStock[]> {
+  return (await http<{ productos: ItemStock[] }>("GET", "/inventario")).productos.map(normItem);
+}
+
+/** Sale 1 del depósito. Si el stock llega al mínimo, el agente arranca solo la compra y viene en `corrida`. */
+export async function consumir(productoId: string): Promise<{ item: ItemStock; corrida: CorridaAgente | null; aviso: string | null }> {
+  const r = await http<{ item: ItemStock; corrida: CorridaAgente | null; aviso: string | null }>(
+    "POST",
+    `/inventario/${productoId}/consumir`,
+  );
+  return { item: normItem(r.item), corrida: r.corrida ? normCorrida(r.corrida) : null, aviso: r.aviso };
+}

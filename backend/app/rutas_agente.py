@@ -6,9 +6,10 @@ Errores con la misma forma que el resto de la API: `{"error": "mensaje legible",
 from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException, Query
+from pydantic import BaseModel, Field
 
 from app import agente, inventario
-from app.agente import Confirmacion, CorridaAgente, NuevaCorrida
+from app.agente import Confirmacion, Consumo, CorridaAgente, NuevaCorrida
 from app.inventario import CambioInventario, Inventario, ItemInventario
 
 router = APIRouter()
@@ -34,6 +35,20 @@ async def ver_inventario(
 async def cambiar_inventario(producto_id: str, cambio: CambioInventario) -> ItemInventario:
     try:
         return inventario.cambiar(producto_id, cambio)
+    except inventario.InventarioError as exc:
+        status = 404 if "No hay inventario" in str(exc) else 422
+        raise _error(status, str(exc)) from exc
+
+
+class SalidaStock(BaseModel):
+    cantidad: float = Field(1, gt=0)
+
+
+@router.post("/inventario/{producto_id}/consumir", response_model=Consumo)
+async def consumir(producto_id: str, salida: SalidaStock | None = None) -> Consumo:
+    """Baja el stock (salida del depósito). Si llega al mínimo, el agente arranca solo la compra."""
+    try:
+        return agente.consumir(producto_id, (salida or SalidaStock()).cantidad)
     except inventario.InventarioError as exc:
         status = 404 if "No hay inventario" in str(exc) else 422
         raise _error(status, str(exc)) from exc

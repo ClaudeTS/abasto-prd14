@@ -239,3 +239,20 @@ def test_cancelar(client):
     assert corrida["estado"] == "cancelada" and _paso(corrida, "cotizar")["estado"] == "omitido"
     assert client.post(f"/agente/{corrida['id']}/confirmar").status_code == 409
     assert client.get(f"/pedidos/{PEDIDO}").json()["estado"] == "nuevo"
+
+
+def test_bajar_el_stock_al_minimo_arranca_la_compra_sola(client):
+    # tóner: stock 7, mínimo 4. Las dos primeras salidas no disparan; la tercera llega al mínimo.
+    for stock in (6, 5):
+        r = client.post("/inventario/toner/consumir").json()
+        assert r["item"]["stock_actual"] == stock and r["corrida"] is None
+    r = client.post("/inventario/toner/consumir").json()
+    assert r["item"]["stock_actual"] == 4
+    assert r["corrida"] and "Arranqué solo" in r["aviso"]
+    corrida = _esperar(client, r["corrida"]["id"], ("esperando_revision", "esperando_aprobacion", "completada", "error"))
+    assert corrida["avisos"][0].startswith("Arranqué solo")
+    assert corrida["pasos"][2]["estado"] == "omitido" or corrida["pasos"][2]["estado"] == "hecho"
+    assert {l["producto_id"] for l in corrida["propuesta"]} >= {"toner", "resma_a4", "desinfectante"}
+    # otra salida con la compra en curso no arranca otra
+    r = client.post("/inventario/toner/consumir").json()
+    assert r["corrida"] is None and "no arranqué" in r["aviso"]

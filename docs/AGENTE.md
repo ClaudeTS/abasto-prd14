@@ -73,6 +73,7 @@ Todos los errores tienen la forma de siempre: `{"error": "mensaje legible", "det
 |---|---|---|---|---|
 | GET | `/inventario?horizonte_meses=1` | — | `Inventario` | 422 si el horizonte no va de 1 a 6 |
 | PATCH | `/inventario/{producto_id}` | `{modo?, tope_automatico_uyu?, stock_actual?, stock_minimo?}` | `ItemInventario` | 404 producto, 422 negativo |
+| POST | `/inventario/{producto_id}/consumir` | `{cantidad?}` (default 1) | `{item, corrida, aviso}`: si el stock llega al mínimo, `corrida` es la compra que el agente arrancó solo (sin texto ni confirmación: repone con el pronóstico) | 404 producto, 422 cantidad ≤ 0 |
 | GET | `/agente/ejemplo` | — | `{texto}`: la frase de la demo | — |
 | POST | `/agente` | `NuevaCorrida` (todo opcional) | `CorridaAgente` (201) | 409 si hay otra compra en curso (`detalle.corrida_id`) o si el pedido ya se cotizó (reset) |
 | GET | `/agente/actual` | — | la última `CorridaAgente` | 404 si nunca hubo |

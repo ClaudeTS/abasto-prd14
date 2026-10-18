@@ -20,6 +20,7 @@ import Llamadas from "@/features/agente/Llamadas";
 import Ordenes from "@/features/agente/Ordenes";
 import Propuesta from "@/features/agente/Propuesta";
 import Revision from "@/features/agente/Revision";
+import Stock from "@/features/agente/Stock";
 import { cantidadConUnidad } from "@/features/agente/comunes";
 import { estaTerminada, type ClienteInterno, type CorridaAgente, type OrdenCompra } from "@/features/agente/types";
 
@@ -221,6 +222,15 @@ export default function NuevoPedido() {
           !errorCarga && (
             <>
               {ultima && <UltimaCompra c={ultima} onVer={() => setCorrida(ultima)} />}
+              {api.MODO !== "mock" && (
+                <Stock
+                  onArranco={(c, a) => {
+                    setUltima(null);
+                    setAviso(a);
+                    setCorrida(c);
+                  }}
+                />
+              )}
               <Entrada
                 texto={texto}
                 setTexto={setTexto}

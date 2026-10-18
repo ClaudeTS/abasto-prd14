@@ -322,6 +322,34 @@ def iniciar(nueva: NuevaCorrida) -> CorridaAgente:
     return corrida
 
 
+class Consumo(BaseModel):
+    """POST /inventario/{producto_id}/consumir: el stock que quedó y, si cruzó el mínimo, la compra que arrancó."""
+
+    item: ItemInventario
+    corrida: CorridaAgente | None = None
+    aviso: str | None = None
+
+
+def consumir(producto_id: str, cantidad: float = 1) -> Consumo:
+    """Sale `cantidad` del depósito. Si el stock llega al mínimo, el agente arranca solo la reposición (RF-03)."""
+    antes = inventario.item(producto_id, inventario.horizonte_por_defecto())
+    nuevo = max(0.0, antes.stock_actual - cantidad)
+    item = inventario.cambiar(producto_id, inventario.CambioInventario(stock_actual=nuevo))
+    if item.stock_minimo <= 0 or item.stock_actual > item.stock_minimo:
+        return Consumo(item=item)
+    disparo = (
+        f"Arranqué solo: el stock de {item.nombre_corto} bajó a {_cantidad(item.stock_actual, item.nombre_corto, item.unidad)}"
+        f" y llegó al mínimo de {fmt(item.stock_minimo)}. Calculo la reposición con el histórico y la estacionalidad."
+    )
+    try:
+        corrida = iniciar(NuevaCorrida(esperar_confirmacion=False))
+    except AgenteError as exc:
+        return Consumo(item=item, aviso=f"El stock llegó al mínimo, pero no arranqué la compra: {exc.error}")
+    corrida.avisos.insert(0, disparo)  # la tarea todavía no corrió (create_task): no se pisa
+    _guardar(corrida)
+    return Consumo(item=item, corrida=corrida, aviso=disparo)
+
+
 def confirmar(corrida_id: str, confirmacion: Confirmacion | None) -> CorridaAgente:
     corrida = obtener(corrida_id)
     if corrida.estado != "esperando_confirmacion":
@@ -500,7 +528,7 @@ def _revisar_inventario(corrida_id: str) -> None:
     avisos += [f"No hay proveedores habilitados para {items[l.producto_id].nombre_corto}." for l in lineas if not items[l.producto_id].proveedores]
     corrida.horizonte_meses = horizonte
     corrida.propuesta = lineas
-    corrida.avisos = avisos
+    corrida.avisos = [*corrida.avisos, *avisos]  # conserva el aviso del disparo por stock mínimo
     _marcar(corrida, "inventario", "hecho", _texto_inventario(lineas, inv.meses_pronostico))
     _guardar(corrida)
 
