@@ -6,6 +6,7 @@ import type {
   ConfigCompra,
   ConfigLlamadas,
   Conversion,
+  CorridaAgente,
   Cotizacion,
   EstrategiaNegociacion,
   ItemCotizado,
@@ -15,6 +16,9 @@ import type {
   Pedido,
   PedidoDemo,
   Plan,
+  Inventario,
+  ItemInventario,
+  NuevaCorrida,
   Producto,
 } from "./types";
 
@@ -47,7 +51,7 @@ function resolverModo(): "mock" | "backend" {
 export const MODO = resolverModo();
 const MOCK = MODO === "mock";
 
-async function http<T>(metodo: "GET" | "POST", ruta: string, body?: unknown): Promise<T> {
+async function http<T>(metodo: "GET" | "POST" | "PATCH", ruta: string, body?: unknown): Promise<T> {
   let res: Response;
   try {
     res = await fetch(API_URL + ruta, {
@@ -260,6 +264,85 @@ export async function llamarParaNegociar(negociacionId: string, mensaje: string,
 export async function getLlamada(id: string): Promise<Llamada> {
   if (MOCK) return mock.llamada(id);
   return normLlamada(await http("GET", `/llamadas/${id}`));
+}
+
+export async function getPlan(pedidoId: string): Promise<Plan> {
+  if (MOCK) throw new ApiError("Sin plan en modo mock.");
+  return normPlan(await http("GET", `/pedidos/${pedidoId}/plan`));
+}
+
+export async function getNegociacion(negociacionId: string): Promise<Negociacion> {
+  if (MOCK) throw new ApiError("Sin negociación en modo mock.");
+  return normNegociacion(await http("GET", `/negociaciones/${negociacionId}`));
+}
+
+// ─────────── Agente de compras e inventario (docs/AGENTE.md) ───────────
+// Solo con el backend: el modo mock no simula al agente.
+
+const SIN_MOCK = "El agente y el inventario necesitan el backend: abrí la app sin ?modo=mock.";
+
+function conBackend(): void {
+  if (MOCK) throw new ApiError(SIN_MOCK);
+}
+
+export async function getInventario(horizonteMeses = 1): Promise<Inventario> {
+  conBackend();
+  return http("GET", `/inventario?horizonte_meses=${horizonteMeses}`);
+}
+
+/** Solo los campos que cambian; tope_automatico_uyu: null = sin tope. */
+export async function cambiarInventario(
+  productoId: string,
+  cambios: Partial<Pick<ItemInventario, "modo" | "tope_automatico_uyu" | "stock_actual" | "stock_minimo">>,
+): Promise<ItemInventario> {
+  conBackend();
+  return http("PATCH", `/inventario/${productoId}`, cambios);
+}
+
+export async function getEjemploAgente(): Promise<string> {
+  conBackend();
+  return (await http<{ texto: string }>("GET", "/agente/ejemplo")).texto;
+}
+
+export async function iniciarAgente(nueva: NuevaCorrida): Promise<CorridaAgente> {
+  conBackend();
+  return http("POST", "/agente", nueva);
+}
+
+/** La última compra del agente, o null si nunca hubo una. */
+export async function getAgenteActual(): Promise<CorridaAgente | null> {
+  conBackend();
+  try {
+    return await http<CorridaAgente>("GET", "/agente/actual");
+  } catch (e) {
+    if (e instanceof ApiError && /nunca|no hay|404/i.test(e.message)) return null;
+    throw e;
+  }
+}
+
+export async function getAgente(corridaId: string): Promise<CorridaAgente> {
+  conBackend();
+  return http("GET", `/agente/${corridaId}`);
+}
+
+export async function confirmarAgente(corridaId: string): Promise<CorridaAgente> {
+  conBackend();
+  return http("POST", `/agente/${corridaId}/confirmar`);
+}
+
+export async function aprobarOrden(corridaId: string, ordenId: string): Promise<CorridaAgente> {
+  conBackend();
+  return http("POST", `/agente/${corridaId}/ordenes/${ordenId}/aprobar`);
+}
+
+export async function rechazarOrden(corridaId: string, ordenId: string): Promise<CorridaAgente> {
+  conBackend();
+  return http("POST", `/agente/${corridaId}/ordenes/${ordenId}/rechazar`);
+}
+
+export async function cancelarAgente(corridaId: string): Promise<CorridaAgente> {
+  conBackend();
+  return http("POST", `/agente/${corridaId}/cancelar`);
 }
 
 export async function reset(): Promise<void> {

@@ -14,7 +14,7 @@ import { Avatar, Encabezado } from "@/components/comunes";
 const CAPAS = [
   { n: 1, nombre: "Percepción", detalle: "Entiende texto, PDF, foto y audio", hecha: true },
   { n: 2, nombre: "Perfil del proveedor", detalle: "Aprende cuánto cede y cuándo sube", hecha: false },
-  { n: 3, nombre: "Predicción", detalle: "Precios y consumo", hecha: false },
+  { n: 3, nombre: "Predicción", detalle: "Consumo: ya en Inventario. Precios: próximamente", hecha: false, parcial: true },
   { n: 4, nombre: "Optimización", detalle: "Solver MILP", hecha: true },
   { n: 5, nombre: "Negociación ensayada", detalle: "Gemelo digital del proveedor", hecha: true },
   { n: 6, nombre: "Índice de mercado", detalle: "Precios anonimizados entre empresas", hecha: false },
@@ -26,7 +26,7 @@ export default function Vision() {
     <div className="space-y-8">
       <Encabezado
         titulo="Hacia dónde va Abasto"
-        bajada="Lo que viste son 3 de 7 capas. Con cada compra Abasto aprende cómo se comporta cada proveedor; con muchas empresas, arma un índice de precios que nadie puede copiar sin los datos."
+        bajada="Lo que viste son 3 de 7 capas, y la mitad de otra: el pronóstico de consumo ya funciona. Con cada compra Abasto aprende cómo se comporta cada proveedor; con muchas empresas, arma un índice de precios que nadie puede copiar sin los datos."
       />
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-7">
@@ -35,7 +35,11 @@ export default function Vision() {
             key={c.n}
             className={cn(
               "flex flex-col gap-1 rounded-xl p-3 text-sm",
-              c.hecha ? "bg-primary text-primary-foreground" : "border border-dashed text-muted-foreground",
+              c.hecha
+                ? "bg-primary text-primary-foreground"
+                : "parcial" in c
+                  ? "border-2 border-primary/60 text-muted-foreground"
+                  : "border border-dashed text-muted-foreground",
             )}
           >
             <span className="text-xs opacity-70">Capa {c.n}</span>
@@ -46,6 +50,8 @@ export default function Vision() {
                 <>
                   <CheckIcon className="size-3" /> En la demo
                 </>
+              ) : "parcial" in c ? (
+                "A medias"
               ) : (
                 "Próximamente"
               )}

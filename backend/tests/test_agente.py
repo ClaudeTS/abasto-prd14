@@ -157,6 +157,37 @@ def test_compra_entera_con_la_frase_de_la_demo(client, gemelo):
     assert client.get("/agente/actual").json()["id"] == corrida["id"]
 
 
+def test_piloto_automatico_hace_la_compra_entera_sin_lucia(client, gemelo):
+    """Rediseño: con autonomía total el agente confirma, repregunta el IVA, manda el mensaje y las órdenes."""
+    corrida = _demo(client, autonomia="total", resolver_dudas=True)
+    corrida = _esperar(client, corrida["id"], ("completada",))
+    assert _paso(corrida, "confirmar")["detalle"].startswith("Piloto automático: confirmé yo 10 notebooks")
+    revisar = _paso(corrida, "revisar")
+    assert revisar["estado"] == "hecho"
+    assert "Le pregunté a Compuservice" in revisar["detalle"] and "IVA incluido" in revisar["detalle"]
+    compu = next(c for c in client.get(f"/pedidos/{PEDIDO}/cotizaciones").json() if c["proveedor_id"] == "compuservice")
+    assert compu["estado"] == "confirmada"
+    assert abs(client.get(f"/pedidos/{PEDIDO}/plan").json()["costo_total"] - 498454) < 50  # el plan de siempre
+    assert client.get(f"/negociaciones/{corrida['negociacion_id']}").json()["estado"] == "enviada_simulada"
+    assert "le mandé el mensaje a Ofisillas" in _paso(corrida, "negociar")["detalle"]
+    assert {o["estado"] for o in corrida["ordenes"]} == {"enviada_simulada"}
+    assert {o["aprobada_por"] for o in corrida["ordenes"]} == {"agente"}
+    notebook = next(l for o in corrida["ordenes"] for l in o["lineas"] if l["producto_id"] == "notebook")
+    assert notebook["motivo"].startswith("Piloto automático: está en modo manual")
+    assert "El agente mandó solo" in corrida["resumen"] and "mensaje de la negociación" in corrida["resumen"]
+
+
+def test_repregunta_el_iva_sin_piloto_automatico(client, gemelo):
+    """resolver_dudas solo: el IVA se aclara con el proveedor, pero manual y topes siguen esperando a Lucía."""
+    corrida = _demo(client, esperar_confirmacion=False, resolver_dudas=True)
+    corrida = _esperar(client, corrida["id"], ("esperando_aprobacion",))
+    assert "Respondió: «Sí, todo con el IVA incluido»." in _paso(corrida, "revisar")["detalle"]
+    ordenes = {o["proveedor_id"]: o for o in corrida["ordenes"]}
+    assert ordenes["papelera_del_sur"]["aprobada_por"] == "agente"
+    assert ordenes["compuservice"]["estado"] == "esperando_aprobacion"
+    assert client.get(f"/negociaciones/{corrida['negociacion_id']}").json()["estado"] == "simulada"
+
+
 DICTADO = (
     "abasto arma la compra del mes entran 10 personas nuevas el 28 y necesitan notebook y para la "
     "oficina nueva 15 sillas ergonomicas para el 3 de noviembre"

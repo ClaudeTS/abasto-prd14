@@ -22,7 +22,9 @@ un WhatsApp."
 **[0:50 – 1:35] Qué es Abasto.**
 "Abasto es un agente de compras con IA. Lucía le dice qué necesita, por voz o por escrito, y Abasto hace
 la compra entera: revisa el inventario, pide cotizaciones, llama a quien no contesta, arma el plan, ensaya
-la negociación y emite las órdenes. Lucía decide qué se compra solo y qué espera su OK.
+la negociación y emite las órdenes. Con el piloto automático, Lucía no toca nada más: Abasto le
+repregunta al proveedor lo que no entendió y cierra la compra. Sin piloto, lo que ella marcó como manual
+o lo que supera su tope espera su OK.
 Por dentro hace tres cosas que sin IA no se pueden hacer.
 Uno: **entiende** las cotizaciones como llegan: texto, PDF, foto, audio, en pesos o en dólares, con o
 sin IVA, y las normaliza con evidencia de cada número.
@@ -56,8 +58,8 @@ Preparación: `make reset` hecho (también vuelve el Inventario a los modos de s
 pestaña única en la pantalla **Agente**, Chrome o Edge con el permiso de micrófono dado, modo no molestar,
 video de respaldo abierto en otra ventana. Tipo de cambio del día cargado en `config.tipo_cambio_usd`.
 
-El recorrido usa las pantallas Agente e Inventario (`docs/AGENTE.md` §6). Hasta que estén en el front, se
-hace el plan B de más abajo.
+La pantalla **Agente** es la portada de la app. Lucía dice qué hay que comprar y el agente hace el resto:
+en la demo, después del primer clic no se toca nada más. Todo se ve en vivo en la línea de tiempo de los 9 pasos.
 
 Con `data/inventario_demo.json`, la frase de la demo arma el pedido de siempre: 10 notebooks y 15 sillas (lo
 pedido) más 150 resmas, 8 tóner y 60 L de desinfectante (reposición). Por eso el plan y el ahorro son los de
@@ -65,32 +67,35 @@ siempre: $ 498.454 + IVA y 8,1 %.
 
 | Paso | Qué hacés | Qué decís |
 |---|---|---|
-| 1. El pedido, por voz | En **Agente**, clic en el micrófono y decir: "Abasto, armá la compra del mes. Entran diez personas nuevas el 28 y necesitan notebook. Y para la oficina nueva, quince sillas ergonómicas para el 3 de noviembre." Revisar el texto dictado y clic en **Comprar**. Sin micrófono: **Usar el ejemplo**. | "Lucía no llena una planilla: le dice a Abasto qué necesita, como se lo diría a alguien del equipo." |
-| 2. La propuesta | La línea de tiempo llega a **Tu OK para cotizar**. Mostrar la propuesta: lo que pidió (notebooks y sillas) y la reposición (resmas, tóner y desinfectante). Señalar la evidencia de las resmas. Clic en **Confirmar y pedir cotizaciones**. | "Lo que pidió, y lo que se le va a terminar. Las resmas: noviembre viene 14 % arriba y ya están bajo el mínimo. Cada línea dice por qué está ahí." |
-| 3. Las respuestas | Desde el paso **Pedir cotizaciones**, abrir el feed. Llegan texto, PDF y foto. A los 25 s el agente llama solo a Papelera del Sur (paso **Llamar a quien no responde**): seguir la transcripción. | "Llegan como llegan de verdad: un PDF en dólares más IVA, una foto escrita a mano. La papelera no contestó, y Abasto no espera: la llama." |
-| 4. La duda | El agente se frena en **Revisar respuestas dudosas**: Compuservice no aclara el IVA. Clic en **Incluyen IVA**. | "Cuando no sabe, no adivina: pregunta. Un clic y sigue solo." |
-| 5. El plan | Desde el paso **Armar el plan de compra**, abrir el Plan. Mostrar el ahorro y señalar las sillas. | "Reparte entre tres proveedores: $ 498.454 más IVA, 8 % menos que comprarle todo al de siempre, casi 44 mil pesos, y 16 % en lo que el habitual vende. Las sillas no van al más barato: el fabricante exige un lote de 20 y necesitamos 15. Eso lo decide un solver, no el modelo de lenguaje." |
-| 6. Negociación y órdenes | El agente ensaya la negociación con Ofisillas y emite las órdenes. Mostrar que **OC-1003 (Papelera del Sur) salió sola** y que OC-1001 (Compuservice) y OC-1002 (Ofisillas) esperan. En OC-1002, **Ver negociación** y después **Aprobar**. | "La orden de la papelera salió sola: resmas y desinfectante están en automático y no pasan su tope. Las otras esperan a Lucía: notebooks y sillas están en manual, y el tóner supera su tope de 20 mil. Con Ofisillas ensayó tres estrategias y la de volumen consiguió 5 % menos. Lucía decide qué se compra solo; lo demás no sale sin ella." |
+| 1. El pedido, por voz | En **Agente**, con **Piloto automático** prendido, clic en el micrófono y decir: "Abasto, armá la compra del mes. Entran diez personas nuevas el 28 y necesitan notebook. Y para la oficina nueva, quince sillas ergonómicas para el 3 de noviembre." Revisar el texto y clic en **Hacer la compra**. Sin micrófono: **Usar el ejemplo**. Desde acá, no se toca nada. | "Lucía no llena una planilla: le dice a Abasto qué necesita, como se lo diría a alguien del equipo. Y se va a hacer otra cosa." |
+| 2. La propuesta | Señalar los pasos **Entender el pedido** y **Revisar el inventario**: lo que pidió (notebooks y sillas) y la reposición (resmas, tóner y desinfectante), con la cuenta de las resmas. | "Lo que pidió, y lo que se le va a terminar. Las resmas: noviembre viene 14 % arriba y ya están bajo el mínimo. Cada línea dice por qué está ahí." |
+| 3. Las respuestas | En **Pedir cotizaciones** van llegando los 6 proveedores. Si la papelera no contesta a tiempo, el agente la llama solo (paso **Llamar a quien no responde**). Para mostrar un PDF o la foto: **Ver los mensajes**. | "Llegan como llegan de verdad: un PDF en dólares más IVA, una foto escrita a mano. Al que no contesta, Abasto no lo espera: lo llama." |
+| 4. La duda | En **Revisar respuestas dudosas** aparece el WhatsApp del agente con Compuservice: "¿Los precios que me pasaste incluyen IVA?" "Sí, todo con el IVA incluido." | "Compuservice no aclaró el IVA. Abasto no adivina: le pregunta al proveedor y confirma con su respuesta. Nadie tuvo que intervenir." |
+| 5. El plan | Señalar el paso **Armar el plan de compra**: ahorro, total y el caso de las sillas. Para el detalle: **Ver el plan y por qué**. | "Reparte entre tres proveedores: $ 498.454 más IVA, 8 % menos que comprarle todo al de siempre, casi 44 mil pesos, y 16 % en lo que el habitual vende. Las sillas no van al más barato: el fabricante exige un lote de 20 y necesitamos 15. Eso lo decide un solver, no el modelo de lenguaje." |
+| 6. Negociación y órdenes | El agente ensaya la negociación con Ofisillas, manda el mensaje y emite las 3 órdenes: todas con **La mandó el agente**. Arriba aparece **Compra cerrada** con el resumen. | "Con Ofisillas ensayó tres estrategias y la de volumen consiguió 5 % menos; le mandó el mensaje. Y emitió las órdenes. Las notebooks estaban en manual y el tóner pasaba su tope: con el piloto automático, Lucía le dio permiso para resolverlo. Cada orden dice qué regla saltó y por qué." |
 | 7. Visión | 10 segundos en las próximas capas. En Predicción, mostrar que el pronóstico de consumo ya es real (el del Inventario); el de precios sigue siendo diseño. | "Y esto es lo que se construye con el tiempo y los datos. El pronóstico de consumo ya lo vieron funcionar; el de precios es lo que sigue." |
 
-Las órdenes que tienen que aparecer en el paso 6:
+Las órdenes que tienen que aparecer en el paso 6, con y sin piloto automático:
 
-| Orden | Proveedor | Qué lleva | Sale |
-|---|---|---|---|
-| OC-1001 | Compuservice | Notebooks (manual) y tóner ($ 25.574, supera su tope de $ 20.000) | Espera a Lucía |
-| OC-1002 | Ofisillas | Sillas (manual) y la negociación | Espera a Lucía |
-| OC-1003 | Papelera del Sur | Resmas ($ 26.804, tope $ 30.000) y desinfectante ($ 6.787, tope $ 10.000) | **Sola** |
+| Orden | Proveedor | Qué lleva | Con piloto | Sin piloto |
+|---|---|---|---|---|
+| OC-1001 | Compuservice | Notebooks (manual) y tóner ($ 25.574, supera su tope de $ 20.000) | La manda el agente | Espera a Lucía |
+| OC-1002 | Ofisillas | Sillas (manual) y la negociación | La manda el agente | Espera a Lucía |
+| OC-1003 | Papelera del Sur | Resmas ($ 26.804, tope $ 30.000) y desinfectante ($ 6.787, tope $ 10.000) | La manda el agente | **Sola** |
 
-Para mostrar el control, si sobra tiempo: mientras llegan las respuestas (paso 3), ir a **Inventario** y cambiar
-un modo. Tiene que ser antes de que el agente emita las órdenes:
+Para mostrar el control, si sobra tiempo: **Nueva compra** con **Piloto automático** apagado (el agente resetea
+la demo solo). Hace todo igual, también la repregunta del IVA, y se frena una sola vez: la tarjeta **Abasto
+necesita tu OK** con OC-1001 y OC-1002. Desde **Inventario** se cambia qué compra solo y hasta qué monto:
 
-- Desinfectante a manual: en el paso 6, la orden de Papelera también espera.
+- Desinfectante a manual: la orden de Papelera también espera.
 - Tóner "sin tope": la orden de Compuservice sigue esperando, por las notebooks.
+
+Sin `ANTHROPIC_API_KEY` el paso de negociación queda en error y la compra sigue igual (las otras órdenes salen).
 
 ### Plan B: recorrido paso a paso, sin el agente
 
-Las pantallas de siempre siguen funcionando con el mismo pedido. Si el agente falla en vivo, o mientras no
-estén las pantallas nuevas:
+Las pantallas de siempre siguen funcionando con el mismo pedido (menú **Detalle**, "Hacer la compra a mano").
+Si el agente falla en vivo:
 
 | Paso | Qué hacés | Qué decís |
 |---|---|---|
@@ -181,6 +186,7 @@ decirlo). La predicción de precios y el índice de mercado son diseño, no cód
       esa frase: decirla tal cual o usar **Usar el ejemplo**.
 - [ ] Inventario con los modos de siempre (el reset los vuelve): notebooks y sillas en manual; resmas, tóner y
       desinfectante en automático, con topes de $ 30.000, $ 20.000 y $ 10.000.
+- [ ] En **Agente**, **Piloto automático** prendido (es el default de cada compra nueva).
 - [ ] Si la demo va contra el deploy: abrir https://abasto-backend.onrender.com/health para despertarlo (se duerme
       a los 15 min) y resetear con el botón de la UI.
 - [ ] Llamadas: decidir real o simulada (`LLAMADAS_MODO`). En real: `GET /llamadas/config` responde `lista: true`,

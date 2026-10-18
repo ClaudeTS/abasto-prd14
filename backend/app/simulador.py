@@ -23,7 +23,7 @@ from datetime import datetime
 from typing import Any
 
 from app import config, pedidos, store
-from app.models import EstadoProveedor, MensajeCrudo
+from app.models import Cotizacion, EstadoProveedor, MensajeCrudo
 from app.pipeline import catalogo, procesar_mensaje
 from app.pipeline import proveedores as proveedores_publicos
 
@@ -42,6 +42,22 @@ def _fixtures() -> dict[str, dict[str, Any]]:
 
 def _proveedores_sim() -> list[dict[str, Any]]:
     return store.semilla("proveedores_sim")["proveedores"]
+
+
+def responder_repregunta(cotizacion: Cotizacion) -> tuple[str, bool | None]:
+    """Lo que contesta el proveedor simulado cuando el agente le repregunta una duda de su cotización.
+
+    Sale de su lista de precios real, la misma con la que cotizó. Devuelve el texto de la respuesta y, si
+    la duda era el IVA, si los precios lo incluyen (None si la respuesta no lo aclara).
+    """
+    prov = next((p for p in _proveedores_sim() if p["publico"]["id"] == cotizacion.proveedor_id), None)
+    if "iva" not in cotizacion.campos_dudosos:
+        return "Sí, los precios que te pasé están bien.", None
+    tabla = prov["privado"].get("tabla_precios", {}) if prov else {}
+    ivas = {bool(tabla[i.producto_id].get("incluye_iva")) for i in cotizacion.items if i.producto_id in tabla}
+    if len(ivas) != 1:
+        return "Depende del producto, después te paso el detalle.", None
+    return ("Sí, todo con el IVA incluido.", True) if ivas.pop() else ("No, son más IVA.", False)
 
 
 def demora_de(proveedor_id: str, demora_factor: float) -> float:

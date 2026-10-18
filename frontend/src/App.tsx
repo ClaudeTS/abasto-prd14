@@ -6,8 +6,10 @@ import { ErrorBanner } from "./components/comunes";
 import { Spinner } from "./components/ui/spinner";
 import { mensajeError } from "./lib/errores";
 import { borrarSesion, useSesion } from "./lib/sesion";
+import Agente from "./pages/Agente";
 import Cotizaciones from "./pages/Cotizaciones";
 import Feed from "./pages/Feed";
+import InventarioPage from "./pages/Inventario";
 import NegociacionPage from "./pages/Negociacion";
 import PedidoPage from "./pages/Pedido";
 import PlanPage from "./pages/Plan";
@@ -67,18 +69,38 @@ export default function App() {
     [demo, recargarPedido, setNegociaciones],
   );
 
+  /** Lo que la app guarda de la demo, en blanco (después de un POST /reset). */
+  const limpiar = useCallback(async () => {
+    borrarSesion();
+    setCotizarEn(null);
+    setPlan(null);
+    setNegociaciones({});
+    setNegociando({});
+    await recargarPedido();
+  }, [recargarPedido, setCotizarEn, setPlan, setNegociaciones]);
+
+  /** Lo que hizo el agente, para que Plan y Negociación (las vistas de detalle) muestren lo mismo. */
+  const sincronizar = useCallback(
+    (nuevoPlan: Plan | null, negociacion: Negociacion | null) => {
+      if (nuevoPlan) setPlan((p) => (JSON.stringify(p) === JSON.stringify(nuevoPlan) ? p : nuevoPlan));
+      if (negociacion)
+        setNegociaciones((n) =>
+          JSON.stringify(n[negociacion.proveedor_id]) === JSON.stringify(negociacion)
+            ? n
+            : { ...n, [negociacion.proveedor_id]: negociacion },
+        );
+    },
+    [setPlan, setNegociaciones],
+  );
+
   const reset = async () => {
-    if (!window.confirm("¿Reiniciar la demo? Se borran respuestas, plan y negociaciones.")) return;
+    if (!window.confirm("¿Reiniciar la demo? Se borran la compra del agente, las respuestas, el plan y las negociaciones."))
+      return;
     setReseteando(true);
     try {
       await api.reset();
-      borrarSesion();
-      setCotizarEn(null);
-      setPlan(null);
-      setNegociaciones({});
-      setNegociando({});
-      await recargarPedido();
-      navigate("/pedido");
+      await limpiar();
+      navigate("/");
     } catch (e) {
       setErrorCarga(mensajeError(e));
     } finally {
@@ -101,7 +123,9 @@ export default function App() {
         )
       ) : (
         <Routes>
-          <Route path="/" element={<Navigate to="/pedido" replace />} />
+          <Route path="/" element={<Agente onReseteado={limpiar} onSincronizar={sincronizar} />} />
+          <Route path="/agente" element={<Navigate to="/" replace />} />
+          <Route path="/inventario" element={<InventarioPage />} />
           <Route
             path="/pedido"
             element={
@@ -151,7 +175,7 @@ export default function App() {
             />
           ))}
           <Route path="/vision" element={<Vision />} />
-          <Route path="*" element={<Navigate to="/pedido" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       )}
     </Layout>

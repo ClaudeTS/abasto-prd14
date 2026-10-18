@@ -224,3 +224,183 @@ export interface Llamada {
   error: string | null;
   iniciada_en: string;
 }
+
+// ─────────── Agente de compras e inventario (docs/AGENTE.md §4) ───────────
+
+export type ModoCompra = "automatico" | "manual";
+
+export interface ItemInventario {
+  producto_id: string;
+  nombre: string;
+  nombre_corto: string; // para frases: "resmas", "tóner"
+  unidad: UnidadCanonica;
+  tipo: "consumible" | "equipamiento";
+  stock_actual: number;
+  stock_minimo: number;
+  en_camino: number; // en órdenes que el agente ya mandó
+  multiplo_compra: number;
+  modo: ModoCompra;
+  tope_automatico_uyu: number | null; // sin IVA; null = sin tope
+  proveedores: { id: string; nombre: string }[];
+  historial: { mes: string; cantidad: number }[]; // 24 meses
+  pronostico: {
+    nivel: number;
+    consumo_diario: number;
+    meses: { mes: string; indice: number; cantidad: number }[];
+    total: number;
+    evidencia: string;
+  } | null; // null: equipamiento
+  reposicion: {
+    cantidad: number; // 0 = alcanza
+    necesario_para: string;
+    cobertura_dias: number | null;
+    evidencia: string;
+  } | null;
+  alerta: "bajo_minimo" | "reponer" | null;
+}
+
+export interface Inventario {
+  fecha: string;
+  horizonte_meses: number;
+  meses_pronostico: string[];
+  plazo_minimo_dias: number;
+  productos: ItemInventario[];
+}
+
+export type PasoId =
+  | "entender"
+  | "inventario"
+  | "confirmar"
+  | "cotizar"
+  | "insistir"
+  | "revisar"
+  | "optimizar"
+  | "negociar"
+  | "ordenes";
+
+export type EstadoPaso = "pendiente" | "en_curso" | "esperando" | "hecho" | "omitido" | "error";
+
+export interface PasoAgente {
+  id: PasoId;
+  titulo: string;
+  estado: EstadoPaso;
+  detalle: string | null;
+  inicio: string | null;
+  fin: string | null;
+}
+
+export interface LineaPropuesta {
+  producto_id: string;
+  nombre: string;
+  nombre_corto: string;
+  unidad: UnidadCanonica;
+  cantidad: number;
+  necesario_para: string;
+  origen: "pedido" | "reposicion";
+  modo: ModoCompra;
+  tope_automatico_uyu: number | null;
+  stock_actual: number;
+  evidencia: string;
+  dudas: string[];
+}
+
+export interface RevisionPendiente {
+  cotizacion_id: string;
+  proveedor_id: string;
+  proveedor_nombre: string;
+  campos_dudosos: string[];
+  pide_iva: boolean;
+  pregunta: string;
+}
+
+export interface LineaOrden {
+  producto_id: string;
+  nombre: string;
+  nombre_corto: string;
+  unidad: UnidadCanonica;
+  cantidad: number;
+  precio_unitario_sin_iva: number;
+  subtotal: number;
+  aprobacion: "automatica" | "manual" | "supera_tope";
+  motivo: string;
+  cotizacion_id: string | null;
+  evidencia: string | null;
+}
+
+export interface OrdenCompra {
+  id: string;
+  numero: string;
+  proveedor_id: string;
+  proveedor_nombre: string;
+  lineas: LineaOrden[];
+  envio: number;
+  total_sin_iva: number;
+  total_con_iva: number;
+  requiere_aprobacion: boolean;
+  motivos: string[];
+  estado: "esperando_aprobacion" | "enviada_simulada" | "rechazada";
+  aprobada_por: "agente" | "lucia" | null;
+  negociacion_id: string | null;
+  mensaje: string;
+  enviada_en: string | null;
+}
+
+export type EstadoCorrida =
+  | "en_curso"
+  | "esperando_confirmacion"
+  | "esperando_revision"
+  | "esperando_aprobacion"
+  | "completada"
+  | "error"
+  | "cancelada";
+
+export interface OpcionesCorrida {
+  horizonte_meses: number | null;
+  esperar_confirmacion: boolean;
+  llamar_si_no_responde: boolean;
+  negociar: boolean;
+  /** El agente le repregunta al proveedor lo dudoso y confirma con su respuesta. */
+  resolver_dudas: boolean;
+  /** "total" = piloto automático: confirma, manda el mensaje negociado y aprueba todas las órdenes. */
+  autonomia: "topes" | "total";
+}
+
+export interface NuevaCorrida extends Partial<OpcionesCorrida> {
+  texto?: string | null;
+}
+
+export interface CorridaAgente {
+  id: string;
+  pedido_id: string;
+  texto: string | null;
+  horizonte_meses: number;
+  opciones: OpcionesCorrida;
+  estado: EstadoCorrida;
+  pasos: PasoAgente[];
+  interpretacion: {
+    origen: "llm" | "fijo";
+    items: {
+      producto_id: string;
+      descripcion: string;
+      cantidad: number | null;
+      necesario_para: string | null;
+      evidencia: string;
+    }[];
+    no_entendido: string[];
+    excluir: string[];
+    horizonte_meses: number | null;
+    evidencia_horizonte: string | null;
+    dudas: string[];
+  } | null;
+  propuesta: LineaPropuesta[];
+  avisos: string[];
+  revision: RevisionPendiente[];
+  llamada_ids: string[];
+  sin_respuesta: string[];
+  negociacion_id: string | null;
+  ordenes: OrdenCompra[];
+  resumen: string | null;
+  error: string | null;
+  creada_en: string;
+  actualizada_en: string;
+}

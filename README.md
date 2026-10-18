@@ -56,6 +56,11 @@ Simula las demoras del simulador, la extracción con evidencia, el solver y la n
 
 ## Recorrido de la demo
 
+La portada es el **agente**: le decís qué hay que comprar (por voz o por escrito) y, con el piloto
+automático prendido, hace todo el recorrido de abajo solo, incluso repreguntarle al proveedor lo que no
+entendió y emitir las órdenes. Se ve en vivo en su línea de tiempo; las pantallas de cada paso quedan en el
+menú **Detalle**, e **Inventario** define qué puede comprar solo y hasta qué monto. Contrato: `docs/AGENTE.md`.
+
 1. **Pedido** → Tecnova carga su compra de octubre (precargada, 5 líneas).
 2. **Cotizar** → Abasto escribe a los 6 proveedores. El feed muestra las respuestas llegando: un PDF en dólares, un audio, una foto de un presupuesto a mano, tres mensajes de texto (uno ambiguo).
 3. **Cotizaciones** → cada respuesta se convierte en una tarjeta estructurada con evidencia y conversiones (USD → UYU, caja de 5 → unidad, con IVA → sin IVA).

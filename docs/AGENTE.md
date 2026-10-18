@@ -113,7 +113,9 @@ Detalles:
   "horizonte_meses": null,
   "esperar_confirmacion": true,
   "llamar_si_no_responde": true,
-  "negociar": true
+  "negociar": true,
+  "resolver_dudas": false,
+  "autonomia": "topes"
 }
 ```
 
@@ -121,6 +123,19 @@ Detalles:
 - **`horizonte_meses`:** de 1 a 6. Si es `null`, vale el que dijo Lucía ("para los próximos dos meses") o
   el de siempre (1).
 - **`esperar_confirmacion: false`:** saltea el OK previo, salvo que haya dudas.
+- **`resolver_dudas: true`:** en el paso `revisar`, el agente le repregunta por WhatsApp (simulado) a cada
+  proveedor con una cotización dudosa y confirma con su respuesta (`POST /cotizaciones/{id}/confirmar` por
+  dentro). La respuesta sale de la lista de precios del proveedor simulado (`simulador.responder_repregunta`).
+  La charla queda en el `detalle` del paso: «Le pregunté a Compuservice: «…». Respondió: «…».». Si la
+  respuesta no lo aclara, la cotización sigue esperando a Lucía.
+- **`autonomia: "total"` (piloto automático):** el agente no espera a nadie. Confirma la propuesta (saca lo
+  que quedó sin cantidad, con un aviso), resuelve las dudas como `resolver_dudas`, manda el mensaje negociado
+  y aprueba todas las órdenes: las líneas en manual o sobre el tope quedan `automatica`, con un `motivo` que
+  dice qué regla saltó ("Piloto automático: está en modo manual, pero la aprobé yo."). Con `"topes"` (el
+  default), manual y topes del Inventario esperan a Lucía como siempre.
+
+La pantalla Agente del front manda siempre `esperar_confirmacion: false` y `resolver_dudas: true`, y
+`autonomia: "total"` salvo que Lucía apague el piloto automático.
 
 ## 4. Tipos (para `types.ts`)
 
@@ -301,7 +316,10 @@ rec.start();
 - **Sin LLM** (sin key, o si falla), el back solo entiende la frase de la demo, escrita o dictada: no
   importan tildes, puntuación ni "10" en vez de "diez". Cualquier otro pedido da `error` con el motivo.
 
-## 6. Pantallas sugeridas
+## 6. Pantallas
+
+Hechas en el rediseño (rama `rediseno-app`): **Agente** es la portada (`/`) e **Inventario** está en
+`/inventario`. Las vistas de antes quedan en el menú **Detalle**. Abajo, lo que se pidió.
 
 **Agente** (nueva home):
 

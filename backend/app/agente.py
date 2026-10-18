@@ -42,6 +42,7 @@ ESPERA_MAXIMA_S = 120.0  # sin respuesta ni llamada en curso: el plan se arma si
 ESPERA_MAXIMA_MINIMA_S = 30.0
 LLAMADA_MAXIMA_S = 600.0  # una llamada no se reanuda si el server se reinicia: no esperarla para siempre
 INTERVALO_S = 1.0
+REPREGUNTA_S = 8.0  # lo que tarda el proveedor en contestar la repregunta (× la escala del simulador)
 DIAS_SIN_FECHA = 7  # equipamiento pedido sin fecha
 
 EstadoCorrida = Literal[
@@ -139,6 +140,11 @@ class OpcionesCorrida(BaseModel):
     esperar_confirmacion: bool = True
     llamar_si_no_responde: bool = True
     negociar: bool = True
+    # Lo dudoso de una cotización se le repregunta al proveedor y se confirma con su respuesta.
+    resolver_dudas: bool = False
+    # "total" (piloto automático): el agente también confirma la propuesta, manda el mensaje
+    # negociado y aprueba todas las órdenes. "topes": manual y topes del Inventario esperan a Lucía.
+    autonomia: Literal["topes", "total"] = "topes"
 
 
 class NuevaCorrida(OpcionesCorrida):
@@ -576,6 +582,12 @@ async def _esperar_confirmacion(corrida_id: str) -> None:
     dudas = any(l.dudas or l.cantidad <= 0 for l in corrida.propuesta) or bool(
         corrida.interpretacion and corrida.interpretacion.dudas
     )
+    if corrida.opciones.autonomia == "total":
+        _confirmar_solo(corrida)
+        _guardar(corrida)
+        if not corrida.propuesta:
+            raise _NadaQueComprar("No quedó nada con cantidad para comprar.")
+        return
     if not corrida.opciones.esperar_confirmacion and not dudas:
         _marcar(corrida, "confirmar", "omitido", "Sin dudas: sigo sin esperar tu OK.")
         _guardar(corrida)
@@ -588,6 +600,16 @@ async def _esperar_confirmacion(corrida_id: str) -> None:
         await asyncio.sleep(INTERVALO_S)
     if not _vigente(corrida_id).propuesta:
         raise _NadaQueComprar("Sacaste todo: no hay nada para comprar.")
+
+
+def _confirmar_solo(corrida: CorridaAgente) -> None:
+    """Piloto automático: el agente confirma la propuesta. Lo que quedó sin cantidad no se inventa: se saca."""
+    for linea in corrida.propuesta:
+        if linea.cantidad <= 0:
+            corrida.avisos.append(f"Saqué {linea.nombre_corto}: no dijiste cuántos y no tengo cómo calcularlo.")
+    corrida.propuesta = [l for l in corrida.propuesta if l.cantidad > 0]
+    confirmado = _enumerar([_cantidad(l.cantidad, l.nombre_corto, l.unidad) for l in corrida.propuesta]) or "nada"
+    _marcar(corrida, "confirmar", "hecho", f"Piloto automático: confirmé yo {confirmado}.")
 
 
 # ---------------------------------------------------------------- 4 y 5. cotizar e insistir
@@ -710,11 +732,18 @@ async def _esperar_revision(corrida_id: str) -> None:
         return
     nombres = _proveedores()
     revisadas: list[str] = []
+    respuestas: list[str] = []  # lo que el agente aclaró preguntándole al proveedor
+    preguntadas: set[str] = set()
     while True:
         corrida = _vigente(corrida_id)
         dudosas = [c for c in _cotizaciones(corrida.pedido_id) if c.estado == "revisar"]
         if not dudosas:
             break
+        nuevas = [c for c in dudosas if c.id not in preguntadas]
+        if nuevas and (corrida.opciones.resolver_dudas or corrida.opciones.autonomia == "total"):
+            preguntadas.update(c.id for c in nuevas)
+            respuestas += await _repreguntar(corrida_id, nuevas)
+            continue  # lo que no se aclaró queda para Lucía
         revisadas = list(dict.fromkeys(revisadas + [nombres[c.proveedor_id] for c in dudosas]))
         pendientes = [_revision(c, nombres[c.proveedor_id]) for c in dudosas]
         if corrida.estado != "esperando_revision" or corrida.revision != pendientes:
@@ -722,12 +751,44 @@ async def _esperar_revision(corrida_id: str) -> None:
             _marcar(corrida, "revisar", "esperando", " ".join(p.pregunta for p in pendientes))
             _guardar(corrida)
         await asyncio.sleep(INTERVALO_S)
+    corrida = _vigente(corrida_id)
     corrida.estado, corrida.revision = "en_curso", []
-    if revisadas:
-        _marcar(corrida, "revisar", "hecho", f"Confirmaste lo dudoso de {_enumerar(revisadas)}.")
+    partes = respuestas + ([f"Confirmaste lo dudoso de {_enumerar(revisadas)}."] if revisadas else [])
+    if partes:
+        _marcar(corrida, "revisar", "hecho", " ".join(partes))
     else:
         _marcar(corrida, "revisar", "omitido", "Todas las respuestas se leyeron sin dudas.")
     _guardar(corrida)
+
+
+async def _repreguntar(corrida_id: str, dudosas: list[Cotizacion]) -> list[str]:
+    """Le repregunta por WhatsApp (simulado) a cada proveedor lo dudoso y confirma con su respuesta.
+    Nada se adivina: si la respuesta no lo aclara, la cotización sigue para revisar."""
+    from app import main as api  # import local: main importa las rutas del agente
+    from app.models import ConfirmacionCotizacion
+
+    nombres = _proveedores()
+    aclaradas = []
+    for cot in dudosas:
+        nombre = nombres[cot.proveedor_id]
+        pide_iva = "iva" in cot.campos_dudosos
+        pregunta = "¿Los precios que me pasaste incluyen IVA?" if pide_iva else "¿Me confirmás los precios que me pasaste?"
+        corrida = _vigente(corrida_id)
+        _marcar(corrida, "revisar", "en_curso", f"Le pregunto a {nombre} por WhatsApp: «{pregunta}»")
+        _guardar(corrida)
+        await asyncio.sleep(REPREGUNTA_S * _escala())
+        respuesta, incluye_iva = simulador.responder_repregunta(cot)
+        if pide_iva and incluye_iva is None:
+            continue
+        try:
+            await api.confirmar_cotizacion(cot.id, ConfirmacionCotizacion(incluye_iva=incluye_iva if pide_iva else None))
+        except HTTPException as exc:
+            log.warning("Corrida %s: no pude confirmar %s con la respuesta de %s: %s", corrida_id, cot.id, nombre, exc)
+            continue
+        aclaradas.append(
+            f"Le pregunté a {nombre}: «{pregunta}». Respondió: «{respuesta.rstrip('.')}». Lo confirmé con su respuesta."
+        )
+    return aclaradas
 
 
 def _revision(cotizacion: Cotizacion, nombre: str) -> RevisionPendiente:
@@ -817,7 +878,16 @@ async def _negociar(corrida_id: str) -> None:
     detalle = f"Con el gemelo de {nombre} conviene «{negociacion.elegida}»"
     if elegida is not None:
         detalle += f": −{fmt(elegida.concesion_obtenida_pct, 1)} %, unos $ {fmt(elegida.ganancia_esperada_uyu)}"
-    _marcar(corrida, "negociar", "hecho", detalle + ". El mensaje está listo para que lo apruebes.")
+    cierre = ". El mensaje está listo para que lo apruebes."
+    if corrida.opciones.autonomia == "total" and negociacion.estado == "simulada":
+        try:
+            await api.aprobar(negociacion.id, None)
+            cierre = f". Piloto automático: le mandé el mensaje a {nombre}."
+        except HTTPException as exc:
+            log.warning("Corrida %s: no pude mandar el mensaje negociado: %s", corrida_id, exc)
+        corrida = _vigente(corrida_id)  # releída después del await: se vuelve a anotar la negociación
+        corrida.negociacion_id = negociacion.id
+    _marcar(corrida, "negociar", "hecho", detalle + cierre)
     _guardar(corrida)
 
 
@@ -838,11 +908,16 @@ def _emitir_ordenes(corrida_id: str) -> None:
     _guardar(corrida)
 
 
-def _aprobacion(item: ItemInventario, subtotal: Decimal) -> tuple[str, str]:
+def _aprobacion(item: ItemInventario, subtotal: Decimal, *, piloto: bool = False) -> tuple[str, str]:
+    """Quién aprueba la línea. Con piloto automático la aprueba el agente, y el motivo dice qué regla saltó."""
     if item.modo == "manual":
+        if piloto:
+            return "automatica", "Piloto automático: está en modo manual, pero la aprobé yo."
         return "manual", "Está en modo manual, la aprobás vos."
     tope = item.tope_automatico_uyu
     if tope is not None and subtotal > tope:
+        if piloto:
+            return "automatica", f"Piloto automático: $ {fmt(subtotal)} supera el tope de $ {fmt(tope)}, pero la aprobé yo."
         return "supera_tope", f"$ {fmt(subtotal)} supera el tope automático de $ {fmt(tope)}."
     if tope is None:
         return "automatica", f"Modo automático y sin tope: $ {fmt(subtotal)}."
@@ -868,7 +943,9 @@ def armar_ordenes(corrida: CorridaAgente, plan: Plan) -> list[OrdenCompra]:
         lineas = []
         for a in (a for a in plan.asignaciones if a.proveedor_id == proveedor_id):
             item = items[a.producto_id]
-            aprobacion, motivo = _aprobacion(item, por_producto[a.producto_id])
+            aprobacion, motivo = _aprobacion(
+                item, por_producto[a.producto_id], piloto=corrida.opciones.autonomia == "total"
+            )
             evidencia = next((i.evidencia for i in cot.items if i.producto_id == a.producto_id), None) if cot else None
             lineas.append(
                 LineaOrden(
@@ -1012,5 +1089,7 @@ def _completar(corrida: CorridaAgente) -> None:
     neg = store.obtener("negociaciones", corrida.negociacion_id, Negociacion) if corrida.negociacion_id else None
     if neg is not None and neg.estado == "simulada":
         partes.append(f"Queda la negociación con {_proveedores()[neg.proveedor_id]}: el mensaje está listo para aprobar.")
+    elif neg is not None and neg.estado == "enviada_simulada" and corrida.opciones.autonomia == "total":
+        partes.append(f"Le mandé a {_proveedores()[neg.proveedor_id]} el mensaje de la negociación.")
     corrida.resumen = " ".join(partes)
     pedidos.cambiar_estado(corrida.pedido_id, "aprobado")
