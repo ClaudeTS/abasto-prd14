@@ -214,6 +214,18 @@ export default function NuevoPedido() {
           </Alert>
         )}
 
+        {/* Siempre a la vista: bajás 1 y, al llegar al mínimo, la compra del agente aparece abajo en vivo. */}
+        {api.MODO !== "mock" && !cargando && (
+          <Stock
+            key={corrida?.id ?? "sin-compra"}
+            onArranco={(c, a) => {
+              setUltima(null);
+              setAviso(a);
+              setCorrida(c);
+            }}
+          />
+        )}
+
         {cargando ? (
           <div className="flex items-center gap-2 text-muted-foreground">
             <Spinner /> Buscando si hay una compra en curso…
@@ -222,15 +234,6 @@ export default function NuevoPedido() {
           !errorCarga && (
             <>
               {ultima && <UltimaCompra c={ultima} onVer={() => setCorrida(ultima)} />}
-              {api.MODO !== "mock" && (
-                <Stock
-                  onArranco={(c, a) => {
-                    setUltima(null);
-                    setAviso(a);
-                    setCorrida(c);
-                  }}
-                />
-              )}
               <Entrada
                 texto={texto}
                 setTexto={setTexto}

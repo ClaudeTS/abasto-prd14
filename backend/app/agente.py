@@ -174,6 +174,7 @@ class CorridaAgente(BaseModel):
     revision: list[RevisionPendiente] = Field(default_factory=list)
     llamada_ids: list[str] = Field(default_factory=list)
     sin_respuesta: list[str] = Field(default_factory=list)  # proveedores que nunca respondieron
+    autonoma: bool = False  # la arrancó el stock mínimo: no espera la revisión, deja afuera lo dudoso
     negociacion_id: str | None = None
     ordenes: list[OrdenCompra] = Field(default_factory=list)
     resumen: str | None = None
@@ -346,6 +347,7 @@ def consumir(producto_id: str, cantidad: float = 1) -> Consumo:
     except AgenteError as exc:
         return Consumo(item=item, aviso=f"El stock llegó al mínimo, pero no arranqué la compra: {exc.error}")
     corrida.avisos.insert(0, disparo)  # la tarea todavía no corrió (create_task): no se pisa
+    corrida.autonoma = True
     _guardar(corrida)
     return Consumo(item=item, corrida=corrida, aviso=disparo)
 
@@ -750,6 +752,12 @@ async def _esperar_revision(corrida_id: str) -> None:
         dudosas = [c for c in _cotizaciones(corrida.pedido_id) if c.estado == "revisar"]
         if not dudosas:
             break
+        if corrida.autonoma:  # nadie mira: no supongo lo dudoso, lo dejo afuera del plan
+            quienes = _enumerar([f"{nombres[c.proveedor_id]} ({', '.join(c.campos_dudosos)})" for c in dudosas])
+            corrida.avisos.append(f"No confirmo solo lo dudoso de {quienes}: dejo esa cotización afuera del plan.")
+            _marcar(corrida, "revisar", "omitido", f"Dejé afuera lo dudoso de {quienes}: sin tu OK no lo supongo.")
+            _guardar(corrida)
+            return
         revisadas = list(dict.fromkeys(revisadas + [nombres[c.proveedor_id] for c in dudosas]))
         pendientes = [_revision(c, nombres[c.proveedor_id]) for c in dudosas]
         if corrida.estado != "esperando_revision" or corrida.revision != pendientes:
@@ -796,7 +804,7 @@ async def _optimizar(corrida_id: str) -> None:
         plan = Plan.model_validate(guardado)
     else:
         try:
-            plan = await api.optimizar(corrida.pedido_id, forzar=bool(corrida.sin_respuesta))
+            plan = await api.optimizar(corrida.pedido_id, forzar=bool(corrida.sin_respuesta) or corrida.autonoma)
         except HTTPException as exc:
             raise _Fallo("optimizar", f"No pude armar el plan: {_mensaje_http(exc)}") from exc
     corrida = _vigente(corrida_id)

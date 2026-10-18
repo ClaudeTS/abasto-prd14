@@ -249,10 +249,23 @@ def test_bajar_el_stock_al_minimo_arranca_la_compra_sola(client):
     r = client.post("/inventario/toner/consumir").json()
     assert r["item"]["stock_actual"] == 4
     assert r["corrida"] and "Arranqué solo" in r["aviso"]
-    corrida = _esperar(client, r["corrida"]["id"], ("esperando_revision", "esperando_aprobacion", "completada", "error"))
+    assert {l["producto_id"] for l in r["corrida"]["propuesta"]} == set()  # la arma la tarea
+    corrida = _esperar(client, r["corrida"]["id"], ("esperando_revision", "esperando_aprobacion", "completada", "error"), 60)
+    assert corrida["estado"] in ("esperando_aprobacion", "completada"), corrida["error"]
     assert corrida["avisos"][0].startswith("Arranqué solo")
-    assert corrida["pasos"][2]["estado"] == "omitido" or corrida["pasos"][2]["estado"] == "hecho"
     assert {l["producto_id"] for l in corrida["propuesta"]} >= {"toner", "resma_a4", "desinfectante"}
+    pasos = {p["id"]: p for p in corrida["pasos"]}
+    assert pasos["confirmar"]["estado"] == "omitido" or pasos["confirmar"]["estado"] == "hecho"
+    assert pasos["revisar"]["estado"] == "omitido" and "Compuservice" in pasos["revisar"]["detalle"]
+    assert corrida["ordenes"]
+    r = client.post("/inventario/toner/consumir").json()  # con la compra terminada, el pedido ya se cotizó
+    assert r["corrida"] is None and "no arranqué" in r["aviso"]
+
+
+def test_con_una_compra_en_curso_no_arranca_otra(client):
+    for _ in range(3):
+        r = client.post("/inventario/toner/consumir").json()
+    assert r["corrida"]
     # otra salida con la compra en curso no arranca otra
     r = client.post("/inventario/toner/consumir").json()
     assert r["corrida"] is None and "no arranqué" in r["aviso"]
