@@ -303,7 +303,7 @@ async def optimizar(
             )
     provs = pipeline.proveedores()
     nombres = _nombres_productos()
-    tc = float(pipeline.datos_pedido()["config"]["tipo_cambio_usd"])
+    tc = float(pipeline.config_vigente()["tipo_cambio_usd"])  # RF-20: el del panel de configuración
     plan = await asyncio.to_thread(
         optimizacion.optimizar, pedido, cots, provs, tipo_cambio_usd=tc, nombres_productos=nombres
     )

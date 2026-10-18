@@ -198,3 +198,19 @@ Deploy de la demo (para desarrollar no hace falta):
 - No tocar `data/*.json` sin actualizar `docs/PITCH_Y_DEMO.md` si cambia la demo.
 - No dejar la UI rota en `main`. Si una página está a medias, ocultar el link.
 - No mostrar en la UI ningún número que no tenga `evidencia`.
+
+## 11. Ingreso de la demo (PRD 1.4, RF-21)
+
+El fork del PRD 1.4 agrega ingreso con usuario y contraseña (deja sin efecto "Autenticación" de §2 para este fork).
+Usuarios de ejemplo en `data/usuarios_demo.json` (hash PBKDF2 de `hashlib`), **contraseña de todos: `abasto2026`**:
+
+| Usuario | Rol | Cliente interno |
+|---|---|---|
+| `lucia@tecnova.com.uy` (o `lucia`) | administrador | Personal |
+| `martin@tecnova.com.uy` (o `martin`) | consulta | Ventas |
+| `sofia@tecnova.com.uy` (o `sofia`) | consulta | Personal |
+
+- El rol solo limita los `PATCH` de `/reglas` y `/configuracion` (y revertir del historial): 401 sin token, 403 si no es
+  administrador. El resto de la API queda abierta (demo guiada y tests).
+- Token firmado con HMAC y sin estado: sobrevive al reset de la demo. En el deploy, definir `AUTH_SECRET`; sin ella se
+  usa un secreto fijo de demo. En modo mock del frontend no hay ingreso: entra Lucía.

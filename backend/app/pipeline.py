@@ -30,6 +30,12 @@ def datos_pedido() -> dict[str, Any]:
     return store.semilla("pedido_demo")
 
 
+def config_vigente() -> dict[str, Any]:
+    """`config` de pedido_demo.json con lo guardado en el panel de configuración encima (RF-20):
+    tipo de cambio, IVA, vigencia por defecto y moneda base. Lo escribe app/reglas.py."""
+    return {**datos_pedido()["config"], **(store.obtener_dict("configuracion", "general") or {})}
+
+
 def catalogo() -> list[Producto]:
     return [Producto.model_validate(p) for p in datos_pedido()["catalogo"]]
 
@@ -155,7 +161,8 @@ def _normalizar(
     confirmada: bool = False,
 ) -> Cotizacion:
     datos = datos_pedido()
-    return normalizar_cotizacion(
+    config_general = config_vigente()  # RF-20: lo del panel de configuración, si se guardó
+    cotizacion = normalizar_cotizacion(
         crudo,
         cotizacion_id=cotizacion_id,
         pedido_id=mensaje.pedido_id,
@@ -163,11 +170,17 @@ def _normalizar(
         proveedor_id=mensaje.proveedor_id,
         catalogo={p.id: p.unidad_canonica for p in catalogo()},
         conversiones=datos["conversiones"],
-        tipo_cambio_usd=float(datos["config"]["tipo_cambio_usd"]),
-        iva=float(datos["config"]["iva"]),
+        tipo_cambio_usd=float(config_general["tipo_cambio_usd"]),
+        iva=float(config_general["iva"]),
         incluye_iva_forzado=iva_forzado,
         confirmada=confirmada,
     )
+    if cotizacion.validez_dias is None:  # PRD 1.4 §11.1: si el proveedor no la indica, la de config
+        cotizacion.validez_dias = int(config_general.get("vigencia_dias_default", 30))
+        cotizacion.observaciones.append(
+            f"Vigencia: {cotizacion.validez_dias} días por defecto (el proveedor no la indicó)."
+        )
+    return cotizacion
 
 
 async def procesar_mensaje(mensaje: MensajeCrudo) -> Cotizacion:

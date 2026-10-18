@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from app import store
 from app.models import Pedido, PedidoCompleto
-from app.pipeline import catalogo, datos_pedido
+from app.pipeline import catalogo, config_vigente, datos_pedido
 
 PEDIDO_DEMO_ID = "pedido_demo_oct_2026"
 
@@ -23,8 +23,8 @@ def completo(pedido: Pedido) -> PedidoCompleto:
         **pedido.model_dump(),
         catalogo=catalogo(),
         conversiones=datos["conversiones"],
-        tipo_cambio_usd=float(datos["config"]["tipo_cambio_usd"]),
-        iva=float(datos["config"]["iva"]),
+        tipo_cambio_usd=float(config_vigente()["tipo_cambio_usd"]),  # RF-20: el del panel, si se guardó
+        iva=float(config_vigente()["iva"]),
     )
 
 
