@@ -9,3 +9,4 @@ __pycache__/
 .DS_Store
 backend/data/*.json
 .pytest_cache/
+*.tsbuildinfo
