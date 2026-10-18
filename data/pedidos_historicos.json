@@ -1,0 +1,669 @@
+{
+  "_nota": "Pedidos de EJEMPLO de Tecnova S.A. (octubre 2026) para el listado y el detalle de pedidos (PRD 1.4: RF-05, RF-10, RF-12, RF-18). La API los devuelve con ejemplo: true y la UI los marca 'Datos de ejemplo'. Productos y proveedores de data/pedido_demo.json y data/proveedores_sim.json, con sus precios de siempre. backend/app/historial_pedidos.py calcula el costo comparable (sin IVA, en pesos, por unidad), subtotales y totales; los mensajes con texto null y motivo solicitud_cotizacion u orden se arman con los datos del pedido o de la orden.",
+  "tipo_cambio_usd": 40.0,
+  "proveedor_habitual_id": "distribuidora_oriental",
+  "pedidos": [
+    {
+      "id": "hist_ped_0131",
+      "numero": "PED-0131",
+      "titulo": "Reposición de resmas A4",
+      "descripcion": "Las resmas quedaron bajo el mínimo al cierre de la jornada.",
+      "cliente_interno": "personal",
+      "origen": "stock_minimo",
+      "solicitante": "Agente (cierre de jornada)",
+      "creado_en": "2026-10-01T18:00:00",
+      "lineas": [{ "producto_id": "resma_a4", "cantidad": 100, "necesario_para": "2026-10-06" }],
+      "historial_estados": [
+        { "estado": "nuevo", "en": "2026-10-01T18:00:00", "detalle": "Stock al cierre: 35 resmas, mínimo 40. Repongo hasta el stock base: 100." },
+        { "estado": "cotizando", "en": "2026-10-01T18:02:00", "detalle": "Pedí cotización a Papelera del Sur y Distribuidora Oriental." },
+        { "estado": "cotizado", "en": "2026-10-02T10:05:00", "detalle": "Papelera del Sur cotizó por teléfono en el reintento." },
+        { "estado": "aprobado", "en": "2026-10-02T10:06:00", "detalle": "Compra automática: $ 17.869 no supera el tope de $ 30.000. Emití la OC-0881." },
+        { "estado": "pendiente_entrega", "en": "2026-10-02T10:06:00", "detalle": "Orden enviada a Papelera del Sur por WhatsApp." },
+        { "estado": "recibido", "en": "2026-10-03T11:40:00", "detalle": "Ingresaron 20 cajas de 5 resmas." },
+        { "estado": "cerrado", "en": "2026-10-03T17:10:00", "detalle": null }
+      ],
+      "cotizaciones": [
+        {
+          "proveedor_id": "papelera_del_sur", "canal": "llamada", "recibida_en": "2026-10-02T10:01:52",
+          "items": [{ "producto_id": "resma_a4", "precio_original": 1090, "moneda_original": "UYU", "incluye_iva_original": true, "unidad_original": "caja de 5 resmas", "factor": 5, "evidencia": "la caja de cinco resmas te la dejo a mil noventa, con IVA" }],
+          "costo_envio": 0, "plazo_pago_dias": 0, "lead_time_dias": 1, "validez_dias": null
+        },
+        {
+          "proveedor_id": "distribuidora_oriental", "canal": "whatsapp", "recibida_en": "2026-10-02T08:47:00",
+          "items": [{ "producto_id": "resma_a4", "precio_original": 235, "moneda_original": "UYU", "incluye_iva_original": false, "unidad_original": "unidad", "factor": 1, "evidencia": "Resma A4 75g $235 + IVA" }],
+          "costo_envio": 0, "plazo_pago_dias": 30, "lead_time_dias": 2, "validez_dias": null
+        }
+      ],
+      "plan": {
+        "asignaciones": [{ "producto_id": "resma_a4", "proveedor_id": "papelera_del_sur", "cantidad": 100 }],
+        "explicacion": "Papelera del Sur cotiza la resma a $ 178,69 sin IVA contra $ 235 de Distribuidora Oriental y entrega al día siguiente."
+      },
+      "ordenes": [
+        {
+          "numero": "OC-0881", "proveedor_id": "papelera_del_sur",
+          "lineas": [{ "producto_id": "resma_a4", "cantidad": 100, "aprobacion": "automatica", "motivo": "Modo automático y $ 17.869 no supera el tope de $ 30.000." }],
+          "envio": 0, "requiere_aprobacion": false, "motivos": [],
+          "emitida_por": "agente", "aprobada_por": "agente", "emitida_en": "2026-10-02T10:06:00",
+          "estado": "recibida", "recibida_en": "2026-10-03T11:40:00"
+        }
+      ],
+      "negociaciones": [],
+      "conversaciones": [
+        {
+          "contraparte": "papelera_del_sur", "proposito": "cotizacion",
+          "mensajes": [
+            { "canal": "whatsapp", "sentido": "enviado", "fecha": "2026-10-01T18:02:00", "texto": null, "motivo": "solicitud_cotizacion" },
+            { "canal": "llamada", "sentido": "enviado", "fecha": "2026-10-02T09:30:00", "motivo": "reintento",
+              "llamada": { "intento": 1, "resultado": "no_atendida", "duracion_segundos": 0 } },
+            { "canal": "llamada", "sentido": "enviado", "fecha": "2026-10-02T10:00:00", "motivo": "reintento", "etiqueta": "Cotización leída",
+              "llamada": { "intento": 2, "resultado": "atendida", "duracion_segundos": 112, "resumen": "Papelera del Sur pasó el precio de la caja de 5 resmas: $ 1.090 con IVA, entrega al día siguiente, contado." },
+              "transcripcion": [
+                { "rol": "abasto", "texto": "Hola, ¿hablo con Papelera del Sur? Soy el asistente de inteligencia artificial de Tecnova S.A. y te aviso que esta llamada se graba. Te llamo por la cotización de resmas que les pedimos ayer por WhatsApp.", "segundo": 0 },
+                { "rol": "proveedor", "texto": "Ah, sí, perdoná que no te contesté, estuve en la ruta. Mirá, la caja de cinco resmas te la dejo a mil noventa, con IVA.", "segundo": 14 },
+                { "rol": "abasto", "texto": "Perfecto. Serían 20 cajas, o sea 100 resmas. ¿Cuándo las podés entregar y cómo es el pago?", "segundo": 31 },
+                { "rol": "proveedor", "texto": "Mañana mismo te las llevo, sin cargo. Contado, como siempre.", "segundo": 44 },
+                { "rol": "abasto", "texto": "Anoto: caja de 5 resmas a $ 1.090 con IVA, entrega mañana sin cargo y pago contado. Te confirmo la orden por WhatsApp. ¡Gracias!", "segundo": 58 }
+              ] }
+          ]
+        },
+        {
+          "contraparte": "distribuidora_oriental", "proposito": "cotizacion",
+          "mensajes": [
+            { "canal": "whatsapp", "sentido": "enviado", "fecha": "2026-10-01T18:02:00", "texto": null, "motivo": "solicitud_cotizacion" },
+            { "canal": "whatsapp", "sentido": "recibido", "fecha": "2026-10-02T08:47:00", "etiqueta": "Cotización leída",
+              "texto": "Buen día Lucía! Resma A4 75g $235 + IVA. Mínimo de compra $8.000. Pago a 30 como siempre. Entrega en 48hs 👍" }
+          ]
+        },
+        {
+          "contraparte": "papelera_del_sur", "proposito": "orden",
+          "mensajes": [{ "canal": "whatsapp", "sentido": "enviado", "fecha": "2026-10-02T10:06:00", "texto": null, "motivo": "orden", "orden": "OC-0881" }]
+        }
+      ]
+    },
+    {
+      "id": "hist_ped_0132",
+      "numero": "PED-0132",
+      "titulo": "Notebooks para dos ingresos",
+      "descripcion": "Dos personas nuevas en Administración.",
+      "cliente_interno": "personal",
+      "origen": "solicitud_email",
+      "solicitante": "Martín (Administración)",
+      "creado_en": "2026-10-02T11:15:00",
+      "lineas": [{ "producto_id": "notebook", "cantidad": 2, "necesario_para": "2026-10-09" }],
+      "historial_estados": [
+        { "estado": "nuevo", "en": "2026-10-02T11:15:00", "detalle": "Martín pidió 2 notebooks por email para el 09/10." },
+        { "estado": "cotizando", "en": "2026-10-02T11:16:00", "detalle": "Pedí cotización a TecnoImport S.A. y Compuservice." },
+        { "estado": "cotizado", "en": "2026-10-02T15:30:00", "detalle": "Compuservice exige mínimo 5 notebooks: queda TecnoImport S.A." },
+        { "estado": "pendiente_aprobacion", "en": "2026-10-02T15:31:00", "detalle": "Notebooks está en modo manual: la orden espera tu OK." },
+        { "estado": "aprobado", "en": "2026-10-02T16:05:00", "detalle": "Lucía aprobó la OC-0882." },
+        { "estado": "pendiente_entrega", "en": "2026-10-02T16:05:00", "detalle": "Orden enviada a TecnoImport S.A. por email." },
+        { "estado": "recibido", "en": "2026-10-07T10:20:00", "detalle": "Ingresaron las 2 notebooks." },
+        { "estado": "cerrado", "en": "2026-10-07T18:00:00", "detalle": null }
+      ],
+      "cotizaciones": [
+        {
+          "proveedor_id": "tecnoimport", "canal": "pdf", "recibida_en": "2026-10-02T15:02:00",
+          "items": [{ "producto_id": "notebook", "precio_original": 780, "moneda_original": "USD", "incluye_iva_original": false, "unidad_original": "unidad", "factor": 1, "evidencia": "Notebook 15.6\" Core i5 / 16 GB RAM / 512 GB SSD · USD 780,00 · más IVA" }],
+          "costo_envio": 0, "plazo_pago_dias": 30, "lead_time_dias": 5, "validez_dias": 5
+        },
+        {
+          "proveedor_id": "compuservice", "canal": "whatsapp", "recibida_en": "2026-10-02T11:40:00",
+          "items": [{ "producto_id": "notebook", "precio_original": 33500, "moneda_original": "UYU", "incluye_iva_original": true, "unidad_original": "unidad", "factor": 1, "cantidad_minima": 5, "evidencia": "Notebook 15 i5 16gb 512 33500. Minimo 5 notebooks" }],
+          "costo_envio": 0, "plazo_pago_dias": 0, "lead_time_dias": 3, "validez_dias": null
+        }
+      ],
+      "plan": {
+        "asignaciones": [{ "producto_id": "notebook", "proveedor_id": "tecnoimport", "cantidad": 2 }],
+        "explicacion": "Compuservice es más barato ($ 27.459 sin IVA) pero exige un mínimo de 5 notebooks y el pedido es de 2: se compra a TecnoImport S.A."
+      },
+      "ordenes": [
+        {
+          "numero": "OC-0882", "proveedor_id": "tecnoimport",
+          "lineas": [{ "producto_id": "notebook", "cantidad": 2, "aprobacion": "manual", "motivo": "Está en modo manual, la aprobás vos." }],
+          "envio": 0, "requiere_aprobacion": true, "motivos": ["Notebooks: está en modo manual, la aprobás vos."],
+          "emitida_por": "agente", "aprobada_por": "lucia", "emitida_en": "2026-10-02T16:05:00",
+          "estado": "recibida", "recibida_en": "2026-10-07T10:20:00"
+        }
+      ],
+      "negociaciones": [],
+      "conversaciones": [
+        {
+          "contraparte": "interno", "proposito": "solicitud",
+          "mensajes": [
+            { "canal": "email", "sentido": "recibido", "fecha": "2026-10-02T11:15:00",
+              "texto": "Hola Abasto: el lunes 9 entran dos personas a Administración y necesitan notebook (las de siempre, i5 con 16 GB). ¿Lo podés gestionar? Gracias, Martín." },
+            { "canal": "email", "sentido": "enviado", "fecha": "2026-10-02T11:16:00",
+              "texto": "Hola Martín: recibí tu pedido de 2 notebooks 15\" i5 / 16 GB / 512 GB para el 09/10. Ya pedí cotizaciones y te aviso cuando salga la orden. Abasto, asistente de compras con IA." }
+          ]
+        },
+        {
+          "contraparte": "tecnoimport", "proposito": "cotizacion",
+          "mensajes": [
+            { "canal": "email", "sentido": "enviado", "fecha": "2026-10-02T11:16:00", "texto": null, "motivo": "solicitud_cotizacion" },
+            { "canal": "pdf", "sentido": "recibido", "fecha": "2026-10-02T15:02:00", "etiqueta": "Cotización leída",
+              "texto": "TecnoImport S.A. · Cotización N.º C-2026-0904 · Notebook 15.6\" Core i5 / 16 GB RAM / 512 GB SSD / Win 11 Pro · 2 × USD 780,00 · Precios en dólares, más IVA · Entrega 5 días hábiles · Pago 30 días · Validez 5 días." }
+          ]
+        },
+        {
+          "contraparte": "compuservice", "proposito": "cotizacion",
+          "mensajes": [
+            { "canal": "whatsapp", "sentido": "enviado", "fecha": "2026-10-02T11:16:00", "texto": null, "motivo": "solicitud_cotizacion" },
+            { "canal": "whatsapp", "sentido": "recibido", "fecha": "2026-10-02T11:40:00", "etiqueta": "Cotización leída",
+              "texto": "Hola! Notebook 15 i5 16gb 512 33500. Minimo 5 notebooks. Entrego en 3 dias. Contado. Dale avisame" }
+          ]
+        },
+        {
+          "contraparte": "tecnoimport", "proposito": "orden",
+          "mensajes": [{ "canal": "email", "sentido": "enviado", "fecha": "2026-10-02T16:05:00", "texto": null, "motivo": "orden", "orden": "OC-0882" }]
+        }
+      ]
+    },
+    {
+      "id": "hist_ped_0133",
+      "numero": "PED-0133",
+      "titulo": "Reposición de tóner HP 85A",
+      "descripcion": "El tóner quedó bajo el mínimo al cierre de la jornada.",
+      "cliente_interno": "personal",
+      "origen": "stock_minimo",
+      "solicitante": "Agente (cierre de jornada)",
+      "creado_en": "2026-10-05T18:00:00",
+      "lineas": [{ "producto_id": "toner", "cantidad": 6, "necesario_para": "2026-10-09" }],
+      "historial_estados": [
+        { "estado": "nuevo", "en": "2026-10-05T18:00:00", "detalle": "Stock al cierre: 3 tóner, mínimo 4. Repongo hasta el stock base: 6." },
+        { "estado": "cotizando", "en": "2026-10-05T18:01:00", "detalle": "Pedí cotización a Compuservice, TecnoImport S.A. y Distribuidora Oriental." },
+        { "estado": "cotizado", "en": "2026-10-06T10:12:00", "detalle": "Compuservice confirmó que su precio incluye IVA." },
+        { "estado": "aprobado", "en": "2026-10-06T10:13:00", "detalle": "Compra automática: $ 19.180 no supera el tope de $ 20.000. Emití la OC-0883." },
+        { "estado": "pendiente_entrega", "en": "2026-10-06T10:13:00", "detalle": "Orden enviada a Compuservice por WhatsApp." },
+        { "estado": "recibido", "en": "2026-10-09T09:45:00", "detalle": "Ingresaron los 6 tóner." }
+      ],
+      "cotizaciones": [
+        {
+          "proveedor_id": "compuservice", "canal": "whatsapp", "recibida_en": "2026-10-05T18:20:00",
+          "items": [{ "producto_id": "toner", "precio_original": 3900, "moneda_original": "UYU", "incluye_iva_original": true, "unidad_original": "unidad", "factor": 1, "evidencia": "Toner 85a 3900 · «si, con iva incluido»" }],
+          "costo_envio": 0, "plazo_pago_dias": 0, "lead_time_dias": 3, "validez_dias": null
+        },
+        {
+          "proveedor_id": "tecnoimport", "canal": "pdf", "recibida_en": "2026-10-06T09:15:00",
+          "items": [{ "producto_id": "toner", "precio_original": 95, "moneda_original": "USD", "incluye_iva_original": false, "unidad_original": "unidad", "factor": 1, "evidencia": "Tóner HP 85A original (CE285A) · USD 95,00 · más IVA" }],
+          "costo_envio": 0, "plazo_pago_dias": 30, "lead_time_dias": 5, "validez_dias": 5
+        },
+        {
+          "proveedor_id": "distribuidora_oriental", "canal": "whatsapp", "recibida_en": "2026-10-06T08:05:00",
+          "items": [{ "producto_id": "toner", "precio_original": 4600, "moneda_original": "UYU", "incluye_iva_original": false, "unidad_original": "unidad", "factor": 1, "evidencia": "Tóner HP 85A original $4.600 + IVA" }],
+          "costo_envio": 0, "plazo_pago_dias": 30, "lead_time_dias": 2, "validez_dias": null
+        }
+      ],
+      "plan": {
+        "asignaciones": [{ "producto_id": "toner", "proveedor_id": "compuservice", "cantidad": 6 }],
+        "explicacion": "Compuservice cotiza $ 3.900 con IVA ($ 3.196,72 sin IVA), por debajo de TecnoImport S.A. ($ 3.800) y Distribuidora Oriental ($ 4.600)."
+      },
+      "ordenes": [
+        {
+          "numero": "OC-0883", "proveedor_id": "compuservice",
+          "lineas": [{ "producto_id": "toner", "cantidad": 6, "aprobacion": "automatica", "motivo": "Modo automático y $ 19.180 no supera el tope de $ 20.000." }],
+          "envio": 0, "requiere_aprobacion": false, "motivos": [],
+          "emitida_por": "agente", "aprobada_por": "agente", "emitida_en": "2026-10-06T10:13:00",
+          "estado": "recibida", "recibida_en": "2026-10-09T09:45:00"
+        }
+      ],
+      "negociaciones": [],
+      "conversaciones": [
+        {
+          "contraparte": "compuservice", "proposito": "cotizacion",
+          "mensajes": [
+            { "canal": "whatsapp", "sentido": "enviado", "fecha": "2026-10-05T18:01:00", "texto": null, "motivo": "solicitud_cotizacion" },
+            { "canal": "whatsapp", "sentido": "recibido", "fecha": "2026-10-05T18:20:00", "etiqueta": "Para revisar",
+              "texto": "Hola! Toner 85a 3900. Entrego en 3 dias. Contado. Dale avisame" },
+            { "canal": "whatsapp", "sentido": "enviado", "fecha": "2026-10-06T08:30:00",
+              "texto": "¡Gracias! Una consulta: el precio de $ 3.900 del tóner, ¿incluye IVA?" },
+            { "canal": "whatsapp", "sentido": "recibido", "fecha": "2026-10-06T10:10:00", "etiqueta": "Cotización leída",
+              "texto": "si, con iva incluido" }
+          ]
+        },
+        {
+          "contraparte": "tecnoimport", "proposito": "cotizacion",
+          "mensajes": [
+            { "canal": "email", "sentido": "enviado", "fecha": "2026-10-05T18:01:00", "texto": null, "motivo": "solicitud_cotizacion" },
+            { "canal": "pdf", "sentido": "recibido", "fecha": "2026-10-06T09:15:00", "etiqueta": "Cotización leída",
+              "texto": "TecnoImport S.A. · Cotización N.º C-2026-0917 · Tóner HP 85A original (CE285A) · 6 × USD 95,00 · Precios en dólares, más IVA · Entrega 5 días hábiles · Pago 30 días · Validez 5 días." }
+          ]
+        },
+        {
+          "contraparte": "distribuidora_oriental", "proposito": "cotizacion",
+          "mensajes": [
+            { "canal": "whatsapp", "sentido": "enviado", "fecha": "2026-10-05T18:01:00", "texto": null, "motivo": "solicitud_cotizacion" },
+            { "canal": "whatsapp", "sentido": "recibido", "fecha": "2026-10-06T08:05:00", "etiqueta": "Cotización leída",
+              "texto": "Buen día Lucía! Tóner HP 85A original $4.600 + IVA. Mínimo de compra $8.000. Pago a 30. Entrega 48hs." }
+          ]
+        },
+        {
+          "contraparte": "compuservice", "proposito": "orden",
+          "mensajes": [{ "canal": "whatsapp", "sentido": "enviado", "fecha": "2026-10-06T10:13:00", "texto": null, "motivo": "orden", "orden": "OC-0883" }]
+        }
+      ]
+    },
+    {
+      "id": "hist_ped_0134",
+      "numero": "PED-0134",
+      "titulo": "Sillas para la sala de reuniones",
+      "descripcion": "Seis sillas ergonómicas para la sala de reuniones del segundo piso.",
+      "cliente_interno": "personal",
+      "origen": "solicitud_email",
+      "solicitante": "Martín (Administración)",
+      "creado_en": "2026-10-06T09:40:00",
+      "lineas": [{ "producto_id": "silla", "cantidad": 6, "necesario_para": "2026-10-17" }],
+      "historial_estados": [
+        { "estado": "nuevo", "en": "2026-10-06T09:40:00", "detalle": "Martín pidió 6 sillas ergonómicas por email." },
+        { "estado": "datos_incompletos", "en": "2026-10-06T09:41:00", "detalle": "Faltaba la fecha de entrega: se la pedí a Martín por email." },
+        { "estado": "cotizando", "en": "2026-10-06T11:05:00", "detalle": "Martín respondió: para el 17/10. Pedí cotización a Ofisillas, Mueblería Rivera y Distribuidora Oriental." },
+        { "estado": "cotizado", "en": "2026-10-07T12:30:00", "detalle": "Mueblería Rivera exige mínimo 20 unidades: la mejor opción es Ofisillas." },
+        { "estado": "negociando", "en": "2026-10-07T12:45:00", "detalle": "Con el gemelo de Ofisillas conviene «plazo» (pago contado): −3 %." },
+        { "estado": "pendiente_aprobacion", "en": "2026-10-07T12:50:00", "detalle": "Silla está en modo manual: la estrategia y la orden esperan tu OK." },
+        { "estado": "aprobado", "en": "2026-10-07T14:20:00", "detalle": "Lucía aprobó; Ofisillas aceptó $ 10.573 + IVA por pago contado. Emití la OC-0884." },
+        { "estado": "pendiente_entrega", "en": "2026-10-07T14:20:00", "detalle": "Orden enviada a Ofisillas por WhatsApp." },
+        { "estado": "recibido", "en": "2026-10-14T11:00:00", "detalle": "Ingresaron las 6 sillas." },
+        { "estado": "cerrado", "en": "2026-10-14T17:30:00", "detalle": null }
+      ],
+      "cotizaciones": [
+        {
+          "proveedor_id": "ofisillas", "canal": "whatsapp", "recibida_en": "2026-10-06T15:20:00",
+          "items": [{ "producto_id": "silla", "precio_original": 10900, "moneda_original": "UYU", "incluye_iva_original": false, "unidad_original": "unidad", "factor": 1, "evidencia": "silla ergonómica mod. Prime $10.900 + IVA c/u" }],
+          "costo_envio": 1200, "plazo_pago_dias": 30, "lead_time_dias": 7, "validez_dias": null
+        },
+        {
+          "proveedor_id": "muebleria_rivera", "canal": "foto", "recibida_en": "2026-10-07T12:25:00",
+          "items": [{ "producto_id": "silla", "precio_original": 9800, "moneda_original": "UYU", "incluye_iva_original": false, "unidad_original": "unidad", "factor": 1, "cantidad_minima": 20, "evidencia": "Silla ergo mod. 2 ... 9.800 x unidad s/iva · minimo 20 unid (lote)" }],
+          "costo_envio": 0, "plazo_pago_dias": 0, "lead_time_dias": 10, "validez_dias": null
+        },
+        {
+          "proveedor_id": "distribuidora_oriental", "canal": "whatsapp", "recibida_en": "2026-10-06T12:10:00",
+          "items": [{ "producto_id": "silla", "precio_original": 12400, "moneda_original": "UYU", "incluye_iva_original": false, "unidad_original": "unidad", "factor": 1, "evidencia": "Silla ergonómica $12.400 + IVA" }],
+          "costo_envio": 0, "plazo_pago_dias": 30, "lead_time_dias": 2, "validez_dias": null
+        }
+      ],
+      "plan": {
+        "asignaciones": [{ "producto_id": "silla", "proveedor_id": "ofisillas", "cantidad": 6 }],
+        "explicacion": "Mueblería Rivera cotiza $ 9.800 pero exige un mínimo de 20 unidades y el pedido es de 6. Ofisillas ($ 10.900 + $ 1.200 de envío) queda por debajo de Distribuidora Oriental ($ 12.400)."
+      },
+      "ordenes": [
+        {
+          "numero": "OC-0884", "proveedor_id": "ofisillas",
+          "lineas": [{ "producto_id": "silla", "cantidad": 6, "precio_unitario_sin_iva": 10573, "aprobacion": "manual", "motivo": "Está en modo manual, la aprobás vos." }],
+          "envio": 1200, "requiere_aprobacion": true, "motivos": ["Sillas: está en modo manual, la aprobás vos."],
+          "emitida_por": "agente", "aprobada_por": "lucia", "emitida_en": "2026-10-07T14:20:00",
+          "estado": "recibida", "recibida_en": "2026-10-14T11:00:00", "negociada": true
+        }
+      ],
+      "negociaciones": [
+        {
+          "proveedor_id": "ofisillas", "elegida": "plazo", "estado": "enviada_simulada",
+          "mensaje_propuesto": "Hola, ¿cómo va? Si les pagamos las 6 sillas Prime contado contra entrega en lugar de a 30 días, ¿pueden mejorar el precio?",
+          "resultado": "Ofisillas aceptó un 3 % por pago contado: $ 10.573 + IVA c/u (ahorro de $ 1.962 en las 6 sillas).",
+          "estrategias": [
+            { "nombre": "competencia", "descripcion": "Mencionar la cotización de Mueblería Rivera ($ 9.800).", "concesion_obtenida_pct": 0, "riesgo": "alto" },
+            { "nombre": "volumen", "descripcion": "Prometer equipar más puestos en los próximos meses.", "concesion_obtenida_pct": 2, "riesgo": "medio" },
+            { "nombre": "plazo", "descripcion": "Pagar contado contra entrega en lugar de a 30 días.", "concesion_obtenida_pct": 3, "riesgo": "bajo" }
+          ]
+        }
+      ],
+      "conversaciones": [
+        {
+          "contraparte": "interno", "proposito": "solicitud",
+          "mensajes": [
+            { "canal": "email", "sentido": "recibido", "fecha": "2026-10-06T09:40:00",
+              "texto": "Hola, necesitamos 6 sillas ergonómicas para la sala de reuniones del segundo piso. Gracias. Martín" },
+            { "canal": "email", "sentido": "enviado", "fecha": "2026-10-06T09:41:00", "motivo": "solicitud_datos",
+              "texto": "Hola Martín: para pedir cotización me falta un dato. ¿Para qué fecha necesitás las sillas? Abasto, asistente de compras con IA." },
+            { "canal": "email", "sentido": "recibido", "fecha": "2026-10-06T11:02:00",
+              "texto": "Para el viernes 17 está bien. Gracias." }
+          ]
+        },
+        {
+          "contraparte": "ofisillas", "proposito": "cotizacion",
+          "mensajes": [
+            { "canal": "whatsapp", "sentido": "enviado", "fecha": "2026-10-06T11:05:00", "texto": null, "motivo": "solicitud_cotizacion" },
+            { "canal": "whatsapp", "sentido": "recibido", "fecha": "2026-10-06T15:20:00", "etiqueta": "Cotización leída",
+              "texto": "Buenas Lucía! Te paso: silla ergonómica mod. Prime, respaldo mesh, apoyabrazos regulables, $10.900 + IVA c/u. Envío $1.200. Entrega 7 días hábiles. Pago 30 días. Sin mínimo. Quedo atento, saludos!" }
+          ]
+        },
+        {
+          "contraparte": "muebleria_rivera", "proposito": "cotizacion",
+          "mensajes": [
+            { "canal": "whatsapp", "sentido": "enviado", "fecha": "2026-10-06T11:05:00", "texto": null, "motivo": "solicitud_cotizacion" },
+            { "canal": "foto", "sentido": "recibido", "fecha": "2026-10-07T12:25:00", "etiqueta": "Cotización leída",
+              "texto": "Foto de un presupuesto escrito a mano: «Silla ergo mod. 2 ... 9.800 x unidad s/iva · minimo 20 unid (lote) · 50% anticipo, resto contra entrega · entrega 10 dias · Rivera»." }
+          ]
+        },
+        {
+          "contraparte": "distribuidora_oriental", "proposito": "cotizacion",
+          "mensajes": [
+            { "canal": "whatsapp", "sentido": "enviado", "fecha": "2026-10-06T11:05:00", "texto": null, "motivo": "solicitud_cotizacion" },
+            { "canal": "whatsapp", "sentido": "recibido", "fecha": "2026-10-06T12:10:00", "etiqueta": "Cotización leída",
+              "texto": "Buen día Lucía! Silla ergonómica $12.400 + IVA. Pago a 30 como siempre. Entrega en 48hs." }
+          ]
+        },
+        {
+          "contraparte": "ofisillas", "proposito": "negociacion",
+          "mensajes": [
+            { "canal": "llamada", "sentido": "enviado", "fecha": "2026-10-07T14:05:00", "motivo": "negociacion",
+              "llamada": { "tipo": "negociacion", "intento": 1, "resultado": "atendida", "duracion_segundos": 95, "acuerdo": true, "precio_acordado": 10573, "resumen": "Ofisillas aceptó un 3 % de descuento por pago contado: $ 10.573 + IVA c/u." },
+              "transcripcion": [
+                { "rol": "abasto", "texto": "Hola, ¿hablo con Ofisillas? Soy el asistente de inteligencia artificial de Tecnova S.A. y te aviso que esta llamada se graba. Te llamo por la cotización de las 6 sillas Prime.", "segundo": 0 },
+                { "rol": "proveedor", "texto": "Sí, buenas. Decime.", "segundo": 12 },
+                { "rol": "abasto", "texto": "Si les pagamos contado contra entrega en lugar de a 30 días, ¿pueden mejorar el precio?", "segundo": 16 },
+                { "rol": "proveedor", "texto": "Contado te puedo hacer un 3 %: quedaría en $ 10.573 más IVA cada una. El envío sigue en $ 1.200.", "segundo": 27 },
+                { "rol": "abasto", "texto": "Perfecto, lo tomamos. Lucía te confirma la orden por WhatsApp en un rato. ¡Gracias!", "segundo": 44 }
+              ] }
+          ]
+        },
+        {
+          "contraparte": "ofisillas", "proposito": "orden",
+          "mensajes": [{ "canal": "whatsapp", "sentido": "enviado", "fecha": "2026-10-07T14:20:00", "texto": null, "motivo": "orden", "orden": "OC-0884" }]
+        }
+      ]
+    },
+    {
+      "id": "hist_ped_0135",
+      "numero": "PED-0135",
+      "titulo": "Reposición de desinfectante",
+      "descripcion": "El desinfectante quedó bajo el mínimo al cierre de la jornada.",
+      "cliente_interno": "personal",
+      "origen": "stock_minimo",
+      "solicitante": "Agente (cierre de jornada)",
+      "creado_en": "2026-10-08T18:00:00",
+      "lineas": [{ "producto_id": "desinfectante", "cantidad": 40, "necesario_para": "2026-10-13" }],
+      "historial_estados": [
+        { "estado": "nuevo", "en": "2026-10-08T18:00:00", "detalle": "Stock al cierre: 15 L, mínimo 20 L. Repongo hasta el stock base: 40 L." },
+        { "estado": "cotizando", "en": "2026-10-08T18:01:00", "detalle": "Pedí cotización a Papelera del Sur y Distribuidora Oriental." },
+        { "estado": "cancelado", "en": "2026-10-09T09:20:00", "detalle": "Al rectificar el stock, el depósito cargó 25 L que no estaban registrados: el stock quedó sobre el mínimo y no hace falta reponer." }
+      ],
+      "motivo_cancelacion": "Al rectificar el stock, el depósito cargó 25 L que no estaban registrados: el stock quedó sobre el mínimo y no hace falta reponer.",
+      "cotizaciones": [
+        {
+          "proveedor_id": "distribuidora_oriental", "canal": "whatsapp", "recibida_en": "2026-10-09T08:10:00",
+          "items": [{ "producto_id": "desinfectante", "precio_original": 790, "moneda_original": "UYU", "incluye_iva_original": false, "unidad_original": "bidón de 5 L", "factor": 5, "evidencia": "Desinfectante de pisos bidón 5L $790 + IVA" }],
+          "costo_envio": 0, "plazo_pago_dias": 30, "lead_time_dias": 2, "validez_dias": null
+        }
+      ],
+      "plan": null,
+      "ordenes": [],
+      "negociaciones": [],
+      "conversaciones": [
+        {
+          "contraparte": "papelera_del_sur", "proposito": "cotizacion",
+          "mensajes": [
+            { "canal": "whatsapp", "sentido": "enviado", "fecha": "2026-10-08T18:01:00", "texto": null, "motivo": "solicitud_cotizacion" },
+            { "canal": "whatsapp", "sentido": "enviado", "fecha": "2026-10-09T09:21:00",
+              "texto": "Hola, te aviso que ya no necesitamos la cotización de desinfectante que te pedimos ayer: apareció stock en el depósito. ¡Gracias igual!" }
+          ]
+        },
+        {
+          "contraparte": "distribuidora_oriental", "proposito": "cotizacion",
+          "mensajes": [
+            { "canal": "whatsapp", "sentido": "enviado", "fecha": "2026-10-08T18:01:00", "texto": null, "motivo": "solicitud_cotizacion" },
+            { "canal": "whatsapp", "sentido": "recibido", "fecha": "2026-10-09T08:10:00", "etiqueta": "Cotización leída",
+              "texto": "Buen día Lucía! Desinfectante de pisos bidón 5L $790 + IVA. Mínimo de compra $8.000. Pago a 30." },
+            { "canal": "whatsapp", "sentido": "enviado", "fecha": "2026-10-09T09:21:00",
+              "texto": "¡Gracias! Te aviso que por ahora no lo vamos a necesitar: apareció stock en el depósito." }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hist_ped_0136",
+      "numero": "PED-0136",
+      "titulo": "Tóner para clientes con contrato de impresión",
+      "descripcion": "Tóner para revender a los clientes con contrato de impresión.",
+      "cliente_interno": "ventas",
+      "origen": "solicitud_email",
+      "solicitante": "Sofía (Ventas)",
+      "creado_en": "2026-10-09T10:30:00",
+      "lineas": [{ "producto_id": "toner", "cantidad": 20, "necesario_para": "2026-10-15" }],
+      "historial_estados": [
+        { "estado": "nuevo", "en": "2026-10-09T10:30:00", "detalle": "Sofía pidió 20 tóner por email para el 15/10." },
+        { "estado": "cotizando", "en": "2026-10-09T10:31:00", "detalle": "Pedí cotización a Compuservice, TecnoImport S.A. y Distribuidora Oriental." },
+        { "estado": "cotizado", "en": "2026-10-09T16:40:00", "detalle": "La mejor opción es Compuservice: $ 3.196,72 sin IVA." },
+        { "estado": "pendiente_aprobacion", "en": "2026-10-09T16:41:00", "detalle": "$ 63.934 supera el tope automático de $ 20.000: la orden espera tu OK." },
+        { "estado": "aprobado", "en": "2026-10-10T09:15:00", "detalle": "Lucía aprobó la OC-0885." },
+        { "estado": "pendiente_entrega", "en": "2026-10-10T09:15:00", "detalle": "Orden enviada a Compuservice por WhatsApp." },
+        { "estado": "recibido", "en": "2026-10-13T10:05:00", "detalle": "Ingresaron los 20 tóner." }
+      ],
+      "cotizaciones": [
+        {
+          "proveedor_id": "compuservice", "canal": "whatsapp", "recibida_en": "2026-10-09T11:05:00",
+          "items": [{ "producto_id": "toner", "precio_original": 3900, "moneda_original": "UYU", "incluye_iva_original": true, "unidad_original": "unidad", "factor": 1, "evidencia": "Toner 85a 3900 con iva. Tengo 20" }],
+          "costo_envio": 0, "plazo_pago_dias": 0, "lead_time_dias": 3, "validez_dias": null
+        },
+        {
+          "proveedor_id": "tecnoimport", "canal": "pdf", "recibida_en": "2026-10-09T16:30:00",
+          "items": [{ "producto_id": "toner", "precio_original": 95, "moneda_original": "USD", "incluye_iva_original": false, "unidad_original": "unidad", "factor": 1, "evidencia": "Tóner HP 85A original (CE285A) · 20 × USD 95,00 · más IVA" }],
+          "costo_envio": 0, "plazo_pago_dias": 30, "lead_time_dias": 5, "validez_dias": 5
+        },
+        {
+          "proveedor_id": "distribuidora_oriental", "canal": "whatsapp", "recibida_en": "2026-10-09T12:00:00",
+          "items": [{ "producto_id": "toner", "precio_original": 4600, "moneda_original": "UYU", "incluye_iva_original": false, "unidad_original": "unidad", "factor": 1, "evidencia": "Tóner HP 85A original $4.600 + IVA" }],
+          "costo_envio": 0, "plazo_pago_dias": 30, "lead_time_dias": 2, "validez_dias": null
+        }
+      ],
+      "plan": {
+        "asignaciones": [{ "producto_id": "toner", "proveedor_id": "compuservice", "cantidad": 20 }],
+        "explicacion": "Compuservice cotiza $ 3.196,72 sin IVA y tiene las 20 unidades; TecnoImport S.A. ($ 3.800) y Distribuidora Oriental ($ 4.600) quedan arriba."
+      },
+      "ordenes": [
+        {
+          "numero": "OC-0885", "proveedor_id": "compuservice",
+          "lineas": [{ "producto_id": "toner", "cantidad": 20, "aprobacion": "supera_tope", "motivo": "$ 63.934 supera el tope automático de $ 20.000." }],
+          "envio": 0, "requiere_aprobacion": true, "motivos": ["Tóner: $ 63.934 supera el tope automático de $ 20.000."],
+          "emitida_por": "agente", "aprobada_por": "lucia", "emitida_en": "2026-10-10T09:15:00",
+          "estado": "recibida", "recibida_en": "2026-10-13T10:05:00"
+        }
+      ],
+      "negociaciones": [],
+      "conversaciones": [
+        {
+          "contraparte": "interno", "proposito": "solicitud",
+          "mensajes": [
+            { "canal": "email", "sentido": "recibido", "fecha": "2026-10-09T10:30:00",
+              "texto": "Abasto, necesito 20 tóner HP 85A para el miércoles 15: son para los clientes con contrato de impresión. Gracias, Sofía." },
+            { "canal": "email", "sentido": "enviado", "fecha": "2026-10-09T10:31:00",
+              "texto": "Hola Sofía: recibí tu pedido de 20 tóner HP 85A para el 15/10. Ya pedí cotizaciones. Abasto, asistente de compras con IA." }
+          ]
+        },
+        {
+          "contraparte": "compuservice", "proposito": "cotizacion",
+          "mensajes": [
+            { "canal": "whatsapp", "sentido": "enviado", "fecha": "2026-10-09T10:31:00", "texto": null, "motivo": "solicitud_cotizacion" },
+            { "canal": "whatsapp", "sentido": "recibido", "fecha": "2026-10-09T11:05:00", "etiqueta": "Cotización leída",
+              "texto": "Hola! Toner 85a 3900 con iva. Tengo 20. Entrego en 3 dias. Contado." }
+          ]
+        },
+        {
+          "contraparte": "tecnoimport", "proposito": "cotizacion",
+          "mensajes": [
+            { "canal": "email", "sentido": "enviado", "fecha": "2026-10-09T10:31:00", "texto": null, "motivo": "solicitud_cotizacion" },
+            { "canal": "pdf", "sentido": "recibido", "fecha": "2026-10-09T16:30:00", "etiqueta": "Cotización leída",
+              "texto": "TecnoImport S.A. · Cotización N.º C-2026-0938 · Tóner HP 85A original (CE285A) · 20 × USD 95,00 · Precios en dólares, más IVA · Entrega 5 días hábiles · Pago 30 días · Validez 5 días." }
+          ]
+        },
+        {
+          "contraparte": "distribuidora_oriental", "proposito": "cotizacion",
+          "mensajes": [
+            { "canal": "whatsapp", "sentido": "enviado", "fecha": "2026-10-09T10:31:00", "texto": null, "motivo": "solicitud_cotizacion" },
+            { "canal": "whatsapp", "sentido": "recibido", "fecha": "2026-10-09T12:00:00", "etiqueta": "Cotización leída",
+              "texto": "Buen día! Tóner HP 85A original $4.600 + IVA. Mínimo de compra $8.000. Pago a 30. Entrega 48hs." }
+          ]
+        },
+        {
+          "contraparte": "compuservice", "proposito": "orden",
+          "mensajes": [{ "canal": "whatsapp", "sentido": "enviado", "fecha": "2026-10-10T09:15:00", "texto": null, "motivo": "orden", "orden": "OC-0885" }]
+        }
+      ]
+    },
+    {
+      "id": "hist_ped_0137",
+      "numero": "PED-0137",
+      "titulo": "Notebooks para un cliente corporativo",
+      "descripcion": "Seis notebooks para revender a un cliente corporativo.",
+      "cliente_interno": "ventas",
+      "origen": "solicitud_voz",
+      "solicitante": "Sofía (Ventas)",
+      "creado_en": "2026-10-13T09:10:00",
+      "lineas": [{ "producto_id": "notebook", "cantidad": 6, "necesario_para": "2026-10-21" }],
+      "historial_estados": [
+        { "estado": "nuevo", "en": "2026-10-13T09:10:00", "detalle": "Sofía pidió 6 notebooks por nota de voz para el 21/10." },
+        { "estado": "cotizando", "en": "2026-10-13T09:11:00", "detalle": "Pedí cotización a Compuservice y TecnoImport S.A." },
+        { "estado": "cotizado", "en": "2026-10-13T15:00:00", "detalle": "Compuservice cotiza $ 27.459,02 sin IVA y el pedido supera su mínimo de 5." },
+        { "estado": "pendiente_aprobacion", "en": "2026-10-13T15:01:00", "detalle": "Notebooks está en modo manual: la orden espera tu OK." },
+        { "estado": "aprobado", "en": "2026-10-14T08:50:00", "detalle": "Lucía aprobó la OC-0886." },
+        { "estado": "pendiente_entrega", "en": "2026-10-14T08:50:00", "detalle": "Orden enviada a Compuservice por WhatsApp." }
+      ],
+      "cotizaciones": [
+        {
+          "proveedor_id": "compuservice", "canal": "whatsapp", "recibida_en": "2026-10-13T09:50:00",
+          "items": [{ "producto_id": "notebook", "precio_original": 33500, "moneda_original": "UYU", "incluye_iva_original": true, "unidad_original": "unidad", "factor": 1, "cantidad_minima": 5, "evidencia": "Notebook 15 i5 16gb 512 33500 con iva. Minimo 5" }],
+          "costo_envio": 0, "plazo_pago_dias": 0, "lead_time_dias": 3, "validez_dias": null
+        },
+        {
+          "proveedor_id": "tecnoimport", "canal": "pdf", "recibida_en": "2026-10-13T14:45:00",
+          "items": [{ "producto_id": "notebook", "precio_original": 780, "moneda_original": "USD", "incluye_iva_original": false, "unidad_original": "unidad", "factor": 1, "evidencia": "Notebook 15.6\" Core i5 / 16 GB RAM / 512 GB SSD · 6 × USD 780,00 · más IVA" }],
+          "costo_envio": 0, "plazo_pago_dias": 30, "lead_time_dias": 5, "validez_dias": 5
+        }
+      ],
+      "plan": {
+        "asignaciones": [{ "producto_id": "notebook", "proveedor_id": "compuservice", "cantidad": 6 }],
+        "explicacion": "Compuservice cotiza $ 27.459,02 sin IVA contra $ 31.200 de TecnoImport S.A. y el pedido de 6 supera su mínimo de 5."
+      },
+      "ordenes": [
+        {
+          "numero": "OC-0886", "proveedor_id": "compuservice",
+          "lineas": [{ "producto_id": "notebook", "cantidad": 6, "aprobacion": "manual", "motivo": "Está en modo manual, la aprobás vos." }],
+          "envio": 0, "requiere_aprobacion": true, "motivos": ["Notebooks: está en modo manual, la aprobás vos."],
+          "emitida_por": "agente", "aprobada_por": "lucia", "emitida_en": "2026-10-14T08:50:00",
+          "estado": "pendiente_entrega", "recibida_en": null
+        }
+      ],
+      "negociaciones": [],
+      "conversaciones": [
+        {
+          "contraparte": "interno", "proposito": "solicitud",
+          "mensajes": [
+            { "canal": "nota_voz", "sentido": "recibido", "fecha": "2026-10-13T09:10:00", "duracion_segundos": 14,
+              "texto": "Abasto, para el cliente de Pocitos necesitamos seis notebooks de las de dieciséis gigas, para el martes 21. Son para vender, ¿eh? Gracias." }
+          ]
+        },
+        {
+          "contraparte": "compuservice", "proposito": "cotizacion",
+          "mensajes": [
+            { "canal": "whatsapp", "sentido": "enviado", "fecha": "2026-10-13T09:11:00", "texto": null, "motivo": "solicitud_cotizacion" },
+            { "canal": "whatsapp", "sentido": "recibido", "fecha": "2026-10-13T09:50:00", "etiqueta": "Cotización leída",
+              "texto": "Hola! Notebook 15 i5 16gb 512 33500 con iva. Minimo 5. Entrego en 3 dias. Contado." }
+          ]
+        },
+        {
+          "contraparte": "tecnoimport", "proposito": "cotizacion",
+          "mensajes": [
+            { "canal": "email", "sentido": "enviado", "fecha": "2026-10-13T09:11:00", "texto": null, "motivo": "solicitud_cotizacion" },
+            { "canal": "pdf", "sentido": "recibido", "fecha": "2026-10-13T14:45:00", "etiqueta": "Cotización leída",
+              "texto": "TecnoImport S.A. · Cotización N.º C-2026-0951 · Notebook 15.6\" Core i5 / 16 GB RAM / 512 GB SSD / Win 11 Pro · 6 × USD 780,00 · Precios en dólares, más IVA · Entrega 5 días hábiles · Pago 30 días · Validez 5 días." }
+          ]
+        },
+        {
+          "contraparte": "compuservice", "proposito": "orden",
+          "mensajes": [
+            { "canal": "whatsapp", "sentido": "enviado", "fecha": "2026-10-14T08:50:00", "texto": null, "motivo": "orden", "orden": "OC-0886" },
+            { "canal": "whatsapp", "sentido": "recibido", "fecha": "2026-10-16T17:30:00",
+              "texto": "Hola! Las notebooks me entran el lunes, te las llevo el martes 21 temprano. Saludos" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hist_ped_0138",
+      "numero": "PED-0138",
+      "titulo": "Reposición de resmas y desinfectante",
+      "descripcion": "Resmas y desinfectante bajo el mínimo al cierre de la jornada.",
+      "cliente_interno": "personal",
+      "origen": "stock_minimo",
+      "solicitante": "Agente (cierre de jornada)",
+      "creado_en": "2026-10-14T18:00:00",
+      "lineas": [
+        { "producto_id": "resma_a4", "cantidad": 150, "necesario_para": "2026-10-17" },
+        { "producto_id": "desinfectante", "cantidad": 30, "necesario_para": "2026-10-17" }
+      ],
+      "historial_estados": [
+        { "estado": "nuevo", "en": "2026-10-14T18:00:00", "detalle": "Stock al cierre: 30 resmas (mínimo 40) y 18 L de desinfectante (mínimo 20 L)." },
+        { "estado": "cotizando", "en": "2026-10-14T18:01:00", "detalle": "Pedí cotización a Papelera del Sur y Distribuidora Oriental." },
+        { "estado": "cotizado", "en": "2026-10-15T13:05:00", "detalle": "Papelera del Sur no atendió dos llamadas; contestó por audio después del WhatsApp." },
+        { "estado": "aprobado", "en": "2026-10-15T13:06:00", "detalle": "Compra automática: resmas $ 26.804 (tope $ 30.000) y desinfectante $ 3.393 (tope $ 10.000). Emití la OC-0887." },
+        { "estado": "pendiente_entrega", "en": "2026-10-15T13:06:00", "detalle": "Orden enviada a Papelera del Sur por WhatsApp." },
+        { "estado": "recibido", "en": "2026-10-16T10:30:00", "detalle": "Ingresaron 30 cajas de resmas y 6 bidones de 5 L." }
+      ],
+      "cotizaciones": [
+        {
+          "proveedor_id": "papelera_del_sur", "canal": "audio", "recibida_en": "2026-10-15T12:58:00",
+          "items": [
+            { "producto_id": "resma_a4", "precio_original": 1090, "moneda_original": "UYU", "incluye_iva_original": true, "unidad_original": "caja de 5 resmas", "factor": 5, "evidencia": "la caja de cinco resmas a mil noventa ... todo con IVA" },
+            { "producto_id": "desinfectante", "precio_original": 690, "moneda_original": "UYU", "incluye_iva_original": true, "unidad_original": "bidón de 5 L", "factor": 5, "evidencia": "el bidón de cinco litros de desinfectante a seiscientos noventa, todo con IVA" }
+          ],
+          "costo_envio": 0, "plazo_pago_dias": 0, "lead_time_dias": 1, "validez_dias": null
+        },
+        {
+          "proveedor_id": "distribuidora_oriental", "canal": "whatsapp", "recibida_en": "2026-10-15T08:30:00",
+          "items": [
+            { "producto_id": "resma_a4", "precio_original": 235, "moneda_original": "UYU", "incluye_iva_original": false, "unidad_original": "unidad", "factor": 1, "evidencia": "Resma A4 75g $235 + IVA" },
+            { "producto_id": "desinfectante", "precio_original": 790, "moneda_original": "UYU", "incluye_iva_original": false, "unidad_original": "bidón de 5 L", "factor": 5, "evidencia": "Desinfectante bidón 5L $790 + IVA" }
+          ],
+          "costo_envio": 0, "plazo_pago_dias": 30, "lead_time_dias": 2, "validez_dias": null
+        }
+      ],
+      "plan": {
+        "asignaciones": [
+          { "producto_id": "resma_a4", "proveedor_id": "papelera_del_sur", "cantidad": 150 },
+          { "producto_id": "desinfectante", "proveedor_id": "papelera_del_sur", "cantidad": 30 }
+        ],
+        "explicacion": "Papelera del Sur es más barata en los dos productos: $ 178,69 la resma y $ 113,11 el litro sin IVA, contra $ 235 y $ 158 de Distribuidora Oriental."
+      },
+      "ordenes": [
+        {
+          "numero": "OC-0887", "proveedor_id": "papelera_del_sur",
+          "lineas": [
+            { "producto_id": "resma_a4", "cantidad": 150, "aprobacion": "automatica", "motivo": "Modo automático y $ 26.804 no supera el tope de $ 30.000." },
+            { "producto_id": "desinfectante", "cantidad": 30, "aprobacion": "automatica", "motivo": "Modo automático y $ 3.393 no supera el tope de $ 10.000." }
+          ],
+          "envio": 0, "requiere_aprobacion": false, "motivos": [],
+          "emitida_por": "agente", "aprobada_por": "agente", "emitida_en": "2026-10-15T13:06:00",
+          "estado": "recibida", "recibida_en": "2026-10-16T10:30:00"
+        }
+      ],
+      "negociaciones": [],
+      "conversaciones": [
+        {
+          "contraparte": "papelera_del_sur", "proposito": "cotizacion",
+          "mensajes": [
+            { "canal": "whatsapp", "sentido": "enviado", "fecha": "2026-10-14T18:01:00", "texto": null, "motivo": "solicitud_cotizacion" },
+            { "canal": "llamada", "sentido": "enviado", "fecha": "2026-10-15T10:00:00", "motivo": "reintento",
+              "llamada": { "intento": 1, "resultado": "no_atendida", "duracion_segundos": 0 } },
+            { "canal": "llamada", "sentido": "enviado", "fecha": "2026-10-15T10:30:00", "motivo": "reintento",
+              "llamada": { "intento": 2, "resultado": "buzon", "duracion_segundos": 0 } },
+            { "canal": "whatsapp", "sentido": "enviado", "fecha": "2026-10-15T10:31:00", "motivo": "aviso_no_atendio",
+              "texto": "Hola, te llamé dos veces por la cotización de resmas y desinfectante que te pedimos ayer. ¿Me pasás el precio por acá cuando puedas? ¡Gracias! Abasto, asistente de compras con IA de Tecnova S.A." },
+            { "canal": "audio", "sentido": "recibido", "fecha": "2026-10-15T12:58:00", "etiqueta": "Cotización leída", "duracion_segundos": 26,
+              "texto": "Hola Lucía, perdoná, estaba en la ruta y no podía atender. Mirá, la caja de cinco resmas a mil noventa y el bidón de cinco litros de desinfectante a seiscientos noventa, todo con IVA. Te lo llevo mañana sin cargo. Dale, beso." }
+          ]
+        },
+        {
+          "contraparte": "distribuidora_oriental", "proposito": "cotizacion",
+          "mensajes": [
+            { "canal": "whatsapp", "sentido": "enviado", "fecha": "2026-10-14T18:01:00", "texto": null, "motivo": "solicitud_cotizacion" },
+            { "canal": "whatsapp", "sentido": "recibido", "fecha": "2026-10-15T08:30:00", "etiqueta": "Cotización leída",
+              "texto": "Buen día Lucía! Resma A4 75g $235 + IVA. Desinfectante bidón 5L $790 + IVA. Mínimo de compra $8.000. Pago a 30." }
+          ]
+        },
+        {
+          "contraparte": "papelera_del_sur", "proposito": "orden",
+          "mensajes": [{ "canal": "whatsapp", "sentido": "enviado", "fecha": "2026-10-15T13:06:00", "texto": null, "motivo": "orden", "orden": "OC-0887" }]
+        }
+      ]
+    }
+  ]
+}
