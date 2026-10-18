@@ -1,0 +1,6491 @@
+{
+ "_nota": "DATOS DE EJEMPLO (no son compras reales de Tecnova S.A.). Histórico inventado para que el dashboard (RF-09, KPI de la §4 del PRD 1.4) tenga con qué calcular mientras no hay meses de uso real. Productos y proveedores de data/pedido_demo.json y data/proveedores_sim.json; precios sin IVA, en UYU y en la unidad canónica, con los de octubre iguales a los de la demo. Todo lo que sale de acá se muestra con el badge 'Datos de ejemplo'. Lo genera un script determinístico; si se edita a mano, mantener la coherencia de fechas.",
+ "ejemplo": true,
+ "empresa": "Tecnova S.A.",
+ "contacto_proveedores": {
+  "_nota": "Canales de contacto para la secuencia de RF-06 (si tiene WhatsApp; email simulado). Datos de ejemplo.",
+  "tecnoimport": {
+   "whatsapp": false,
+   "email": "cotizaciones@tecnoimport.example"
+  },
+  "compuservice": {
+   "whatsapp": true,
+   "email": "ventas@compuservice.example"
+  },
+  "papelera_del_sur": {
+   "whatsapp": true,
+   "email": "pedidos@papeleradelsur.example"
+  },
+  "muebleria_rivera": {
+   "whatsapp": true,
+   "email": "presupuestos@muebleriarivera.example"
+  },
+  "ofisillas": {
+   "whatsapp": true,
+   "email": "ventas@ofisillas.example"
+  },
+  "distribuidora_oriental": {
+   "whatsapp": true,
+   "email": "ventas@distoriental.example"
+  }
+ },
+ "pedidos": [
+  {
+   "id": "PED-0101",
+   "cliente_interno": "personal",
+   "origen": "stock_minimo",
+   "descripcion": "Reposición de consumibles de oficina y limpieza",
+   "solicitud_recibida_en": null,
+   "creado_en": "2025-11-11T08:10:00"
+  },
+  {
+   "id": "PED-0102",
+   "cliente_interno": "ventas",
+   "origen": "solicitud_interna",
+   "descripcion": "Tóner HP 85A para reventa",
+   "solicitud_recibida_en": "2025-11-19T11:20:00",
+   "creado_en": "2025-11-19T11:40:00"
+  },
+  {
+   "id": "PED-0103",
+   "cliente_interno": "ventas",
+   "origen": "solicitud_interna",
+   "descripcion": "Tóner HP 85A para reventa",
+   "solicitud_recibida_en": "2025-11-23T09:48:00",
+   "creado_en": "2025-11-23T10:00:00"
+  },
+  {
+   "id": "PED-0104",
+   "cliente_interno": "ventas",
+   "origen": "solicitud_interna",
+   "descripcion": "Tóner HP 85A para reventa",
+   "solicitud_recibida_en": "2025-11-28T14:44:00",
+   "creado_en": "2025-11-28T14:55:00"
+  },
+  {
+   "id": "PED-0105",
+   "cliente_interno": "ventas",
+   "origen": "stock_minimo",
+   "descripcion": "Tóner HP 85A para reventa",
+   "solicitud_recibida_en": null,
+   "creado_en": "2025-12-02T15:00:00"
+  },
+  {
+   "id": "PED-0106",
+   "cliente_interno": "personal",
+   "origen": "stock_minimo",
+   "descripcion": "Reposición de consumibles de oficina y limpieza",
+   "solicitud_recibida_en": null,
+   "creado_en": "2025-12-07T12:55:00"
+  },
+  {
+   "id": "PED-0107",
+   "cliente_interno": "personal",
+   "origen": "solicitud_interna",
+   "descripcion": "Notebooks para ingresos",
+   "solicitud_recibida_en": "2025-12-14T16:40:00",
+   "creado_en": "2025-12-14T16:55:00"
+  },
+  {
+   "id": "PED-0108",
+   "cliente_interno": "personal",
+   "origen": "solicitud_interna",
+   "descripcion": "Reposición de consumibles de oficina y limpieza",
+   "solicitud_recibida_en": "2025-12-20T10:01:00",
+   "creado_en": "2025-12-20T10:10:00"
+  },
+  {
+   "id": "PED-0109",
+   "cliente_interno": "personal",
+   "origen": "solicitud_interna",
+   "descripcion": "Sillas para puestos nuevos",
+   "solicitud_recibida_en": "2025-12-24T16:17:00",
+   "creado_en": "2025-12-24T16:25:00"
+  },
+  {
+   "id": "PED-0110",
+   "cliente_interno": "personal",
+   "origen": "solicitud_interna",
+   "descripcion": "Reposición de consumibles de oficina y limpieza",
+   "solicitud_recibida_en": "2025-12-31T08:40:00",
+   "creado_en": "2025-12-31T09:00:00"
+  },
+  {
+   "id": "PED-0111",
+   "cliente_interno": "personal",
+   "origen": "solicitud_interna",
+   "descripcion": "Sillas para puestos nuevos",
+   "solicitud_recibida_en": "2026-01-07T15:00:00",
+   "creado_en": "2026-01-07T15:25:00"
+  },
+  {
+   "id": "PED-0112",
+   "cliente_interno": "ventas",
+   "origen": "solicitud_interna",
+   "descripcion": "Tóner HP 85A para reventa",
+   "solicitud_recibida_en": "2026-01-12T08:07:00",
+   "creado_en": "2026-01-12T08:25:00"
+  },
+  {
+   "id": "PED-0113",
+   "cliente_interno": "personal",
+   "origen": "solicitud_interna",
+   "descripcion": "Reposición de consumibles de oficina y limpieza",
+   "solicitud_recibida_en": "2026-01-18T12:17:00",
+   "creado_en": "2026-01-18T12:25:00"
+  },
+  {
+   "id": "PED-0114",
+   "cliente_interno": "personal",
+   "origen": "solicitud_interna",
+   "descripcion": "Sillas para puestos nuevos",
+   "solicitud_recibida_en": "2026-01-26T11:45:00",
+   "creado_en": "2026-01-26T12:00:00"
+  },
+  {
+   "id": "PED-0115",
+   "cliente_interno": "personal",
+   "origen": "solicitud_interna",
+   "descripcion": "Sillas para puestos nuevos",
+   "solicitud_recibida_en": "2026-01-30T14:39:00",
+   "creado_en": "2026-01-30T14:55:00"
+  },
+  {
+   "id": "PED-0116",
+   "cliente_interno": "personal",
+   "origen": "stock_minimo",
+   "descripcion": "Reposición de consumibles de oficina y limpieza",
+   "solicitud_recibida_en": null,
+   "creado_en": "2026-02-03T11:10:00"
+  },
+  {
+   "id": "PED-0117",
+   "cliente_interno": "ventas",
+   "origen": "stock_minimo",
+   "descripcion": "Tóner HP 85A para reventa",
+   "solicitud_recibida_en": null,
+   "creado_en": "2026-02-07T13:00:00"
+  },
+  {
+   "id": "PED-0118",
+   "cliente_interno": "ventas",
+   "origen": "stock_minimo",
+   "descripcion": "Tóner HP 85A para reventa",
+   "solicitud_recibida_en": null,
+   "creado_en": "2026-02-15T13:10:00"
+  },
+  {
+   "id": "PED-0119",
+   "cliente_interno": "personal",
+   "origen": "solicitud_interna",
+   "descripcion": "Sillas para puestos nuevos",
+   "solicitud_recibida_en": "2026-02-22T11:05:00",
+   "creado_en": "2026-02-22T11:25:00"
+  },
+  {
+   "id": "PED-0120",
+   "cliente_interno": "personal",
+   "origen": "stock_minimo",
+   "descripcion": "Reposición de consumibles de oficina y limpieza",
+   "solicitud_recibida_en": null,
+   "creado_en": "2026-02-27T12:25:00"
+  },
+  {
+   "id": "PED-0121",
+   "cliente_interno": "ventas",
+   "origen": "stock_minimo",
+   "descripcion": "Tóner HP 85A para reventa",
+   "solicitud_recibida_en": null,
+   "creado_en": "2026-03-03T14:40:00"
+  },
+  {
+   "id": "PED-0122",
+   "cliente_interno": "personal",
+   "origen": "stock_minimo",
+   "descripcion": "Reposición de consumibles de oficina y limpieza",
+   "solicitud_recibida_en": null,
+   "creado_en": "2026-03-08T15:00:00"
+  },
+  {
+   "id": "PED-0123",
+   "cliente_interno": "personal",
+   "origen": "solicitud_interna",
+   "descripcion": "Notebooks para ingresos",
+   "solicitud_recibida_en": "2026-03-15T08:31:00",
+   "creado_en": "2026-03-15T08:40:00"
+  },
+  {
+   "id": "PED-0124",
+   "cliente_interno": "personal",
+   "origen": "solicitud_interna",
+   "descripcion": "Sillas para puestos nuevos",
+   "solicitud_recibida_en": "2026-03-20T09:33:00",
+   "creado_en": "2026-03-20T09:40:00"
+  },
+  {
+   "id": "PED-0125",
+   "cliente_interno": "personal",
+   "origen": "stock_minimo",
+   "descripcion": "Reposición de consumibles de oficina y limpieza",
+   "solicitud_recibida_en": null,
+   "creado_en": "2026-03-24T10:25:00"
+  },
+  {
+   "id": "PED-0126",
+   "cliente_interno": "personal",
+   "origen": "solicitud_interna",
+   "descripcion": "Notebooks para ingresos",
+   "solicitud_recibida_en": "2026-03-28T10:40:00",
+   "creado_en": "2026-03-28T11:00:00"
+  },
+  {
+   "id": "PED-0127",
+   "cliente_interno": "personal",
+   "origen": "stock_minimo",
+   "descripcion": "Reposición de consumibles de oficina y limpieza",
+   "solicitud_recibida_en": null,
+   "creado_en": "2026-04-01T13:25:00"
+  },
+  {
+   "id": "PED-0128",
+   "cliente_interno": "personal",
+   "origen": "stock_minimo",
+   "descripcion": "Reposición de consumibles de oficina y limpieza",
+   "solicitud_recibida_en": null,
+   "creado_en": "2026-04-05T12:10:00"
+  },
+  {
+   "id": "PED-0129",
+   "cliente_interno": "personal",
+   "origen": "stock_minimo",
+   "descripcion": "Reposición de consumibles de oficina y limpieza",
+   "solicitud_recibida_en": null,
+   "creado_en": "2026-04-10T09:55:00"
+  },
+  {
+   "id": "PED-0130",
+   "cliente_interno": "personal",
+   "origen": "stock_minimo",
+   "descripcion": "Reposición de consumibles de oficina y limpieza",
+   "solicitud_recibida_en": null,
+   "creado_en": "2026-04-14T15:00:00"
+  },
+  {
+   "id": "PED-0131",
+   "cliente_interno": "ventas",
+   "origen": "solicitud_interna",
+   "descripcion": "Tóner HP 85A para reventa",
+   "solicitud_recibida_en": "2026-04-19T07:57:00",
+   "creado_en": "2026-04-19T08:10:00"
+  },
+  {
+   "id": "PED-0132",
+   "cliente_interno": "personal",
+   "origen": "stock_minimo",
+   "descripcion": "Reposición de consumibles de oficina y limpieza",
+   "solicitud_recibida_en": null,
+   "creado_en": "2026-04-24T16:00:00"
+  },
+  {
+   "id": "PED-0133",
+   "cliente_interno": "personal",
+   "origen": "solicitud_interna",
+   "descripcion": "Sillas para puestos nuevos",
+   "solicitud_recibida_en": "2026-05-02T15:17:00",
+   "creado_en": "2026-05-02T15:40:00"
+  },
+  {
+   "id": "PED-0134",
+   "cliente_interno": "ventas",
+   "origen": "stock_minimo",
+   "descripcion": "Tóner HP 85A para reventa",
+   "solicitud_recibida_en": null,
+   "creado_en": "2026-05-09T10:10:00"
+  },
+  {
+   "id": "PED-0135",
+   "cliente_interno": "ventas",
+   "origen": "stock_minimo",
+   "descripcion": "Tóner HP 85A para reventa",
+   "solicitud_recibida_en": null,
+   "creado_en": "2026-05-15T14:10:00"
+  },
+  {
+   "id": "PED-0136",
+   "cliente_interno": "ventas",
+   "origen": "stock_minimo",
+   "descripcion": "Tóner HP 85A para reventa",
+   "solicitud_recibida_en": null,
+   "creado_en": "2026-05-21T10:40:00"
+  },
+  {
+   "id": "PED-0137",
+   "cliente_interno": "personal",
+   "origen": "stock_minimo",
+   "descripcion": "Reposición de consumibles de oficina y limpieza",
+   "solicitud_recibida_en": null,
+   "creado_en": "2026-05-28T11:40:00"
+  },
+  {
+   "id": "PED-0138",
+   "cliente_interno": "personal",
+   "origen": "solicitud_interna",
+   "descripcion": "Reposición de consumibles de oficina y limpieza",
+   "solicitud_recibida_en": "2026-06-05T12:06:00",
+   "creado_en": "2026-06-05T12:10:00"
+  },
+  {
+   "id": "PED-0139",
+   "cliente_interno": "personal",
+   "origen": "stock_minimo",
+   "descripcion": "Reposición de consumibles de oficina y limpieza",
+   "solicitud_recibida_en": null,
+   "creado_en": "2026-06-11T09:25:00"
+  },
+  {
+   "id": "PED-0140",
+   "cliente_interno": "ventas",
+   "origen": "solicitud_interna",
+   "descripcion": "Tóner HP 85A para reventa",
+   "solicitud_recibida_en": "2026-06-18T08:50:00",
+   "creado_en": "2026-06-18T09:10:00"
+  },
+  {
+   "id": "PED-0141",
+   "cliente_interno": "personal",
+   "origen": "stock_minimo",
+   "descripcion": "Reposición de consumibles de oficina y limpieza",
+   "solicitud_recibida_en": null,
+   "creado_en": "2026-06-24T10:00:00"
+  },
+  {
+   "id": "PED-0142",
+   "cliente_interno": "ventas",
+   "origen": "stock_minimo",
+   "descripcion": "Tóner HP 85A para reventa",
+   "solicitud_recibida_en": null,
+   "creado_en": "2026-07-02T15:10:00"
+  },
+  {
+   "id": "PED-0143",
+   "cliente_interno": "personal",
+   "origen": "solicitud_interna",
+   "descripcion": "Reposición de consumibles de oficina y limpieza",
+   "solicitud_recibida_en": "2026-07-08T13:53:00",
+   "creado_en": "2026-07-08T14:10:00"
+  },
+  {
+   "id": "PED-0144",
+   "cliente_interno": "personal",
+   "origen": "stock_minimo",
+   "descripcion": "Reposición de consumibles de oficina y limpieza",
+   "solicitud_recibida_en": null,
+   "creado_en": "2026-07-15T08:40:00"
+  },
+  {
+   "id": "PED-0145",
+   "cliente_interno": "personal",
+   "origen": "solicitud_interna",
+   "descripcion": "Reposición de consumibles de oficina y limpieza",
+   "solicitud_recibida_en": "2026-07-21T10:45:00",
+   "creado_en": "2026-07-21T11:00:00"
+  },
+  {
+   "id": "PED-0146",
+   "cliente_interno": "personal",
+   "origen": "solicitud_interna",
+   "descripcion": "Notebooks para ingresos",
+   "solicitud_recibida_en": "2026-07-29T08:52:00",
+   "creado_en": "2026-07-29T09:10:00"
+  },
+  {
+   "id": "PED-0147",
+   "cliente_interno": "personal",
+   "origen": "solicitud_interna",
+   "descripcion": "Notebooks para ingresos",
+   "solicitud_recibida_en": "2026-08-03T08:04:00",
+   "creado_en": "2026-08-03T08:10:00"
+  },
+  {
+   "id": "PED-0148",
+   "cliente_interno": "personal",
+   "origen": "stock_minimo",
+   "descripcion": "Reposición de consumibles de oficina y limpieza",
+   "solicitud_recibida_en": null,
+   "creado_en": "2026-08-11T08:25:00"
+  },
+  {
+   "id": "PED-0149",
+   "cliente_interno": "personal",
+   "origen": "solicitud_interna",
+   "descripcion": "Reposición de consumibles de oficina y limpieza",
+   "solicitud_recibida_en": "2026-08-19T09:54:00",
+   "creado_en": "2026-08-19T10:10:00"
+  },
+  {
+   "id": "PED-0150",
+   "cliente_interno": "personal",
+   "origen": "solicitud_interna",
+   "descripcion": "Sillas para puestos nuevos",
+   "solicitud_recibida_en": "2026-08-25T13:29:00",
+   "creado_en": "2026-08-25T13:55:00"
+  },
+  {
+   "id": "PED-0151",
+   "cliente_interno": "ventas",
+   "origen": "stock_minimo",
+   "descripcion": "Tóner HP 85A para reventa",
+   "solicitud_recibida_en": null,
+   "creado_en": "2026-09-01T12:40:00"
+  },
+  {
+   "id": "PED-0152",
+   "cliente_interno": "personal",
+   "origen": "stock_minimo",
+   "descripcion": "Reposición de consumibles de oficina y limpieza",
+   "solicitud_recibida_en": null,
+   "creado_en": "2026-09-08T09:55:00"
+  },
+  {
+   "id": "PED-0153",
+   "cliente_interno": "personal",
+   "origen": "solicitud_interna",
+   "descripcion": "Notebooks para ingresos",
+   "solicitud_recibida_en": "2026-09-16T12:46:00",
+   "creado_en": "2026-09-16T12:55:00"
+  },
+  {
+   "id": "PED-0154",
+   "cliente_interno": "personal",
+   "origen": "solicitud_interna",
+   "descripcion": "Reposición de consumibles de oficina y limpieza",
+   "solicitud_recibida_en": "2026-09-24T11:54:00",
+   "creado_en": "2026-09-24T12:10:00"
+  },
+  {
+   "id": "PED-0155",
+   "cliente_interno": "personal",
+   "origen": "solicitud_interna",
+   "descripcion": "Reposición de consumibles de oficina y limpieza",
+   "solicitud_recibida_en": "2026-09-29T15:30:00",
+   "creado_en": "2026-09-29T15:40:00"
+  },
+  {
+   "id": "PED-0156",
+   "cliente_interno": "personal",
+   "origen": "solicitud_interna",
+   "descripcion": "Sillas para puestos nuevos",
+   "solicitud_recibida_en": "2026-10-06T08:04:00",
+   "creado_en": "2026-10-06T08:25:00"
+  },
+  {
+   "id": "PED-0157",
+   "cliente_interno": "ventas",
+   "origen": "solicitud_interna",
+   "descripcion": "Tóner HP 85A para reventa",
+   "solicitud_recibida_en": "2026-10-13T07:50:00",
+   "creado_en": "2026-10-13T08:10:00"
+  }
+ ],
+ "precios": [
+  {
+   "fecha": "2025-11-11T09:10:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 227.5,
+   "pedido_id": "PED-0101"
+  },
+  {
+   "fecha": "2025-11-11T09:10:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 152.7,
+   "pedido_id": "PED-0101"
+  },
+  {
+   "fecha": "2025-11-11T11:10:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 174.75,
+   "pedido_id": "PED-0101"
+  },
+  {
+   "fecha": "2025-11-11T11:10:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 114.35,
+   "pedido_id": "PED-0101"
+  },
+  {
+   "fecha": "2025-11-19T13:52:00",
+   "producto_id": "toner",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 3208,
+   "pedido_id": "PED-0102"
+  },
+  {
+   "fecha": "2025-11-19T12:37:00",
+   "producto_id": "toner",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 4323,
+   "pedido_id": "PED-0102"
+  },
+  {
+   "fecha": "2025-11-19T15:20:00",
+   "producto_id": "toner",
+   "proveedor_id": "tecnoimport",
+   "precio_sin_iva": 3791,
+   "pedido_id": "PED-0102"
+  },
+  {
+   "fecha": "2025-11-23T10:31:00",
+   "producto_id": "toner",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 3167,
+   "pedido_id": "PED-0103"
+  },
+  {
+   "fecha": "2025-11-23T10:35:00",
+   "producto_id": "toner",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 4142,
+   "pedido_id": "PED-0103"
+  },
+  {
+   "fecha": "2025-11-23T12:13:00",
+   "producto_id": "toner",
+   "proveedor_id": "tecnoimport",
+   "precio_sin_iva": 3712,
+   "pedido_id": "PED-0103"
+  },
+  {
+   "fecha": "2025-11-28T15:26:00",
+   "producto_id": "toner",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 3196,
+   "pedido_id": "PED-0104"
+  },
+  {
+   "fecha": "2025-11-28T17:15:00",
+   "producto_id": "toner",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 4118,
+   "pedido_id": "PED-0104"
+  },
+  {
+   "fecha": "2025-11-28T17:46:00",
+   "producto_id": "toner",
+   "proveedor_id": "tecnoimport",
+   "precio_sin_iva": 3712,
+   "pedido_id": "PED-0104"
+  },
+  {
+   "fecha": "2025-12-02T15:31:00",
+   "producto_id": "toner",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 3205,
+   "pedido_id": "PED-0105"
+  },
+  {
+   "fecha": "2025-12-02T17:11:00",
+   "producto_id": "toner",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 4164,
+   "pedido_id": "PED-0105"
+  },
+  {
+   "fecha": "2025-12-02T16:37:00",
+   "producto_id": "toner",
+   "proveedor_id": "tecnoimport",
+   "precio_sin_iva": 3726,
+   "pedido_id": "PED-0105"
+  },
+  {
+   "fecha": "2025-12-07T13:14:00",
+   "producto_id": "toner",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 3186,
+   "pedido_id": "PED-0106"
+  },
+  {
+   "fecha": "2025-12-07T15:12:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 224.1,
+   "pedido_id": "PED-0106"
+  },
+  {
+   "fecha": "2025-12-07T15:12:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 157.67,
+   "pedido_id": "PED-0106"
+  },
+  {
+   "fecha": "2025-12-07T15:12:00",
+   "producto_id": "toner",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 4279,
+   "pedido_id": "PED-0106"
+  },
+  {
+   "fecha": "2025-12-07T14:57:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 173.15,
+   "pedido_id": "PED-0106"
+  },
+  {
+   "fecha": "2025-12-07T14:57:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 112.6,
+   "pedido_id": "PED-0106"
+  },
+  {
+   "fecha": "2025-12-07T15:22:00",
+   "producto_id": "toner",
+   "proveedor_id": "tecnoimport",
+   "precio_sin_iva": 3689,
+   "pedido_id": "PED-0106"
+  },
+  {
+   "fecha": "2025-12-14T17:17:00",
+   "producto_id": "notebook",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 27384,
+   "pedido_id": "PED-0107"
+  },
+  {
+   "fecha": "2025-12-14T19:00:00",
+   "producto_id": "notebook",
+   "proveedor_id": "tecnoimport",
+   "precio_sin_iva": 31466,
+   "pedido_id": "PED-0107"
+  },
+  {
+   "fecha": "2025-12-20T10:44:00",
+   "producto_id": "toner",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 3105,
+   "pedido_id": "PED-0108"
+  },
+  {
+   "fecha": "2025-12-20T11:05:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 225.6,
+   "pedido_id": "PED-0108"
+  },
+  {
+   "fecha": "2025-12-20T11:05:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 150.54,
+   "pedido_id": "PED-0108"
+  },
+  {
+   "fecha": "2025-12-20T11:05:00",
+   "producto_id": "toner",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 4222,
+   "pedido_id": "PED-0108"
+  },
+  {
+   "fecha": "2025-12-20T14:22:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 178.71,
+   "pedido_id": "PED-0108"
+  },
+  {
+   "fecha": "2025-12-20T14:22:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 110.81,
+   "pedido_id": "PED-0108"
+  },
+  {
+   "fecha": "2025-12-20T12:01:00",
+   "producto_id": "toner",
+   "proveedor_id": "tecnoimport",
+   "precio_sin_iva": 3785,
+   "pedido_id": "PED-0108"
+  },
+  {
+   "fecha": "2025-12-24T17:19:00",
+   "producto_id": "silla",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 11892,
+   "pedido_id": "PED-0109"
+  },
+  {
+   "fecha": "2025-12-24T22:14:00",
+   "producto_id": "silla",
+   "proveedor_id": "muebleria_rivera",
+   "precio_sin_iva": 9528,
+   "pedido_id": "PED-0109"
+  },
+  {
+   "fecha": "2025-12-24T17:06:00",
+   "producto_id": "silla",
+   "proveedor_id": "ofisillas",
+   "precio_sin_iva": 10663,
+   "pedido_id": "PED-0109"
+  },
+  {
+   "fecha": "2025-12-31T09:34:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 225.11,
+   "pedido_id": "PED-0110"
+  },
+  {
+   "fecha": "2025-12-31T09:34:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 152.1,
+   "pedido_id": "PED-0110"
+  },
+  {
+   "fecha": "2025-12-31T12:41:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 175.73,
+   "pedido_id": "PED-0110"
+  },
+  {
+   "fecha": "2025-12-31T12:41:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 112.17,
+   "pedido_id": "PED-0110"
+  },
+  {
+   "fecha": "2026-01-07T16:16:00",
+   "producto_id": "silla",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 12165,
+   "pedido_id": "PED-0111"
+  },
+  {
+   "fecha": "2026-01-07T19:16:00",
+   "producto_id": "silla",
+   "proveedor_id": "muebleria_rivera",
+   "precio_sin_iva": 9789,
+   "pedido_id": "PED-0111"
+  },
+  {
+   "fecha": "2026-01-07T16:08:00",
+   "producto_id": "silla",
+   "proveedor_id": "ofisillas",
+   "precio_sin_iva": 10631,
+   "pedido_id": "PED-0111"
+  },
+  {
+   "fecha": "2026-01-12T08:52:00",
+   "producto_id": "toner",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 3233,
+   "pedido_id": "PED-0112"
+  },
+  {
+   "fecha": "2026-01-12T08:53:00",
+   "producto_id": "toner",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 4281,
+   "pedido_id": "PED-0112"
+  },
+  {
+   "fecha": "2026-01-12T10:22:00",
+   "producto_id": "toner",
+   "proveedor_id": "tecnoimport",
+   "precio_sin_iva": 3828,
+   "pedido_id": "PED-0112"
+  },
+  {
+   "fecha": "2026-01-18T13:23:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 233.75,
+   "pedido_id": "PED-0113"
+  },
+  {
+   "fecha": "2026-01-18T13:23:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 155.18,
+   "pedido_id": "PED-0113"
+  },
+  {
+   "fecha": "2026-01-18T13:23:00",
+   "producto_id": "toner",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 4230,
+   "pedido_id": "PED-0113"
+  },
+  {
+   "fecha": "2026-01-18T14:35:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 173.84,
+   "pedido_id": "PED-0113"
+  },
+  {
+   "fecha": "2026-01-18T14:35:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 109.2,
+   "pedido_id": "PED-0113"
+  },
+  {
+   "fecha": "2026-01-18T14:39:00",
+   "producto_id": "toner",
+   "proveedor_id": "tecnoimport",
+   "precio_sin_iva": 3755,
+   "pedido_id": "PED-0113"
+  },
+  {
+   "fecha": "2026-01-26T12:41:00",
+   "producto_id": "silla",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 12076,
+   "pedido_id": "PED-0114"
+  },
+  {
+   "fecha": "2026-01-26T14:40:00",
+   "producto_id": "silla",
+   "proveedor_id": "muebleria_rivera",
+   "precio_sin_iva": 9903,
+   "pedido_id": "PED-0114"
+  },
+  {
+   "fecha": "2026-01-26T12:44:00",
+   "producto_id": "silla",
+   "proveedor_id": "ofisillas",
+   "precio_sin_iva": 10913,
+   "pedido_id": "PED-0114"
+  },
+  {
+   "fecha": "2026-01-30T15:37:00",
+   "producto_id": "silla",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 12329,
+   "pedido_id": "PED-0115"
+  },
+  {
+   "fecha": "2026-01-30T17:24:00",
+   "producto_id": "silla",
+   "proveedor_id": "muebleria_rivera",
+   "precio_sin_iva": 9825,
+   "pedido_id": "PED-0115"
+  },
+  {
+   "fecha": "2026-01-30T15:48:00",
+   "producto_id": "silla",
+   "proveedor_id": "ofisillas",
+   "precio_sin_iva": 10688,
+   "pedido_id": "PED-0115"
+  },
+  {
+   "fecha": "2026-02-03T11:52:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 231.58,
+   "pedido_id": "PED-0116"
+  },
+  {
+   "fecha": "2026-02-03T11:52:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 151.71,
+   "pedido_id": "PED-0116"
+  },
+  {
+   "fecha": "2026-02-03T15:29:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 172.65,
+   "pedido_id": "PED-0116"
+  },
+  {
+   "fecha": "2026-02-03T15:29:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 113.58,
+   "pedido_id": "PED-0116"
+  },
+  {
+   "fecha": "2026-02-07T13:20:00",
+   "producto_id": "toner",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 3249,
+   "pedido_id": "PED-0117"
+  },
+  {
+   "fecha": "2026-02-07T13:46:00",
+   "producto_id": "toner",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 4300,
+   "pedido_id": "PED-0117"
+  },
+  {
+   "fecha": "2026-02-07T15:34:00",
+   "producto_id": "toner",
+   "proveedor_id": "tecnoimport",
+   "precio_sin_iva": 3799,
+   "pedido_id": "PED-0117"
+  },
+  {
+   "fecha": "2026-02-15T13:44:00",
+   "producto_id": "toner",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 3258,
+   "pedido_id": "PED-0118"
+  },
+  {
+   "fecha": "2026-02-15T13:52:00",
+   "producto_id": "toner",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 4243,
+   "pedido_id": "PED-0118"
+  },
+  {
+   "fecha": "2026-02-15T15:42:00",
+   "producto_id": "toner",
+   "proveedor_id": "tecnoimport",
+   "precio_sin_iva": 3727,
+   "pedido_id": "PED-0118"
+  },
+  {
+   "fecha": "2026-02-22T12:14:00",
+   "producto_id": "silla",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 11979,
+   "pedido_id": "PED-0119"
+  },
+  {
+   "fecha": "2026-02-22T16:20:00",
+   "producto_id": "silla",
+   "proveedor_id": "muebleria_rivera",
+   "precio_sin_iva": 9700,
+   "pedido_id": "PED-0119"
+  },
+  {
+   "fecha": "2026-02-22T11:58:00",
+   "producto_id": "silla",
+   "proveedor_id": "ofisillas",
+   "precio_sin_iva": 10975,
+   "pedido_id": "PED-0119"
+  },
+  {
+   "fecha": "2026-02-27T12:58:00",
+   "producto_id": "toner",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 3218,
+   "pedido_id": "PED-0120"
+  },
+  {
+   "fecha": "2026-02-27T13:19:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 234.08,
+   "pedido_id": "PED-0120"
+  },
+  {
+   "fecha": "2026-02-27T13:19:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 153.35,
+   "pedido_id": "PED-0120"
+  },
+  {
+   "fecha": "2026-02-27T13:19:00",
+   "producto_id": "toner",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 4188,
+   "pedido_id": "PED-0120"
+  },
+  {
+   "fecha": "2026-02-27T14:21:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 175.82,
+   "pedido_id": "PED-0120"
+  },
+  {
+   "fecha": "2026-02-27T14:21:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 114.66,
+   "pedido_id": "PED-0120"
+  },
+  {
+   "fecha": "2026-02-27T14:04:00",
+   "producto_id": "toner",
+   "proveedor_id": "tecnoimport",
+   "precio_sin_iva": 3843,
+   "pedido_id": "PED-0120"
+  },
+  {
+   "fecha": "2026-03-03T16:58:00",
+   "producto_id": "toner",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 3210,
+   "pedido_id": "PED-0121"
+  },
+  {
+   "fecha": "2026-03-03T15:19:00",
+   "producto_id": "toner",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 4318,
+   "pedido_id": "PED-0121"
+  },
+  {
+   "fecha": "2026-03-03T16:23:00",
+   "producto_id": "toner",
+   "proveedor_id": "tecnoimport",
+   "precio_sin_iva": 3742,
+   "pedido_id": "PED-0121"
+  },
+  {
+   "fecha": "2026-03-08T15:34:00",
+   "producto_id": "toner",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 3126,
+   "pedido_id": "PED-0122"
+  },
+  {
+   "fecha": "2026-03-08T15:46:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 233.35,
+   "pedido_id": "PED-0122"
+  },
+  {
+   "fecha": "2026-03-08T15:46:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 155.54,
+   "pedido_id": "PED-0122"
+  },
+  {
+   "fecha": "2026-03-08T15:46:00",
+   "producto_id": "toner",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 4260,
+   "pedido_id": "PED-0122"
+  },
+  {
+   "fecha": "2026-03-08T17:06:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 180.39,
+   "pedido_id": "PED-0122"
+  },
+  {
+   "fecha": "2026-03-08T17:06:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 111.3,
+   "pedido_id": "PED-0122"
+  },
+  {
+   "fecha": "2026-03-08T18:01:00",
+   "producto_id": "toner",
+   "proveedor_id": "tecnoimport",
+   "precio_sin_iva": 3806,
+   "pedido_id": "PED-0122"
+  },
+  {
+   "fecha": "2026-03-15T08:58:00",
+   "producto_id": "notebook",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 27223,
+   "pedido_id": "PED-0123"
+  },
+  {
+   "fecha": "2026-03-15T11:11:00",
+   "producto_id": "notebook",
+   "proveedor_id": "tecnoimport",
+   "precio_sin_iva": 30189,
+   "pedido_id": "PED-0123"
+  },
+  {
+   "fecha": "2026-03-20T10:22:00",
+   "producto_id": "silla",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 12005,
+   "pedido_id": "PED-0124"
+  },
+  {
+   "fecha": "2026-03-20T15:34:00",
+   "producto_id": "silla",
+   "proveedor_id": "muebleria_rivera",
+   "precio_sin_iva": 9787,
+   "pedido_id": "PED-0124"
+  },
+  {
+   "fecha": "2026-03-20T10:21:00",
+   "producto_id": "silla",
+   "proveedor_id": "ofisillas",
+   "precio_sin_iva": 10932,
+   "pedido_id": "PED-0124"
+  },
+  {
+   "fecha": "2026-03-24T11:24:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 229.07,
+   "pedido_id": "PED-0125"
+  },
+  {
+   "fecha": "2026-03-24T11:24:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 150.67,
+   "pedido_id": "PED-0125"
+  },
+  {
+   "fecha": "2026-03-24T13:57:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 174.47,
+   "pedido_id": "PED-0125"
+  },
+  {
+   "fecha": "2026-03-24T13:57:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 111.59,
+   "pedido_id": "PED-0125"
+  },
+  {
+   "fecha": "2026-03-28T11:32:00",
+   "producto_id": "notebook",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 27697,
+   "pedido_id": "PED-0126"
+  },
+  {
+   "fecha": "2026-03-28T13:53:00",
+   "producto_id": "notebook",
+   "proveedor_id": "tecnoimport",
+   "precio_sin_iva": 30095,
+   "pedido_id": "PED-0126"
+  },
+  {
+   "fecha": "2026-04-01T13:50:00",
+   "producto_id": "toner",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 3151,
+   "pedido_id": "PED-0127"
+  },
+  {
+   "fecha": "2026-04-01T14:20:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 231.28,
+   "pedido_id": "PED-0127"
+  },
+  {
+   "fecha": "2026-04-01T14:20:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 153.16,
+   "pedido_id": "PED-0127"
+  },
+  {
+   "fecha": "2026-04-01T14:20:00",
+   "producto_id": "toner",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 4177,
+   "pedido_id": "PED-0127"
+  },
+  {
+   "fecha": "2026-04-01T16:52:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 178.03,
+   "pedido_id": "PED-0127"
+  },
+  {
+   "fecha": "2026-04-01T16:52:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 109.62,
+   "pedido_id": "PED-0127"
+  },
+  {
+   "fecha": "2026-04-05T12:40:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 228.91,
+   "pedido_id": "PED-0128"
+  },
+  {
+   "fecha": "2026-04-05T12:40:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 154.15,
+   "pedido_id": "PED-0128"
+  },
+  {
+   "fecha": "2026-04-05T14:23:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 177.61,
+   "pedido_id": "PED-0128"
+  },
+  {
+   "fecha": "2026-04-05T14:23:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 114.63,
+   "pedido_id": "PED-0128"
+  },
+  {
+   "fecha": "2026-04-10T10:29:00",
+   "producto_id": "toner",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 3192,
+   "pedido_id": "PED-0129"
+  },
+  {
+   "fecha": "2026-04-10T10:48:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 233.78,
+   "pedido_id": "PED-0129"
+  },
+  {
+   "fecha": "2026-04-10T10:48:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 153.48,
+   "pedido_id": "PED-0129"
+  },
+  {
+   "fecha": "2026-04-10T10:48:00",
+   "producto_id": "toner",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 4301,
+   "pedido_id": "PED-0129"
+  },
+  {
+   "fecha": "2026-04-10T13:26:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 172.7,
+   "pedido_id": "PED-0129"
+  },
+  {
+   "fecha": "2026-04-10T13:26:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 111.06,
+   "pedido_id": "PED-0129"
+  },
+  {
+   "fecha": "2026-04-10T11:35:00",
+   "producto_id": "toner",
+   "proveedor_id": "tecnoimport",
+   "precio_sin_iva": 3815,
+   "pedido_id": "PED-0129"
+  },
+  {
+   "fecha": "2026-04-14T17:21:00",
+   "producto_id": "toner",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 3117,
+   "pedido_id": "PED-0130"
+  },
+  {
+   "fecha": "2026-04-14T15:35:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 232.1,
+   "pedido_id": "PED-0130"
+  },
+  {
+   "fecha": "2026-04-14T15:35:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 152.35,
+   "pedido_id": "PED-0130"
+  },
+  {
+   "fecha": "2026-04-14T15:35:00",
+   "producto_id": "toner",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 4122,
+   "pedido_id": "PED-0130"
+  },
+  {
+   "fecha": "2026-04-14T17:13:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 176.48,
+   "pedido_id": "PED-0130"
+  },
+  {
+   "fecha": "2026-04-14T17:13:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 112.27,
+   "pedido_id": "PED-0130"
+  },
+  {
+   "fecha": "2026-04-19T08:31:00",
+   "producto_id": "toner",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 3200,
+   "pedido_id": "PED-0131"
+  },
+  {
+   "fecha": "2026-04-19T08:43:00",
+   "producto_id": "toner",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 4189,
+   "pedido_id": "PED-0131"
+  },
+  {
+   "fecha": "2026-04-19T10:31:00",
+   "producto_id": "toner",
+   "proveedor_id": "tecnoimport",
+   "precio_sin_iva": 3833,
+   "pedido_id": "PED-0131"
+  },
+  {
+   "fecha": "2026-04-24T16:33:00",
+   "producto_id": "toner",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 3147,
+   "pedido_id": "PED-0132"
+  },
+  {
+   "fecha": "2026-04-24T16:26:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 224.54,
+   "pedido_id": "PED-0132"
+  },
+  {
+   "fecha": "2026-04-24T16:26:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 151.64,
+   "pedido_id": "PED-0132"
+  },
+  {
+   "fecha": "2026-04-24T16:26:00",
+   "producto_id": "toner",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 4289,
+   "pedido_id": "PED-0132"
+  },
+  {
+   "fecha": "2026-04-24T18:10:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 178.55,
+   "pedido_id": "PED-0132"
+  },
+  {
+   "fecha": "2026-04-24T18:10:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 111.3,
+   "pedido_id": "PED-0132"
+  },
+  {
+   "fecha": "2026-04-24T19:12:00",
+   "producto_id": "toner",
+   "proveedor_id": "tecnoimport",
+   "precio_sin_iva": 3745,
+   "pedido_id": "PED-0132"
+  },
+  {
+   "fecha": "2026-05-02T16:06:00",
+   "producto_id": "silla",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 12092,
+   "pedido_id": "PED-0133"
+  },
+  {
+   "fecha": "2026-05-02T21:59:00",
+   "producto_id": "silla",
+   "proveedor_id": "muebleria_rivera",
+   "precio_sin_iva": 9800,
+   "pedido_id": "PED-0133"
+  },
+  {
+   "fecha": "2026-05-02T16:51:00",
+   "producto_id": "silla",
+   "proveedor_id": "ofisillas",
+   "precio_sin_iva": 10725,
+   "pedido_id": "PED-0133"
+  },
+  {
+   "fecha": "2026-05-09T10:33:00",
+   "producto_id": "toner",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 3151,
+   "pedido_id": "PED-0134"
+  },
+  {
+   "fecha": "2026-05-09T11:05:00",
+   "producto_id": "toner",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 4162,
+   "pedido_id": "PED-0134"
+  },
+  {
+   "fecha": "2026-05-09T13:41:00",
+   "producto_id": "toner",
+   "proveedor_id": "tecnoimport",
+   "precio_sin_iva": 3840,
+   "pedido_id": "PED-0134"
+  },
+  {
+   "fecha": "2026-05-15T14:31:00",
+   "producto_id": "toner",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 3222,
+   "pedido_id": "PED-0135"
+  },
+  {
+   "fecha": "2026-05-15T16:25:00",
+   "producto_id": "toner",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 4312,
+   "pedido_id": "PED-0135"
+  },
+  {
+   "fecha": "2026-05-15T16:37:00",
+   "producto_id": "toner",
+   "proveedor_id": "tecnoimport",
+   "precio_sin_iva": 3772,
+   "pedido_id": "PED-0135"
+  },
+  {
+   "fecha": "2026-05-21T11:05:00",
+   "producto_id": "toner",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 3113,
+   "pedido_id": "PED-0136"
+  },
+  {
+   "fecha": "2026-05-21T11:38:00",
+   "producto_id": "toner",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 4216,
+   "pedido_id": "PED-0136"
+  },
+  {
+   "fecha": "2026-05-21T12:51:00",
+   "producto_id": "toner",
+   "proveedor_id": "tecnoimport",
+   "precio_sin_iva": 3672,
+   "pedido_id": "PED-0136"
+  },
+  {
+   "fecha": "2026-05-28T12:08:00",
+   "producto_id": "toner",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 3232,
+   "pedido_id": "PED-0137"
+  },
+  {
+   "fecha": "2026-05-28T12:25:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 224.24,
+   "pedido_id": "PED-0137"
+  },
+  {
+   "fecha": "2026-05-28T12:25:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 155.65,
+   "pedido_id": "PED-0137"
+  },
+  {
+   "fecha": "2026-05-28T12:25:00",
+   "producto_id": "toner",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 4270,
+   "pedido_id": "PED-0137"
+  },
+  {
+   "fecha": "2026-05-28T15:24:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 178.17,
+   "pedido_id": "PED-0137"
+  },
+  {
+   "fecha": "2026-05-28T15:24:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 109.92,
+   "pedido_id": "PED-0137"
+  },
+  {
+   "fecha": "2026-05-28T13:58:00",
+   "producto_id": "toner",
+   "proveedor_id": "tecnoimport",
+   "precio_sin_iva": 3802,
+   "pedido_id": "PED-0137"
+  },
+  {
+   "fecha": "2026-06-05T12:31:00",
+   "producto_id": "toner",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 3154,
+   "pedido_id": "PED-0138"
+  },
+  {
+   "fecha": "2026-06-05T13:01:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 228.29,
+   "pedido_id": "PED-0138"
+  },
+  {
+   "fecha": "2026-06-05T13:01:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 154.59,
+   "pedido_id": "PED-0138"
+  },
+  {
+   "fecha": "2026-06-05T13:01:00",
+   "producto_id": "toner",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 4322,
+   "pedido_id": "PED-0138"
+  },
+  {
+   "fecha": "2026-06-05T15:22:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 173.6,
+   "pedido_id": "PED-0138"
+  },
+  {
+   "fecha": "2026-06-05T15:22:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 112.17,
+   "pedido_id": "PED-0138"
+  },
+  {
+   "fecha": "2026-06-05T15:46:00",
+   "producto_id": "toner",
+   "proveedor_id": "tecnoimport",
+   "precio_sin_iva": 3760,
+   "pedido_id": "PED-0138"
+  },
+  {
+   "fecha": "2026-06-11T09:51:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 227.13,
+   "pedido_id": "PED-0139"
+  },
+  {
+   "fecha": "2026-06-11T09:51:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 152.58,
+   "pedido_id": "PED-0139"
+  },
+  {
+   "fecha": "2026-06-11T13:03:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 173.01,
+   "pedido_id": "PED-0139"
+  },
+  {
+   "fecha": "2026-06-11T13:03:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 114.75,
+   "pedido_id": "PED-0139"
+  },
+  {
+   "fecha": "2026-06-18T09:42:00",
+   "producto_id": "toner",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 3153,
+   "pedido_id": "PED-0140"
+  },
+  {
+   "fecha": "2026-06-18T10:01:00",
+   "producto_id": "toner",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 4122,
+   "pedido_id": "PED-0140"
+  },
+  {
+   "fecha": "2026-06-18T12:20:00",
+   "producto_id": "toner",
+   "proveedor_id": "tecnoimport",
+   "precio_sin_iva": 3792,
+   "pedido_id": "PED-0140"
+  },
+  {
+   "fecha": "2026-06-24T12:20:00",
+   "producto_id": "toner",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 3163,
+   "pedido_id": "PED-0141"
+  },
+  {
+   "fecha": "2026-06-24T10:49:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 230.95,
+   "pedido_id": "PED-0141"
+  },
+  {
+   "fecha": "2026-06-24T10:49:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 153.24,
+   "pedido_id": "PED-0141"
+  },
+  {
+   "fecha": "2026-06-24T10:49:00",
+   "producto_id": "toner",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 4188,
+   "pedido_id": "PED-0141"
+  },
+  {
+   "fecha": "2026-06-24T13:05:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 177.5,
+   "pedido_id": "PED-0141"
+  },
+  {
+   "fecha": "2026-06-24T13:05:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 111.77,
+   "pedido_id": "PED-0141"
+  },
+  {
+   "fecha": "2026-06-24T12:22:00",
+   "producto_id": "toner",
+   "proveedor_id": "tecnoimport",
+   "precio_sin_iva": 3762,
+   "pedido_id": "PED-0141"
+  },
+  {
+   "fecha": "2026-07-02T15:36:00",
+   "producto_id": "toner",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 3156,
+   "pedido_id": "PED-0142"
+  },
+  {
+   "fecha": "2026-07-02T17:32:00",
+   "producto_id": "toner",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 4122,
+   "pedido_id": "PED-0142"
+  },
+  {
+   "fecha": "2026-07-02T17:22:00",
+   "producto_id": "toner",
+   "proveedor_id": "tecnoimport",
+   "precio_sin_iva": 3786,
+   "pedido_id": "PED-0142"
+  },
+  {
+   "fecha": "2026-07-08T14:29:00",
+   "producto_id": "toner",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 3211,
+   "pedido_id": "PED-0143"
+  },
+  {
+   "fecha": "2026-07-08T15:01:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 225.15,
+   "pedido_id": "PED-0143"
+  },
+  {
+   "fecha": "2026-07-08T15:01:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 152.76,
+   "pedido_id": "PED-0143"
+  },
+  {
+   "fecha": "2026-07-08T15:01:00",
+   "producto_id": "toner",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 4148,
+   "pedido_id": "PED-0143"
+  },
+  {
+   "fecha": "2026-07-08T16:38:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 178.13,
+   "pedido_id": "PED-0143"
+  },
+  {
+   "fecha": "2026-07-08T16:38:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 109.81,
+   "pedido_id": "PED-0143"
+  },
+  {
+   "fecha": "2026-07-08T16:24:00",
+   "producto_id": "toner",
+   "proveedor_id": "tecnoimport",
+   "precio_sin_iva": 3756,
+   "pedido_id": "PED-0143"
+  },
+  {
+   "fecha": "2026-07-15T09:37:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 233.69,
+   "pedido_id": "PED-0144"
+  },
+  {
+   "fecha": "2026-07-15T09:37:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 157.81,
+   "pedido_id": "PED-0144"
+  },
+  {
+   "fecha": "2026-07-15T12:29:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 175.41,
+   "pedido_id": "PED-0144"
+  },
+  {
+   "fecha": "2026-07-15T12:29:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 113.13,
+   "pedido_id": "PED-0144"
+  },
+  {
+   "fecha": "2026-07-21T11:28:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 224.04,
+   "pedido_id": "PED-0145"
+  },
+  {
+   "fecha": "2026-07-21T11:28:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 151.04,
+   "pedido_id": "PED-0145"
+  },
+  {
+   "fecha": "2026-07-21T13:23:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 180.07,
+   "pedido_id": "PED-0145"
+  },
+  {
+   "fecha": "2026-07-21T13:23:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 109.74,
+   "pedido_id": "PED-0145"
+  },
+  {
+   "fecha": "2026-07-29T09:25:00",
+   "producto_id": "notebook",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 27709,
+   "pedido_id": "PED-0146"
+  },
+  {
+   "fecha": "2026-07-29T12:27:00",
+   "producto_id": "notebook",
+   "proveedor_id": "tecnoimport",
+   "precio_sin_iva": 31214,
+   "pedido_id": "PED-0146"
+  },
+  {
+   "fecha": "2026-08-03T08:37:00",
+   "producto_id": "notebook",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 26893,
+   "pedido_id": "PED-0147"
+  },
+  {
+   "fecha": "2026-08-03T10:26:00",
+   "producto_id": "notebook",
+   "proveedor_id": "tecnoimport",
+   "precio_sin_iva": 30564,
+   "pedido_id": "PED-0147"
+  },
+  {
+   "fecha": "2026-08-11T09:01:00",
+   "producto_id": "toner",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 3228,
+   "pedido_id": "PED-0148"
+  },
+  {
+   "fecha": "2026-08-11T09:23:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 231.85,
+   "pedido_id": "PED-0148"
+  },
+  {
+   "fecha": "2026-08-11T09:23:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 154.33,
+   "pedido_id": "PED-0148"
+  },
+  {
+   "fecha": "2026-08-11T09:23:00",
+   "producto_id": "toner",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 4299,
+   "pedido_id": "PED-0148"
+  },
+  {
+   "fecha": "2026-08-11T10:49:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 174.64,
+   "pedido_id": "PED-0148"
+  },
+  {
+   "fecha": "2026-08-11T10:49:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 112.83,
+   "pedido_id": "PED-0148"
+  },
+  {
+   "fecha": "2026-08-11T10:38:00",
+   "producto_id": "toner",
+   "proveedor_id": "tecnoimport",
+   "precio_sin_iva": 3701,
+   "pedido_id": "PED-0148"
+  },
+  {
+   "fecha": "2026-08-19T11:01:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 228.05,
+   "pedido_id": "PED-0149"
+  },
+  {
+   "fecha": "2026-08-19T11:01:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 157.58,
+   "pedido_id": "PED-0149"
+  },
+  {
+   "fecha": "2026-08-19T13:45:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 176.96,
+   "pedido_id": "PED-0149"
+  },
+  {
+   "fecha": "2026-08-19T13:45:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 110.83,
+   "pedido_id": "PED-0149"
+  },
+  {
+   "fecha": "2026-08-25T14:46:00",
+   "producto_id": "silla",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 12119,
+   "pedido_id": "PED-0150"
+  },
+  {
+   "fecha": "2026-08-25T18:03:00",
+   "producto_id": "silla",
+   "proveedor_id": "muebleria_rivera",
+   "precio_sin_iva": 9682,
+   "pedido_id": "PED-0150"
+  },
+  {
+   "fecha": "2026-08-25T14:51:00",
+   "producto_id": "silla",
+   "proveedor_id": "ofisillas",
+   "precio_sin_iva": 10864,
+   "pedido_id": "PED-0150"
+  },
+  {
+   "fecha": "2026-09-01T13:04:00",
+   "producto_id": "toner",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 3219,
+   "pedido_id": "PED-0151"
+  },
+  {
+   "fecha": "2026-09-01T13:28:00",
+   "producto_id": "toner",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 4147,
+   "pedido_id": "PED-0151"
+  },
+  {
+   "fecha": "2026-09-01T14:55:00",
+   "producto_id": "toner",
+   "proveedor_id": "tecnoimport",
+   "precio_sin_iva": 3674,
+   "pedido_id": "PED-0151"
+  },
+  {
+   "fecha": "2026-09-08T12:07:00",
+   "producto_id": "toner",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 3229,
+   "pedido_id": "PED-0152"
+  },
+  {
+   "fecha": "2026-09-08T10:43:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 230.06,
+   "pedido_id": "PED-0152"
+  },
+  {
+   "fecha": "2026-09-08T10:43:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 150.26,
+   "pedido_id": "PED-0152"
+  },
+  {
+   "fecha": "2026-09-08T10:43:00",
+   "producto_id": "toner",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 4117,
+   "pedido_id": "PED-0152"
+  },
+  {
+   "fecha": "2026-09-08T13:27:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 174.51,
+   "pedido_id": "PED-0152"
+  },
+  {
+   "fecha": "2026-09-08T13:27:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 111.81,
+   "pedido_id": "PED-0152"
+  },
+  {
+   "fecha": "2026-09-08T11:55:00",
+   "producto_id": "toner",
+   "proveedor_id": "tecnoimport",
+   "precio_sin_iva": 3686,
+   "pedido_id": "PED-0152"
+  },
+  {
+   "fecha": "2026-09-16T15:12:00",
+   "producto_id": "notebook",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 27589,
+   "pedido_id": "PED-0153"
+  },
+  {
+   "fecha": "2026-09-16T16:32:00",
+   "producto_id": "notebook",
+   "proveedor_id": "tecnoimport",
+   "precio_sin_iva": 30105,
+   "pedido_id": "PED-0153"
+  },
+  {
+   "fecha": "2026-09-24T12:37:00",
+   "producto_id": "toner",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 3168,
+   "pedido_id": "PED-0154"
+  },
+  {
+   "fecha": "2026-09-24T12:47:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 233.18,
+   "pedido_id": "PED-0154"
+  },
+  {
+   "fecha": "2026-09-24T12:47:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 153.86,
+   "pedido_id": "PED-0154"
+  },
+  {
+   "fecha": "2026-09-24T12:47:00",
+   "producto_id": "toner",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 4235,
+   "pedido_id": "PED-0154"
+  },
+  {
+   "fecha": "2026-09-24T14:31:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 174.63,
+   "pedido_id": "PED-0154"
+  },
+  {
+   "fecha": "2026-09-24T14:31:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 113.73,
+   "pedido_id": "PED-0154"
+  },
+  {
+   "fecha": "2026-09-24T14:16:00",
+   "producto_id": "toner",
+   "proveedor_id": "tecnoimport",
+   "precio_sin_iva": 3820,
+   "pedido_id": "PED-0154"
+  },
+  {
+   "fecha": "2026-09-29T16:20:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 225.55,
+   "pedido_id": "PED-0155"
+  },
+  {
+   "fecha": "2026-09-29T16:20:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 152.66,
+   "pedido_id": "PED-0155"
+  },
+  {
+   "fecha": "2026-09-29T17:46:00",
+   "producto_id": "resma_a4",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 177.55,
+   "pedido_id": "PED-0155"
+  },
+  {
+   "fecha": "2026-09-29T17:46:00",
+   "producto_id": "desinfectante",
+   "proveedor_id": "papelera_del_sur",
+   "precio_sin_iva": 113.94,
+   "pedido_id": "PED-0155"
+  },
+  {
+   "fecha": "2026-10-06T08:53:00",
+   "producto_id": "silla",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 12400,
+   "pedido_id": "PED-0156"
+  },
+  {
+   "fecha": "2026-10-06T14:15:00",
+   "producto_id": "silla",
+   "proveedor_id": "muebleria_rivera",
+   "precio_sin_iva": 9800,
+   "pedido_id": "PED-0156"
+  },
+  {
+   "fecha": "2026-10-06T09:07:00",
+   "producto_id": "silla",
+   "proveedor_id": "ofisillas",
+   "precio_sin_iva": 10900,
+   "pedido_id": "PED-0156"
+  },
+  {
+   "fecha": "2026-10-13T08:41:00",
+   "producto_id": "toner",
+   "proveedor_id": "compuservice",
+   "precio_sin_iva": 3196.72,
+   "pedido_id": "PED-0157"
+  },
+  {
+   "fecha": "2026-10-13T08:52:00",
+   "producto_id": "toner",
+   "proveedor_id": "distribuidora_oriental",
+   "precio_sin_iva": 4600,
+   "pedido_id": "PED-0157"
+  },
+  {
+   "fecha": "2026-10-13T10:31:00",
+   "producto_id": "toner",
+   "proveedor_id": "tecnoimport",
+   "precio_sin_iva": 3800,
+   "pedido_id": "PED-0157"
+  }
+ ],
+ "ordenes": [
+  {
+   "numero": "OC-901",
+   "pedido_id": "PED-0101",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "resma_a4",
+   "cantidad": 150,
+   "precio_cotizacion_inicial": 227.5,
+   "precio_unitario_sin_iva": 217.72,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2025-11-11T08:10:00",
+   "emitida_en": "2025-11-11T11:39:59"
+  },
+  {
+   "numero": "OC-902",
+   "pedido_id": "PED-0101",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "desinfectante",
+   "cantidad": 80,
+   "precio_cotizacion_inicial": 152.7,
+   "precio_unitario_sin_iva": 152.7,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2025-11-11T08:10:00",
+   "emitida_en": "2025-11-11T12:26:21"
+  },
+  {
+   "numero": "OC-903",
+   "pedido_id": "PED-0102",
+   "cliente_interno": "ventas",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "cantidad": 20,
+   "precio_cotizacion_inicial": 4323,
+   "precio_unitario_sin_iva": 4323.0,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2025-11-19T11:40:00",
+   "emitida_en": "2025-11-19T15:20:00"
+  },
+  {
+   "numero": "OC-904",
+   "pedido_id": "PED-0103",
+   "cliente_interno": "ventas",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "cantidad": 20,
+   "precio_cotizacion_inicial": 4142,
+   "precio_unitario_sin_iva": 4142,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2025-11-23T10:00:00",
+   "emitida_en": "2025-11-23T13:05:00"
+  },
+  {
+   "numero": "OC-905",
+   "pedido_id": "PED-0104",
+   "cliente_interno": "ventas",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "cantidad": 12,
+   "precio_cotizacion_inicial": 4118,
+   "precio_unitario_sin_iva": 4118,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2025-11-28T14:55:00",
+   "emitida_en": "2025-11-28T17:46:00"
+  },
+  {
+   "numero": "OC-906",
+   "pedido_id": "PED-0105",
+   "cliente_interno": "ventas",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "cantidad": 20,
+   "precio_cotizacion_inicial": 4164,
+   "precio_unitario_sin_iva": 4164,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2025-12-02T15:00:00",
+   "emitida_en": "2025-12-03T15:27:37"
+  },
+  {
+   "numero": "OC-907",
+   "pedido_id": "PED-0106",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "resma_a4",
+   "cantidad": 150,
+   "precio_cotizacion_inicial": 224.1,
+   "precio_unitario_sin_iva": 224.1,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2025-12-07T12:55:00",
+   "emitida_en": "2025-12-07T15:35:52"
+  },
+  {
+   "numero": "OC-908",
+   "pedido_id": "PED-0106",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "desinfectante",
+   "cantidad": 80,
+   "precio_cotizacion_inicial": 157.67,
+   "precio_unitario_sin_iva": 151.21,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2025-12-07T12:55:00",
+   "emitida_en": "2025-12-08T09:50:20"
+  },
+  {
+   "numero": "OC-909",
+   "pedido_id": "PED-0106",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "cantidad": 6,
+   "precio_cotizacion_inicial": 4279,
+   "precio_unitario_sin_iva": 3975.19,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2025-12-07T12:55:00",
+   "emitida_en": "2025-12-08T04:15:40"
+  },
+  {
+   "numero": "OC-910",
+   "pedido_id": "PED-0107",
+   "cliente_interno": "personal",
+   "proveedor_id": "compuservice",
+   "producto_id": "notebook",
+   "cantidad": 5,
+   "precio_cotizacion_inicial": 27384,
+   "precio_unitario_sin_iva": 27384,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2025-12-14T16:55:00",
+   "emitida_en": "2025-12-15T20:33:04"
+  },
+  {
+   "numero": "OC-911",
+   "pedido_id": "PED-0108",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "resma_a4",
+   "cantidad": 150,
+   "precio_cotizacion_inicial": 225.6,
+   "precio_unitario_sin_iva": 225.6,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2025-12-20T10:10:00",
+   "emitida_en": "2025-12-20T21:16:33"
+  },
+  {
+   "numero": "OC-912",
+   "pedido_id": "PED-0108",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "desinfectante",
+   "cantidad": 60,
+   "precio_cotizacion_inicial": 150.54,
+   "precio_unitario_sin_iva": 150.54,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2025-12-20T10:10:00",
+   "emitida_en": "2025-12-20T14:43:56"
+  },
+  {
+   "numero": "OC-913",
+   "pedido_id": "PED-0108",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "cantidad": 8,
+   "precio_cotizacion_inicial": 4222,
+   "precio_unitario_sin_iva": 4032.01,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2025-12-20T10:10:00",
+   "emitida_en": "2025-12-20T15:19:34"
+  },
+  {
+   "numero": "OC-914",
+   "pedido_id": "PED-0109",
+   "cliente_interno": "personal",
+   "proveedor_id": "ofisillas",
+   "producto_id": "silla",
+   "cantidad": 8,
+   "precio_cotizacion_inicial": 10663,
+   "precio_unitario_sin_iva": 10663,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2025-12-24T16:25:00",
+   "emitida_en": "2025-12-25T00:58:23"
+  },
+  {
+   "numero": "OC-915",
+   "pedido_id": "PED-0110",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "resma_a4",
+   "cantidad": 200,
+   "precio_cotizacion_inicial": 225.11,
+   "precio_unitario_sin_iva": 225.11,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2025-12-31T09:00:00",
+   "emitida_en": "2026-01-01T12:53:50"
+  },
+  {
+   "numero": "OC-916",
+   "pedido_id": "PED-0110",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "desinfectante",
+   "cantidad": 40,
+   "precio_cotizacion_inicial": 152.1,
+   "precio_unitario_sin_iva": 152.1,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2025-12-31T09:00:00",
+   "emitida_en": "2025-12-31T12:41:00"
+  },
+  {
+   "numero": "OC-917",
+   "pedido_id": "PED-0111",
+   "cliente_interno": "personal",
+   "proveedor_id": "ofisillas",
+   "producto_id": "silla",
+   "cantidad": 4,
+   "precio_cotizacion_inicial": 10631,
+   "precio_unitario_sin_iva": 10631,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-01-07T15:25:00",
+   "emitida_en": "2026-01-08T08:57:42"
+  },
+  {
+   "numero": "OC-918",
+   "pedido_id": "PED-0112",
+   "cliente_interno": "ventas",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "cantidad": 12,
+   "precio_cotizacion_inicial": 4281,
+   "precio_unitario_sin_iva": 4281,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-01-12T08:25:00",
+   "emitida_en": "2026-01-12T22:11:05"
+  },
+  {
+   "numero": "OC-919",
+   "pedido_id": "PED-0113",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "resma_a4",
+   "cantidad": 200,
+   "precio_cotizacion_inicial": 233.75,
+   "precio_unitario_sin_iva": 233.75,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-01-18T12:25:00",
+   "emitida_en": "2026-01-18T21:42:47"
+  },
+  {
+   "numero": "OC-920",
+   "pedido_id": "PED-0113",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "desinfectante",
+   "cantidad": 60,
+   "precio_cotizacion_inicial": 155.18,
+   "precio_unitario_sin_iva": 150.06,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-01-18T12:25:00",
+   "emitida_en": "2026-01-18T22:07:29"
+  },
+  {
+   "numero": "OC-921",
+   "pedido_id": "PED-0113",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "cantidad": 8,
+   "precio_cotizacion_inicial": 4230,
+   "precio_unitario_sin_iva": 4230.0,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-01-18T12:25:00",
+   "emitida_en": "2026-01-19T04:47:12"
+  },
+  {
+   "numero": "OC-922",
+   "pedido_id": "PED-0114",
+   "cliente_interno": "personal",
+   "proveedor_id": "ofisillas",
+   "producto_id": "silla",
+   "cantidad": 4,
+   "precio_cotizacion_inicial": 10913,
+   "precio_unitario_sin_iva": 10913,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-01-26T12:00:00",
+   "emitida_en": "2026-01-26T21:19:51"
+  },
+  {
+   "numero": "OC-923",
+   "pedido_id": "PED-0115",
+   "cliente_interno": "personal",
+   "proveedor_id": "ofisillas",
+   "producto_id": "silla",
+   "cantidad": 8,
+   "precio_cotizacion_inicial": 10688,
+   "precio_unitario_sin_iva": 10688,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-01-30T14:55:00",
+   "emitida_en": "2026-01-31T13:02:16"
+  },
+  {
+   "numero": "OC-924",
+   "pedido_id": "PED-0116",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "resma_a4",
+   "cantidad": 150,
+   "precio_cotizacion_inicial": 231.58,
+   "precio_unitario_sin_iva": 231.58,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-02-03T11:10:00",
+   "emitida_en": "2026-02-03T16:04:24"
+  },
+  {
+   "numero": "OC-925",
+   "pedido_id": "PED-0116",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "desinfectante",
+   "cantidad": 80,
+   "precio_cotizacion_inicial": 151.71,
+   "precio_unitario_sin_iva": 151.71,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-02-03T11:10:00",
+   "emitida_en": "2026-02-03T16:19:28"
+  },
+  {
+   "numero": "OC-926",
+   "pedido_id": "PED-0117",
+   "cliente_interno": "ventas",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "cantidad": 10,
+   "precio_cotizacion_inicial": 4300,
+   "precio_unitario_sin_iva": 4145.2,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-02-07T13:00:00",
+   "emitida_en": "2026-02-08T00:03:40"
+  },
+  {
+   "numero": "OC-927",
+   "pedido_id": "PED-0118",
+   "cliente_interno": "ventas",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "cantidad": 10,
+   "precio_cotizacion_inicial": 4243,
+   "precio_unitario_sin_iva": 4196.33,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-02-15T13:10:00",
+   "emitida_en": "2026-02-15T16:55:53"
+  },
+  {
+   "numero": "OC-928",
+   "pedido_id": "PED-0119",
+   "cliente_interno": "personal",
+   "proveedor_id": "ofisillas",
+   "producto_id": "silla",
+   "cantidad": 6,
+   "precio_cotizacion_inicial": 10975,
+   "precio_unitario_sin_iva": 10975.0,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-02-22T11:25:00",
+   "emitida_en": "2026-02-22T21:37:02"
+  },
+  {
+   "numero": "OC-929",
+   "pedido_id": "PED-0120",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "resma_a4",
+   "cantidad": 150,
+   "precio_cotizacion_inicial": 234.08,
+   "precio_unitario_sin_iva": 232.91,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-02-27T12:25:00",
+   "emitida_en": "2026-02-28T12:47:57"
+  },
+  {
+   "numero": "OC-930",
+   "pedido_id": "PED-0120",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "desinfectante",
+   "cantidad": 60,
+   "precio_cotizacion_inicial": 153.35,
+   "precio_unitario_sin_iva": 153.35,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-02-27T12:25:00",
+   "emitida_en": "2026-02-27T17:44:50"
+  },
+  {
+   "numero": "OC-931",
+   "pedido_id": "PED-0120",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "cantidad": 6,
+   "precio_cotizacion_inicial": 4188,
+   "precio_unitario_sin_iva": 4188,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-02-27T12:25:00",
+   "emitida_en": "2026-02-27T17:40:55"
+  },
+  {
+   "numero": "OC-932",
+   "pedido_id": "PED-0121",
+   "cliente_interno": "ventas",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "cantidad": 10,
+   "precio_cotizacion_inicial": 4318,
+   "precio_unitario_sin_iva": 4270.5,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-03-03T14:40:00",
+   "emitida_en": "2026-03-03T17:40:03"
+  },
+  {
+   "numero": "OC-933",
+   "pedido_id": "PED-0122",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "resma_a4",
+   "cantidad": 200,
+   "precio_cotizacion_inicial": 233.35,
+   "precio_unitario_sin_iva": 233.35,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-03-08T15:00:00",
+   "emitida_en": "2026-03-08T19:28:20"
+  },
+  {
+   "numero": "OC-934",
+   "pedido_id": "PED-0122",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "desinfectante",
+   "cantidad": 60,
+   "precio_cotizacion_inicial": 155.54,
+   "precio_unitario_sin_iva": 155.54,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-03-08T15:00:00",
+   "emitida_en": "2026-03-08T20:13:39"
+  },
+  {
+   "numero": "OC-935",
+   "pedido_id": "PED-0122",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "cantidad": 8,
+   "precio_cotizacion_inicial": 4260,
+   "precio_unitario_sin_iva": 4260.0,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-03-08T15:00:00",
+   "emitida_en": "2026-03-08T19:52:22"
+  },
+  {
+   "numero": "OC-936",
+   "pedido_id": "PED-0123",
+   "cliente_interno": "personal",
+   "proveedor_id": "compuservice",
+   "producto_id": "notebook",
+   "cantidad": 5,
+   "precio_cotizacion_inicial": 27223,
+   "precio_unitario_sin_iva": 27223,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-03-15T08:40:00",
+   "emitida_en": "2026-03-15T23:46:05"
+  },
+  {
+   "numero": "OC-937",
+   "pedido_id": "PED-0124",
+   "cliente_interno": "personal",
+   "proveedor_id": "ofisillas",
+   "producto_id": "silla",
+   "cantidad": 4,
+   "precio_cotizacion_inicial": 10932,
+   "precio_unitario_sin_iva": 10932,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-03-20T09:40:00",
+   "emitida_en": "2026-03-21T07:54:51"
+  },
+  {
+   "numero": "OC-938",
+   "pedido_id": "PED-0125",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "resma_a4",
+   "cantidad": 150,
+   "precio_cotizacion_inicial": 229.07,
+   "precio_unitario_sin_iva": 221.97,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-03-24T10:25:00",
+   "emitida_en": "2026-03-24T15:53:00"
+  },
+  {
+   "numero": "OC-939",
+   "pedido_id": "PED-0125",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "desinfectante",
+   "cantidad": 40,
+   "precio_cotizacion_inicial": 150.67,
+   "precio_unitario_sin_iva": 150.67,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-03-24T10:25:00",
+   "emitida_en": "2026-03-24T13:57:00"
+  },
+  {
+   "numero": "OC-940",
+   "pedido_id": "PED-0126",
+   "cliente_interno": "personal",
+   "proveedor_id": "compuservice",
+   "producto_id": "notebook",
+   "cantidad": 5,
+   "precio_cotizacion_inicial": 27697,
+   "precio_unitario_sin_iva": 27697,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-03-28T11:00:00",
+   "emitida_en": "2026-03-29T05:59:16"
+  },
+  {
+   "numero": "OC-941",
+   "pedido_id": "PED-0127",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "resma_a4",
+   "cantidad": 150,
+   "precio_cotizacion_inicial": 231.28,
+   "precio_unitario_sin_iva": 226.19,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-04-01T13:25:00",
+   "emitida_en": "2026-04-01T17:51:26"
+  },
+  {
+   "numero": "OC-942",
+   "pedido_id": "PED-0127",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "desinfectante",
+   "cantidad": 60,
+   "precio_cotizacion_inicial": 153.16,
+   "precio_unitario_sin_iva": 153.16,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-04-01T13:25:00",
+   "emitida_en": "2026-04-02T07:45:49"
+  },
+  {
+   "numero": "OC-943",
+   "pedido_id": "PED-0127",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "cantidad": 6,
+   "precio_cotizacion_inicial": 4177,
+   "precio_unitario_sin_iva": 4177.0,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-04-01T13:25:00",
+   "emitida_en": "2026-04-02T17:01:11"
+  },
+  {
+   "numero": "OC-944",
+   "pedido_id": "PED-0128",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "resma_a4",
+   "cantidad": 150,
+   "precio_cotizacion_inicial": 228.91,
+   "precio_unitario_sin_iva": 228.91,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-04-05T12:10:00",
+   "emitida_en": "2026-04-05T16:27:44"
+  },
+  {
+   "numero": "OC-945",
+   "pedido_id": "PED-0128",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "desinfectante",
+   "cantidad": 60,
+   "precio_cotizacion_inicial": 154.15,
+   "precio_unitario_sin_iva": 146.44,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-04-05T12:10:00",
+   "emitida_en": "2026-04-05T14:50:12"
+  },
+  {
+   "numero": "OC-946",
+   "pedido_id": "PED-0129",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "resma_a4",
+   "cantidad": 100,
+   "precio_cotizacion_inicial": 233.78,
+   "precio_unitario_sin_iva": 233.78,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-04-10T09:55:00",
+   "emitida_en": "2026-04-10T14:00:56"
+  },
+  {
+   "numero": "OC-947",
+   "pedido_id": "PED-0129",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "desinfectante",
+   "cantidad": 40,
+   "precio_cotizacion_inicial": 153.48,
+   "precio_unitario_sin_iva": 153.48,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-04-10T09:55:00",
+   "emitida_en": "2026-04-10T13:26:00"
+  },
+  {
+   "numero": "OC-948",
+   "pedido_id": "PED-0129",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "cantidad": 4,
+   "precio_cotizacion_inicial": 4301,
+   "precio_unitario_sin_iva": 4301.0,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-04-10T09:55:00",
+   "emitida_en": "2026-04-10T13:26:00"
+  },
+  {
+   "numero": "OC-949",
+   "pedido_id": "PED-0130",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "resma_a4",
+   "cantidad": 100,
+   "precio_cotizacion_inicial": 232.1,
+   "precio_unitario_sin_iva": 232.1,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-04-14T15:00:00",
+   "emitida_en": "2026-04-15T00:26:18"
+  },
+  {
+   "numero": "OC-950",
+   "pedido_id": "PED-0130",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "desinfectante",
+   "cantidad": 60,
+   "precio_cotizacion_inicial": 152.35,
+   "precio_unitario_sin_iva": 143.97,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-04-14T15:00:00",
+   "emitida_en": "2026-04-15T07:21:05"
+  },
+  {
+   "numero": "OC-951",
+   "pedido_id": "PED-0130",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "cantidad": 4,
+   "precio_cotizacion_inicial": 4122,
+   "precio_unitario_sin_iva": 4122,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-04-14T15:00:00",
+   "emitida_en": "2026-04-15T01:15:33"
+  },
+  {
+   "numero": "OC-952",
+   "pedido_id": "PED-0131",
+   "cliente_interno": "ventas",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "cantidad": 10,
+   "precio_cotizacion_inicial": 4189,
+   "precio_unitario_sin_iva": 3904.15,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-04-19T08:10:00",
+   "emitida_en": "2026-04-20T07:45:28"
+  },
+  {
+   "numero": "OC-953",
+   "pedido_id": "PED-0132",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "resma_a4",
+   "cantidad": 150,
+   "precio_cotizacion_inicial": 224.54,
+   "precio_unitario_sin_iva": 224.54,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-04-24T16:00:00",
+   "emitida_en": "2026-04-24T21:16:40"
+  },
+  {
+   "numero": "OC-954",
+   "pedido_id": "PED-0132",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "desinfectante",
+   "cantidad": 60,
+   "precio_cotizacion_inicial": 151.64,
+   "precio_unitario_sin_iva": 150.88,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-04-24T16:00:00",
+   "emitida_en": "2026-04-25T06:15:35"
+  },
+  {
+   "numero": "OC-955",
+   "pedido_id": "PED-0132",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "cantidad": 4,
+   "precio_cotizacion_inicial": 4289,
+   "precio_unitario_sin_iva": 4289,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-04-24T16:00:00",
+   "emitida_en": "2026-04-24T20:52:06"
+  },
+  {
+   "numero": "OC-956",
+   "pedido_id": "PED-0133",
+   "cliente_interno": "personal",
+   "proveedor_id": "ofisillas",
+   "producto_id": "silla",
+   "cantidad": 8,
+   "precio_cotizacion_inicial": 10725,
+   "precio_unitario_sin_iva": 10725,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-05-02T15:40:00",
+   "emitida_en": "2026-05-03T04:17:08"
+  },
+  {
+   "numero": "OC-957",
+   "pedido_id": "PED-0134",
+   "cliente_interno": "ventas",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "cantidad": 12,
+   "precio_cotizacion_inicial": 4162,
+   "precio_unitario_sin_iva": 4162,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-05-09T10:10:00",
+   "emitida_en": "2026-05-10T07:42:19"
+  },
+  {
+   "numero": "OC-958",
+   "pedido_id": "PED-0135",
+   "cliente_interno": "ventas",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "cantidad": 20,
+   "precio_cotizacion_inicial": 4312,
+   "precio_unitario_sin_iva": 4312.0,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-05-15T14:10:00",
+   "emitida_en": "2026-05-16T09:12:37"
+  },
+  {
+   "numero": "OC-959",
+   "pedido_id": "PED-0136",
+   "cliente_interno": "ventas",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "cantidad": 12,
+   "precio_cotizacion_inicial": 4216,
+   "precio_unitario_sin_iva": 4216,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-05-21T10:40:00",
+   "emitida_en": "2026-05-21T23:40:25"
+  },
+  {
+   "numero": "OC-960",
+   "pedido_id": "PED-0137",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "resma_a4",
+   "cantidad": 200,
+   "precio_cotizacion_inicial": 224.24,
+   "precio_unitario_sin_iva": 224.24,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-05-28T11:40:00",
+   "emitida_en": "2026-05-28T15:24:00"
+  },
+  {
+   "numero": "OC-961",
+   "pedido_id": "PED-0137",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "desinfectante",
+   "cantidad": 60,
+   "precio_cotizacion_inicial": 155.65,
+   "precio_unitario_sin_iva": 155.65,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-05-28T11:40:00",
+   "emitida_en": "2026-05-28T16:48:08"
+  },
+  {
+   "numero": "OC-962",
+   "pedido_id": "PED-0137",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "cantidad": 8,
+   "precio_cotizacion_inicial": 4270,
+   "precio_unitario_sin_iva": 4141.9,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-05-28T11:40:00",
+   "emitida_en": "2026-05-29T14:03:19"
+  },
+  {
+   "numero": "OC-963",
+   "pedido_id": "PED-0138",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "resma_a4",
+   "cantidad": 200,
+   "precio_cotizacion_inicial": 228.29,
+   "precio_unitario_sin_iva": 228.29,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-06-05T12:10:00",
+   "emitida_en": "2026-06-05T17:37:57"
+  },
+  {
+   "numero": "OC-964",
+   "pedido_id": "PED-0138",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "desinfectante",
+   "cantidad": 40,
+   "precio_cotizacion_inicial": 154.59,
+   "precio_unitario_sin_iva": 154.59,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-06-05T12:10:00",
+   "emitida_en": "2026-06-06T03:34:43"
+  },
+  {
+   "numero": "OC-965",
+   "pedido_id": "PED-0138",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "cantidad": 8,
+   "precio_cotizacion_inicial": 4322,
+   "precio_unitario_sin_iva": 4322,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-06-05T12:10:00",
+   "emitida_en": "2026-06-05T15:46:00"
+  },
+  {
+   "numero": "OC-966",
+   "pedido_id": "PED-0139",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "resma_a4",
+   "cantidad": 100,
+   "precio_cotizacion_inicial": 227.13,
+   "precio_unitario_sin_iva": 227.13,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-06-11T09:25:00",
+   "emitida_en": "2026-06-11T14:36:42"
+  },
+  {
+   "numero": "OC-967",
+   "pedido_id": "PED-0139",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "desinfectante",
+   "cantidad": 60,
+   "precio_cotizacion_inicial": 152.58,
+   "precio_unitario_sin_iva": 152.58,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-06-11T09:25:00",
+   "emitida_en": "2026-06-11T22:29:55"
+  },
+  {
+   "numero": "OC-968",
+   "pedido_id": "PED-0140",
+   "cliente_interno": "ventas",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "cantidad": 20,
+   "precio_cotizacion_inicial": 4122,
+   "precio_unitario_sin_iva": 4122,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-06-18T09:10:00",
+   "emitida_en": "2026-06-18T13:23:30"
+  },
+  {
+   "numero": "OC-969",
+   "pedido_id": "PED-0141",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "resma_a4",
+   "cantidad": 200,
+   "precio_cotizacion_inicial": 230.95,
+   "precio_unitario_sin_iva": 221.02,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-06-24T10:00:00",
+   "emitida_en": "2026-06-24T15:29:34"
+  },
+  {
+   "numero": "OC-970",
+   "pedido_id": "PED-0141",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "desinfectante",
+   "cantidad": 40,
+   "precio_cotizacion_inicial": 153.24,
+   "precio_unitario_sin_iva": 141.9,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-06-24T10:00:00",
+   "emitida_en": "2026-06-24T14:37:40"
+  },
+  {
+   "numero": "OC-971",
+   "pedido_id": "PED-0141",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "cantidad": 4,
+   "precio_cotizacion_inicial": 4188,
+   "precio_unitario_sin_iva": 4188,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-06-24T10:00:00",
+   "emitida_en": "2026-06-25T09:10:03"
+  },
+  {
+   "numero": "OC-972",
+   "pedido_id": "PED-0142",
+   "cliente_interno": "ventas",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "cantidad": 20,
+   "precio_cotizacion_inicial": 4122,
+   "precio_unitario_sin_iva": 4122,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-07-02T15:10:00",
+   "emitida_en": "2026-07-02T18:34:05"
+  },
+  {
+   "numero": "OC-973",
+   "pedido_id": "PED-0143",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "resma_a4",
+   "cantidad": 100,
+   "precio_cotizacion_inicial": 225.15,
+   "precio_unitario_sin_iva": 225.15,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-07-08T14:10:00",
+   "emitida_en": "2026-07-09T15:31:57"
+  },
+  {
+   "numero": "OC-974",
+   "pedido_id": "PED-0143",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "desinfectante",
+   "cantidad": 60,
+   "precio_cotizacion_inicial": 152.76,
+   "precio_unitario_sin_iva": 152.76,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-07-08T14:10:00",
+   "emitida_en": "2026-07-08T18:36:13"
+  },
+  {
+   "numero": "OC-975",
+   "pedido_id": "PED-0143",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "cantidad": 8,
+   "precio_cotizacion_inicial": 4148,
+   "precio_unitario_sin_iva": 3940.6,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-07-08T14:10:00",
+   "emitida_en": "2026-07-08T21:18:15"
+  },
+  {
+   "numero": "OC-976",
+   "pedido_id": "PED-0144",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "resma_a4",
+   "cantidad": 150,
+   "precio_cotizacion_inicial": 233.69,
+   "precio_unitario_sin_iva": 233.69,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-07-15T08:40:00",
+   "emitida_en": "2026-07-16T02:58:02"
+  },
+  {
+   "numero": "OC-977",
+   "pedido_id": "PED-0144",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "desinfectante",
+   "cantidad": 40,
+   "precio_cotizacion_inicial": 157.81,
+   "precio_unitario_sin_iva": 151.66,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-07-15T08:40:00",
+   "emitida_en": "2026-07-15T12:29:00"
+  },
+  {
+   "numero": "OC-978",
+   "pedido_id": "PED-0145",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "resma_a4",
+   "cantidad": 200,
+   "precio_cotizacion_inicial": 224.04,
+   "precio_unitario_sin_iva": 211.05,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-07-21T11:00:00",
+   "emitida_en": "2026-07-22T03:02:09"
+  },
+  {
+   "numero": "OC-979",
+   "pedido_id": "PED-0145",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "desinfectante",
+   "cantidad": 60,
+   "precio_cotizacion_inicial": 151.04,
+   "precio_unitario_sin_iva": 151.04,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-07-21T11:00:00",
+   "emitida_en": "2026-07-21T16:12:13"
+  },
+  {
+   "numero": "OC-980",
+   "pedido_id": "PED-0146",
+   "cliente_interno": "personal",
+   "proveedor_id": "compuservice",
+   "producto_id": "notebook",
+   "cantidad": 3,
+   "precio_cotizacion_inicial": 27709,
+   "precio_unitario_sin_iva": 27709,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-07-29T09:10:00",
+   "emitida_en": "2026-07-29T19:13:42"
+  },
+  {
+   "numero": "OC-981",
+   "pedido_id": "PED-0147",
+   "cliente_interno": "personal",
+   "proveedor_id": "compuservice",
+   "producto_id": "notebook",
+   "cantidad": 2,
+   "precio_cotizacion_inicial": 26893,
+   "precio_unitario_sin_iva": 26893,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-08-03T08:10:00",
+   "emitida_en": "2026-08-03T17:51:12"
+  },
+  {
+   "numero": "OC-982",
+   "pedido_id": "PED-0148",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "resma_a4",
+   "cantidad": 150,
+   "precio_cotizacion_inicial": 231.85,
+   "precio_unitario_sin_iva": 231.85,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-08-11T08:25:00",
+   "emitida_en": "2026-08-11T11:30:37"
+  },
+  {
+   "numero": "OC-983",
+   "pedido_id": "PED-0148",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "desinfectante",
+   "cantidad": 60,
+   "precio_cotizacion_inicial": 154.33,
+   "precio_unitario_sin_iva": 154.33,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-08-11T08:25:00",
+   "emitida_en": "2026-08-11T12:12:49"
+  },
+  {
+   "numero": "OC-984",
+   "pedido_id": "PED-0148",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "cantidad": 6,
+   "precio_cotizacion_inicial": 4299,
+   "precio_unitario_sin_iva": 4299,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-08-11T08:25:00",
+   "emitida_en": "2026-08-11T13:03:57"
+  },
+  {
+   "numero": "OC-985",
+   "pedido_id": "PED-0149",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "resma_a4",
+   "cantidad": 100,
+   "precio_cotizacion_inicial": 228.05,
+   "precio_unitario_sin_iva": 228.05,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-08-19T10:10:00",
+   "emitida_en": "2026-08-20T13:24:39"
+  },
+  {
+   "numero": "OC-986",
+   "pedido_id": "PED-0149",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "desinfectante",
+   "cantidad": 80,
+   "precio_cotizacion_inicial": 157.58,
+   "precio_unitario_sin_iva": 147.65,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-08-19T10:10:00",
+   "emitida_en": "2026-08-20T07:16:20"
+  },
+  {
+   "numero": "OC-987",
+   "pedido_id": "PED-0150",
+   "cliente_interno": "personal",
+   "proveedor_id": "ofisillas",
+   "producto_id": "silla",
+   "cantidad": 8,
+   "precio_cotizacion_inicial": 10864,
+   "precio_unitario_sin_iva": 10864,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-08-25T13:55:00",
+   "emitida_en": "2026-08-26T05:28:51"
+  },
+  {
+   "numero": "OC-988",
+   "pedido_id": "PED-0151",
+   "cliente_interno": "ventas",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "cantidad": 10,
+   "precio_cotizacion_inicial": 4147,
+   "precio_unitario_sin_iva": 4147,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-09-01T12:40:00",
+   "emitida_en": "2026-09-01T16:18:56"
+  },
+  {
+   "numero": "OC-989",
+   "pedido_id": "PED-0152",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "resma_a4",
+   "cantidad": 100,
+   "precio_cotizacion_inicial": 230.06,
+   "precio_unitario_sin_iva": 224.31,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-09-08T09:55:00",
+   "emitida_en": "2026-09-08T13:27:00"
+  },
+  {
+   "numero": "OC-990",
+   "pedido_id": "PED-0152",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "desinfectante",
+   "cantidad": 60,
+   "precio_cotizacion_inicial": 150.26,
+   "precio_unitario_sin_iva": 150.26,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-09-08T09:55:00",
+   "emitida_en": "2026-09-09T01:40:46"
+  },
+  {
+   "numero": "OC-991",
+   "pedido_id": "PED-0152",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "cantidad": 4,
+   "precio_cotizacion_inicial": 4117,
+   "precio_unitario_sin_iva": 3985.26,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-09-08T09:55:00",
+   "emitida_en": "2026-09-08T14:18:52"
+  },
+  {
+   "numero": "OC-992",
+   "pedido_id": "PED-0153",
+   "cliente_interno": "personal",
+   "proveedor_id": "compuservice",
+   "producto_id": "notebook",
+   "cantidad": 5,
+   "precio_cotizacion_inicial": 27589,
+   "precio_unitario_sin_iva": 27589,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-09-16T12:55:00",
+   "emitida_en": "2026-09-17T13:10:21"
+  },
+  {
+   "numero": "OC-993",
+   "pedido_id": "PED-0154",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "resma_a4",
+   "cantidad": 150,
+   "precio_cotizacion_inicial": 233.18,
+   "precio_unitario_sin_iva": 233.18,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-09-24T12:10:00",
+   "emitida_en": "2026-09-24T15:19:00"
+  },
+  {
+   "numero": "OC-994",
+   "pedido_id": "PED-0154",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "desinfectante",
+   "cantidad": 40,
+   "precio_cotizacion_inicial": 153.86,
+   "precio_unitario_sin_iva": 153.86,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-09-24T12:10:00",
+   "emitida_en": "2026-09-24T17:26:11"
+  },
+  {
+   "numero": "OC-995",
+   "pedido_id": "PED-0154",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "cantidad": 4,
+   "precio_cotizacion_inicial": 4235,
+   "precio_unitario_sin_iva": 4235,
+   "emitida_por": "agente",
+   "pedido_creado_en": "2026-09-24T12:10:00",
+   "emitida_en": "2026-09-24T16:39:44"
+  },
+  {
+   "numero": "OC-996",
+   "pedido_id": "PED-0155",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "resma_a4",
+   "cantidad": 150,
+   "precio_cotizacion_inicial": 225.55,
+   "precio_unitario_sin_iva": 225.55,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-09-29T15:40:00",
+   "emitida_en": "2026-09-30T07:30:19"
+  },
+  {
+   "numero": "OC-997",
+   "pedido_id": "PED-0155",
+   "cliente_interno": "personal",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "desinfectante",
+   "cantidad": 60,
+   "precio_cotizacion_inicial": 152.66,
+   "precio_unitario_sin_iva": 146.4,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-09-29T15:40:00",
+   "emitida_en": "2026-09-30T03:06:37"
+  },
+  {
+   "numero": "OC-998",
+   "pedido_id": "PED-0156",
+   "cliente_interno": "personal",
+   "proveedor_id": "ofisillas",
+   "producto_id": "silla",
+   "cantidad": 6,
+   "precio_cotizacion_inicial": 10900,
+   "precio_unitario_sin_iva": 10900,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-10-06T08:25:00",
+   "emitida_en": "2026-10-06T17:43:45"
+  },
+  {
+   "numero": "OC-999",
+   "pedido_id": "PED-0157",
+   "cliente_interno": "ventas",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "cantidad": 12,
+   "precio_cotizacion_inicial": 4600,
+   "precio_unitario_sin_iva": 4600,
+   "emitida_por": "usuario",
+   "pedido_creado_en": "2026-10-13T08:10:00",
+   "emitida_en": "2026-10-14T08:00:47"
+  }
+ ],
+ "cotizaciones": [
+  {
+   "pedido_id": "PED-0101",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2025-11-11T09:10:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0101",
+   "proveedor_id": "papelera_del_sur",
+   "fecha": "2025-11-11T11:10:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0102",
+   "proveedor_id": "compuservice",
+   "fecha": "2025-11-19T13:52:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0102",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2025-11-19T12:37:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0102",
+   "proveedor_id": "tecnoimport",
+   "fecha": "2025-11-19T15:20:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0103",
+   "proveedor_id": "compuservice",
+   "fecha": "2025-11-23T10:31:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0103",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2025-11-23T10:35:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0103",
+   "proveedor_id": "tecnoimport",
+   "fecha": "2025-11-23T12:13:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0104",
+   "proveedor_id": "compuservice",
+   "fecha": "2025-11-28T15:26:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0104",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2025-11-28T17:15:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0104",
+   "proveedor_id": "tecnoimport",
+   "fecha": "2025-11-28T17:46:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0105",
+   "proveedor_id": "compuservice",
+   "fecha": "2025-12-02T15:31:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0105",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2025-12-02T17:11:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0105",
+   "proveedor_id": "tecnoimport",
+   "fecha": "2025-12-02T16:37:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0106",
+   "proveedor_id": "compuservice",
+   "fecha": "2025-12-07T13:14:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0106",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2025-12-07T15:12:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0106",
+   "proveedor_id": "papelera_del_sur",
+   "fecha": "2025-12-07T14:57:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0106",
+   "proveedor_id": "tecnoimport",
+   "fecha": "2025-12-07T15:22:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0107",
+   "proveedor_id": "compuservice",
+   "fecha": "2025-12-14T17:17:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0107",
+   "proveedor_id": "tecnoimport",
+   "fecha": "2025-12-14T19:00:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0108",
+   "proveedor_id": "compuservice",
+   "fecha": "2025-12-20T10:44:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0108",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2025-12-20T11:05:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0108",
+   "proveedor_id": "papelera_del_sur",
+   "fecha": "2025-12-20T14:22:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0108",
+   "proveedor_id": "tecnoimport",
+   "fecha": "2025-12-20T12:01:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0109",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2025-12-24T17:19:00",
+   "corregida": true
+  },
+  {
+   "pedido_id": "PED-0109",
+   "proveedor_id": "muebleria_rivera",
+   "fecha": "2025-12-24T22:14:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0109",
+   "proveedor_id": "ofisillas",
+   "fecha": "2025-12-24T17:06:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0110",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2025-12-31T09:34:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0110",
+   "proveedor_id": "papelera_del_sur",
+   "fecha": "2025-12-31T12:41:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0111",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-01-07T16:16:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0111",
+   "proveedor_id": "muebleria_rivera",
+   "fecha": "2026-01-07T19:16:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0111",
+   "proveedor_id": "ofisillas",
+   "fecha": "2026-01-07T16:08:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0112",
+   "proveedor_id": "compuservice",
+   "fecha": "2026-01-12T08:52:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0112",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-01-12T08:53:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0112",
+   "proveedor_id": "tecnoimport",
+   "fecha": "2026-01-12T10:22:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0113",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-01-18T13:23:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0113",
+   "proveedor_id": "papelera_del_sur",
+   "fecha": "2026-01-18T14:35:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0113",
+   "proveedor_id": "tecnoimport",
+   "fecha": "2026-01-18T14:39:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0114",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-01-26T12:41:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0114",
+   "proveedor_id": "muebleria_rivera",
+   "fecha": "2026-01-26T14:40:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0114",
+   "proveedor_id": "ofisillas",
+   "fecha": "2026-01-26T12:44:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0115",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-01-30T15:37:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0115",
+   "proveedor_id": "muebleria_rivera",
+   "fecha": "2026-01-30T17:24:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0115",
+   "proveedor_id": "ofisillas",
+   "fecha": "2026-01-30T15:48:00",
+   "corregida": true
+  },
+  {
+   "pedido_id": "PED-0116",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-02-03T11:52:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0116",
+   "proveedor_id": "papelera_del_sur",
+   "fecha": "2026-02-03T15:29:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0117",
+   "proveedor_id": "compuservice",
+   "fecha": "2026-02-07T13:20:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0117",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-02-07T13:46:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0117",
+   "proveedor_id": "tecnoimport",
+   "fecha": "2026-02-07T15:34:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0118",
+   "proveedor_id": "compuservice",
+   "fecha": "2026-02-15T13:44:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0118",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-02-15T13:52:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0118",
+   "proveedor_id": "tecnoimport",
+   "fecha": "2026-02-15T15:42:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0119",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-02-22T12:14:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0119",
+   "proveedor_id": "muebleria_rivera",
+   "fecha": "2026-02-22T16:20:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0119",
+   "proveedor_id": "ofisillas",
+   "fecha": "2026-02-22T11:58:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0120",
+   "proveedor_id": "compuservice",
+   "fecha": "2026-02-27T12:58:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0120",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-02-27T13:19:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0120",
+   "proveedor_id": "papelera_del_sur",
+   "fecha": "2026-02-27T14:21:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0120",
+   "proveedor_id": "tecnoimport",
+   "fecha": "2026-02-27T14:04:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0121",
+   "proveedor_id": "compuservice",
+   "fecha": "2026-03-03T16:58:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0121",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-03-03T15:19:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0121",
+   "proveedor_id": "tecnoimport",
+   "fecha": "2026-03-03T16:23:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0122",
+   "proveedor_id": "compuservice",
+   "fecha": "2026-03-08T15:34:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0122",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-03-08T15:46:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0122",
+   "proveedor_id": "papelera_del_sur",
+   "fecha": "2026-03-08T17:06:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0122",
+   "proveedor_id": "tecnoimport",
+   "fecha": "2026-03-08T18:01:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0123",
+   "proveedor_id": "compuservice",
+   "fecha": "2026-03-15T08:58:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0123",
+   "proveedor_id": "tecnoimport",
+   "fecha": "2026-03-15T11:11:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0124",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-03-20T10:22:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0124",
+   "proveedor_id": "muebleria_rivera",
+   "fecha": "2026-03-20T15:34:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0124",
+   "proveedor_id": "ofisillas",
+   "fecha": "2026-03-20T10:21:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0125",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-03-24T11:24:00",
+   "corregida": true
+  },
+  {
+   "pedido_id": "PED-0125",
+   "proveedor_id": "papelera_del_sur",
+   "fecha": "2026-03-24T13:57:00",
+   "corregida": true
+  },
+  {
+   "pedido_id": "PED-0126",
+   "proveedor_id": "compuservice",
+   "fecha": "2026-03-28T11:32:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0126",
+   "proveedor_id": "tecnoimport",
+   "fecha": "2026-03-28T13:53:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0127",
+   "proveedor_id": "compuservice",
+   "fecha": "2026-04-01T13:50:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0127",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-04-01T14:20:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0127",
+   "proveedor_id": "papelera_del_sur",
+   "fecha": "2026-04-01T16:52:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0128",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-04-05T12:40:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0128",
+   "proveedor_id": "papelera_del_sur",
+   "fecha": "2026-04-05T14:23:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0129",
+   "proveedor_id": "compuservice",
+   "fecha": "2026-04-10T10:29:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0129",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-04-10T10:48:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0129",
+   "proveedor_id": "papelera_del_sur",
+   "fecha": "2026-04-10T13:26:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0129",
+   "proveedor_id": "tecnoimport",
+   "fecha": "2026-04-10T11:35:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0130",
+   "proveedor_id": "compuservice",
+   "fecha": "2026-04-14T17:21:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0130",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-04-14T15:35:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0130",
+   "proveedor_id": "papelera_del_sur",
+   "fecha": "2026-04-14T17:13:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0131",
+   "proveedor_id": "compuservice",
+   "fecha": "2026-04-19T08:31:00",
+   "corregida": true
+  },
+  {
+   "pedido_id": "PED-0131",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-04-19T08:43:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0131",
+   "proveedor_id": "tecnoimport",
+   "fecha": "2026-04-19T10:31:00",
+   "corregida": true
+  },
+  {
+   "pedido_id": "PED-0132",
+   "proveedor_id": "compuservice",
+   "fecha": "2026-04-24T16:33:00",
+   "corregida": true
+  },
+  {
+   "pedido_id": "PED-0132",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-04-24T16:26:00",
+   "corregida": true
+  },
+  {
+   "pedido_id": "PED-0132",
+   "proveedor_id": "papelera_del_sur",
+   "fecha": "2026-04-24T18:10:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0132",
+   "proveedor_id": "tecnoimport",
+   "fecha": "2026-04-24T19:12:00",
+   "corregida": true
+  },
+  {
+   "pedido_id": "PED-0133",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-05-02T16:06:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0133",
+   "proveedor_id": "muebleria_rivera",
+   "fecha": "2026-05-02T21:59:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0133",
+   "proveedor_id": "ofisillas",
+   "fecha": "2026-05-02T16:51:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0134",
+   "proveedor_id": "compuservice",
+   "fecha": "2026-05-09T10:33:00",
+   "corregida": true
+  },
+  {
+   "pedido_id": "PED-0134",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-05-09T11:05:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0134",
+   "proveedor_id": "tecnoimport",
+   "fecha": "2026-05-09T13:41:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0135",
+   "proveedor_id": "compuservice",
+   "fecha": "2026-05-15T14:31:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0135",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-05-15T16:25:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0135",
+   "proveedor_id": "tecnoimport",
+   "fecha": "2026-05-15T16:37:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0136",
+   "proveedor_id": "compuservice",
+   "fecha": "2026-05-21T11:05:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0136",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-05-21T11:38:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0136",
+   "proveedor_id": "tecnoimport",
+   "fecha": "2026-05-21T12:51:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0137",
+   "proveedor_id": "compuservice",
+   "fecha": "2026-05-28T12:08:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0137",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-05-28T12:25:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0137",
+   "proveedor_id": "papelera_del_sur",
+   "fecha": "2026-05-28T15:24:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0137",
+   "proveedor_id": "tecnoimport",
+   "fecha": "2026-05-28T13:58:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0138",
+   "proveedor_id": "compuservice",
+   "fecha": "2026-06-05T12:31:00",
+   "corregida": true
+  },
+  {
+   "pedido_id": "PED-0138",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-06-05T13:01:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0138",
+   "proveedor_id": "papelera_del_sur",
+   "fecha": "2026-06-05T15:22:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0138",
+   "proveedor_id": "tecnoimport",
+   "fecha": "2026-06-05T15:46:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0139",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-06-11T09:51:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0139",
+   "proveedor_id": "papelera_del_sur",
+   "fecha": "2026-06-11T13:03:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0140",
+   "proveedor_id": "compuservice",
+   "fecha": "2026-06-18T09:42:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0140",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-06-18T10:01:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0140",
+   "proveedor_id": "tecnoimport",
+   "fecha": "2026-06-18T12:20:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0141",
+   "proveedor_id": "compuservice",
+   "fecha": "2026-06-24T12:20:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0141",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-06-24T10:49:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0141",
+   "proveedor_id": "papelera_del_sur",
+   "fecha": "2026-06-24T13:05:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0141",
+   "proveedor_id": "tecnoimport",
+   "fecha": "2026-06-24T12:22:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0142",
+   "proveedor_id": "compuservice",
+   "fecha": "2026-07-02T15:36:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0142",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-07-02T17:32:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0142",
+   "proveedor_id": "tecnoimport",
+   "fecha": "2026-07-02T17:22:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0143",
+   "proveedor_id": "compuservice",
+   "fecha": "2026-07-08T14:29:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0143",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-07-08T15:01:00",
+   "corregida": true
+  },
+  {
+   "pedido_id": "PED-0143",
+   "proveedor_id": "papelera_del_sur",
+   "fecha": "2026-07-08T16:38:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0143",
+   "proveedor_id": "tecnoimport",
+   "fecha": "2026-07-08T16:24:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0144",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-07-15T09:37:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0144",
+   "proveedor_id": "papelera_del_sur",
+   "fecha": "2026-07-15T12:29:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0145",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-07-21T11:28:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0145",
+   "proveedor_id": "papelera_del_sur",
+   "fecha": "2026-07-21T13:23:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0146",
+   "proveedor_id": "compuservice",
+   "fecha": "2026-07-29T09:25:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0146",
+   "proveedor_id": "tecnoimport",
+   "fecha": "2026-07-29T12:27:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0147",
+   "proveedor_id": "compuservice",
+   "fecha": "2026-08-03T08:37:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0147",
+   "proveedor_id": "tecnoimport",
+   "fecha": "2026-08-03T10:26:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0148",
+   "proveedor_id": "compuservice",
+   "fecha": "2026-08-11T09:01:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0148",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-08-11T09:23:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0148",
+   "proveedor_id": "papelera_del_sur",
+   "fecha": "2026-08-11T10:49:00",
+   "corregida": true
+  },
+  {
+   "pedido_id": "PED-0148",
+   "proveedor_id": "tecnoimport",
+   "fecha": "2026-08-11T10:38:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0149",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-08-19T11:01:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0149",
+   "proveedor_id": "papelera_del_sur",
+   "fecha": "2026-08-19T13:45:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0150",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-08-25T14:46:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0150",
+   "proveedor_id": "muebleria_rivera",
+   "fecha": "2026-08-25T18:03:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0150",
+   "proveedor_id": "ofisillas",
+   "fecha": "2026-08-25T14:51:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0151",
+   "proveedor_id": "compuservice",
+   "fecha": "2026-09-01T13:04:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0151",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-09-01T13:28:00",
+   "corregida": true
+  },
+  {
+   "pedido_id": "PED-0151",
+   "proveedor_id": "tecnoimport",
+   "fecha": "2026-09-01T14:55:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0152",
+   "proveedor_id": "compuservice",
+   "fecha": "2026-09-08T12:07:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0152",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-09-08T10:43:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0152",
+   "proveedor_id": "papelera_del_sur",
+   "fecha": "2026-09-08T13:27:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0152",
+   "proveedor_id": "tecnoimport",
+   "fecha": "2026-09-08T11:55:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0153",
+   "proveedor_id": "compuservice",
+   "fecha": "2026-09-16T15:12:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0153",
+   "proveedor_id": "tecnoimport",
+   "fecha": "2026-09-16T16:32:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0154",
+   "proveedor_id": "compuservice",
+   "fecha": "2026-09-24T12:37:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0154",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-09-24T12:47:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0154",
+   "proveedor_id": "papelera_del_sur",
+   "fecha": "2026-09-24T14:31:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0154",
+   "proveedor_id": "tecnoimport",
+   "fecha": "2026-09-24T14:16:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0155",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-09-29T16:20:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0155",
+   "proveedor_id": "papelera_del_sur",
+   "fecha": "2026-09-29T17:46:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0156",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-10-06T08:53:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0156",
+   "proveedor_id": "muebleria_rivera",
+   "fecha": "2026-10-06T14:15:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0156",
+   "proveedor_id": "ofisillas",
+   "fecha": "2026-10-06T09:07:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0157",
+   "proveedor_id": "compuservice",
+   "fecha": "2026-10-13T08:41:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0157",
+   "proveedor_id": "distribuidora_oriental",
+   "fecha": "2026-10-13T08:52:00",
+   "corregida": false
+  },
+  {
+   "pedido_id": "PED-0157",
+   "proveedor_id": "tecnoimport",
+   "fecha": "2026-10-13T10:31:00",
+   "corregida": false
+  }
+ ],
+ "negociaciones": [
+  {
+   "pedido_id": "PED-0101",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "resma_a4",
+   "fecha": "2025-11-11T12:10:00",
+   "estrategia": "volumen",
+   "concesion_simulada_pct": 4.2,
+   "concesion_real_pct": 4.3,
+   "mejora": true
+  },
+  {
+   "pedido_id": "PED-0102",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "fecha": "2025-11-19T16:20:00",
+   "estrategia": "plazo",
+   "concesion_simulada_pct": 2.1,
+   "concesion_real_pct": 0.0,
+   "mejora": false
+  },
+  {
+   "pedido_id": "PED-0106",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "desinfectante",
+   "fecha": "2025-12-07T16:22:00",
+   "estrategia": "plazo",
+   "concesion_simulada_pct": 2.5,
+   "concesion_real_pct": 4.1,
+   "mejora": true
+  },
+  {
+   "pedido_id": "PED-0106",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "fecha": "2025-12-07T16:22:00",
+   "estrategia": "volumen",
+   "concesion_simulada_pct": 4.9,
+   "concesion_real_pct": 7.1,
+   "mejora": true
+  },
+  {
+   "pedido_id": "PED-0108",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "fecha": "2025-12-20T15:22:00",
+   "estrategia": "plazo",
+   "concesion_simulada_pct": 5.9,
+   "concesion_real_pct": 4.5,
+   "mejora": true
+  },
+  {
+   "pedido_id": "PED-0113",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "resma_a4",
+   "fecha": "2026-01-18T15:39:00",
+   "estrategia": "plazo",
+   "concesion_simulada_pct": 0.6,
+   "concesion_real_pct": 0.0,
+   "mejora": false
+  },
+  {
+   "pedido_id": "PED-0113",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "desinfectante",
+   "fecha": "2026-01-18T15:39:00",
+   "estrategia": "competencia",
+   "concesion_simulada_pct": 5.7,
+   "concesion_real_pct": 3.3,
+   "mejora": true
+  },
+  {
+   "pedido_id": "PED-0113",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "fecha": "2026-01-18T15:39:00",
+   "estrategia": "plazo",
+   "concesion_simulada_pct": 0.9,
+   "concesion_real_pct": 0.0,
+   "mejora": false
+  },
+  {
+   "pedido_id": "PED-0117",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "fecha": "2026-02-07T16:34:00",
+   "estrategia": "competencia",
+   "concesion_simulada_pct": 4.2,
+   "concesion_real_pct": 3.6,
+   "mejora": true
+  },
+  {
+   "pedido_id": "PED-0118",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "fecha": "2026-02-15T16:42:00",
+   "estrategia": "volumen",
+   "concesion_simulada_pct": 3.7,
+   "concesion_real_pct": 1.1,
+   "mejora": true
+  },
+  {
+   "pedido_id": "PED-0119",
+   "proveedor_id": "ofisillas",
+   "producto_id": "silla",
+   "fecha": "2026-02-22T17:20:00",
+   "estrategia": "plazo",
+   "concesion_simulada_pct": 2.0,
+   "concesion_real_pct": 0.0,
+   "mejora": false
+  },
+  {
+   "pedido_id": "PED-0120",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "resma_a4",
+   "fecha": "2026-02-27T15:21:00",
+   "estrategia": "plazo",
+   "concesion_simulada_pct": 2.9,
+   "concesion_real_pct": 0.5,
+   "mejora": true
+  },
+  {
+   "pedido_id": "PED-0121",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "fecha": "2026-03-03T17:58:00",
+   "estrategia": "plazo",
+   "concesion_simulada_pct": 2.3,
+   "concesion_real_pct": 1.1,
+   "mejora": true
+  },
+  {
+   "pedido_id": "PED-0122",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "fecha": "2026-03-08T19:01:00",
+   "estrategia": "plazo",
+   "concesion_simulada_pct": 2.1,
+   "concesion_real_pct": 0.0,
+   "mejora": false
+  },
+  {
+   "pedido_id": "PED-0125",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "resma_a4",
+   "fecha": "2026-03-24T14:57:00",
+   "estrategia": "plazo",
+   "concesion_simulada_pct": 5.7,
+   "concesion_real_pct": 3.1,
+   "mejora": true
+  },
+  {
+   "pedido_id": "PED-0127",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "resma_a4",
+   "fecha": "2026-04-01T17:52:00",
+   "estrategia": "competencia",
+   "concesion_simulada_pct": 2.4,
+   "concesion_real_pct": 2.2,
+   "mejora": true
+  },
+  {
+   "pedido_id": "PED-0127",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "fecha": "2026-04-01T17:52:00",
+   "estrategia": "plazo",
+   "concesion_simulada_pct": 0.8,
+   "concesion_real_pct": 0.0,
+   "mejora": false
+  },
+  {
+   "pedido_id": "PED-0128",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "desinfectante",
+   "fecha": "2026-04-05T15:23:00",
+   "estrategia": "volumen",
+   "concesion_simulada_pct": 4.0,
+   "concesion_real_pct": 5.0,
+   "mejora": true
+  },
+  {
+   "pedido_id": "PED-0129",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "fecha": "2026-04-10T14:26:00",
+   "estrategia": "plazo",
+   "concesion_simulada_pct": 0.8,
+   "concesion_real_pct": 0.0,
+   "mejora": false
+  },
+  {
+   "pedido_id": "PED-0130",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "resma_a4",
+   "fecha": "2026-04-14T18:21:00",
+   "estrategia": "volumen",
+   "concesion_simulada_pct": 1.6,
+   "concesion_real_pct": 0.0,
+   "mejora": false
+  },
+  {
+   "pedido_id": "PED-0130",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "desinfectante",
+   "fecha": "2026-04-14T18:21:00",
+   "estrategia": "volumen",
+   "concesion_simulada_pct": 6.0,
+   "concesion_real_pct": 5.5,
+   "mejora": true
+  },
+  {
+   "pedido_id": "PED-0131",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "fecha": "2026-04-19T11:31:00",
+   "estrategia": "volumen",
+   "concesion_simulada_pct": 6.4,
+   "concesion_real_pct": 6.8,
+   "mejora": true
+  },
+  {
+   "pedido_id": "PED-0132",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "desinfectante",
+   "fecha": "2026-04-24T20:12:00",
+   "estrategia": "volumen",
+   "concesion_simulada_pct": 2.5,
+   "concesion_real_pct": 0.5,
+   "mejora": true
+  },
+  {
+   "pedido_id": "PED-0135",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "fecha": "2026-05-15T17:37:00",
+   "estrategia": "plazo",
+   "concesion_simulada_pct": 2.2,
+   "concesion_real_pct": 0.0,
+   "mejora": false
+  },
+  {
+   "pedido_id": "PED-0137",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "fecha": "2026-05-28T16:24:00",
+   "estrategia": "competencia",
+   "concesion_simulada_pct": 4.6,
+   "concesion_real_pct": 3.0,
+   "mejora": true
+  },
+  {
+   "pedido_id": "PED-0141",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "resma_a4",
+   "fecha": "2026-06-24T14:05:00",
+   "estrategia": "volumen",
+   "concesion_simulada_pct": 2.9,
+   "concesion_real_pct": 4.3,
+   "mejora": true
+  },
+  {
+   "pedido_id": "PED-0141",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "desinfectante",
+   "fecha": "2026-06-24T14:05:00",
+   "estrategia": "volumen",
+   "concesion_simulada_pct": 5.1,
+   "concesion_real_pct": 7.4,
+   "mejora": true
+  },
+  {
+   "pedido_id": "PED-0143",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "fecha": "2026-07-08T17:38:00",
+   "estrategia": "volumen",
+   "concesion_simulada_pct": 3.5,
+   "concesion_real_pct": 5.0,
+   "mejora": true
+  },
+  {
+   "pedido_id": "PED-0144",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "desinfectante",
+   "fecha": "2026-07-15T13:29:00",
+   "estrategia": "competencia",
+   "concesion_simulada_pct": 2.8,
+   "concesion_real_pct": 3.9,
+   "mejora": true
+  },
+  {
+   "pedido_id": "PED-0145",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "resma_a4",
+   "fecha": "2026-07-21T14:23:00",
+   "estrategia": "volumen",
+   "concesion_simulada_pct": 3.8,
+   "concesion_real_pct": 5.8,
+   "mejora": true
+  },
+  {
+   "pedido_id": "PED-0145",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "desinfectante",
+   "fecha": "2026-07-21T14:23:00",
+   "estrategia": "competencia",
+   "concesion_simulada_pct": 0.1,
+   "concesion_real_pct": 0.0,
+   "mejora": false
+  },
+  {
+   "pedido_id": "PED-0149",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "desinfectante",
+   "fecha": "2026-08-19T14:45:00",
+   "estrategia": "plazo",
+   "concesion_simulada_pct": 5.5,
+   "concesion_real_pct": 6.3,
+   "mejora": true
+  },
+  {
+   "pedido_id": "PED-0152",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "resma_a4",
+   "fecha": "2026-09-08T14:27:00",
+   "estrategia": "competencia",
+   "concesion_simulada_pct": 2.7,
+   "concesion_real_pct": 2.5,
+   "mejora": true
+  },
+  {
+   "pedido_id": "PED-0152",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "toner",
+   "fecha": "2026-09-08T14:27:00",
+   "estrategia": "competencia",
+   "concesion_simulada_pct": 4.8,
+   "concesion_real_pct": 3.2,
+   "mejora": true
+  },
+  {
+   "pedido_id": "PED-0155",
+   "proveedor_id": "distribuidora_oriental",
+   "producto_id": "desinfectante",
+   "fecha": "2026-09-29T18:46:00",
+   "estrategia": "volumen",
+   "concesion_simulada_pct": 3.6,
+   "concesion_real_pct": 4.1,
+   "mejora": true
+  }
+ ],
+ "contactos": [
+  {
+   "pedido_id": "PED-0101",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2025-11-11T08:15:00",
+   "respondido_en": "2025-11-11T09:10:00"
+  },
+  {
+   "pedido_id": "PED-0101",
+   "proveedor_id": "papelera_del_sur",
+   "canal": "whatsapp",
+   "enviado_en": "2025-11-11T08:16:00",
+   "respondido_en": "2025-11-11T11:10:00"
+  },
+  {
+   "pedido_id": "PED-0101",
+   "proveedor_id": "papelera_del_sur",
+   "canal": "llamada",
+   "enviado_en": "2025-11-11T08:17:00",
+   "respondido_en": "2025-11-11T08:20:00"
+  },
+  {
+   "pedido_id": "PED-0102",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2025-11-19T11:42:00",
+   "respondido_en": null
+  },
+  {
+   "pedido_id": "PED-0102",
+   "proveedor_id": "compuservice",
+   "canal": "llamada",
+   "enviado_en": "2025-11-19T13:42:00",
+   "respondido_en": "2025-11-19T13:52:00"
+  },
+  {
+   "pedido_id": "PED-0102",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2025-11-19T11:46:00",
+   "respondido_en": "2025-11-19T12:37:00"
+  },
+  {
+   "pedido_id": "PED-0102",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2025-11-19T11:44:00",
+   "respondido_en": "2025-11-19T15:20:00"
+  },
+  {
+   "pedido_id": "PED-0103",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2025-11-23T10:01:00",
+   "respondido_en": "2025-11-23T10:31:00"
+  },
+  {
+   "pedido_id": "PED-0103",
+   "proveedor_id": "compuservice",
+   "canal": "llamada",
+   "enviado_en": "2025-11-23T10:01:00",
+   "respondido_en": "2025-11-23T10:20:00"
+  },
+  {
+   "pedido_id": "PED-0103",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2025-11-23T10:05:00",
+   "respondido_en": "2025-11-23T10:35:00"
+  },
+  {
+   "pedido_id": "PED-0103",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "llamada",
+   "enviado_en": "2025-11-23T10:05:00",
+   "respondido_en": "2025-11-23T10:19:00"
+  },
+  {
+   "pedido_id": "PED-0103",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2025-11-23T10:01:00",
+   "respondido_en": null
+  },
+  {
+   "pedido_id": "PED-0103",
+   "proveedor_id": "tecnoimport",
+   "canal": "llamada",
+   "enviado_en": "2025-11-23T12:01:00",
+   "respondido_en": "2025-11-23T12:13:00"
+  },
+  {
+   "pedido_id": "PED-0104",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2025-11-28T14:58:00",
+   "respondido_en": "2025-11-28T15:26:00"
+  },
+  {
+   "pedido_id": "PED-0104",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2025-11-28T14:58:00",
+   "respondido_en": null
+  },
+  {
+   "pedido_id": "PED-0104",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "llamada",
+   "enviado_en": "2025-11-28T16:58:00",
+   "respondido_en": "2025-11-28T17:15:00"
+  },
+  {
+   "pedido_id": "PED-0104",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2025-11-28T14:56:00",
+   "respondido_en": "2025-11-28T17:46:00"
+  },
+  {
+   "pedido_id": "PED-0104",
+   "proveedor_id": "tecnoimport",
+   "canal": "llamada",
+   "enviado_en": "2025-11-28T14:57:00",
+   "respondido_en": "2025-11-28T15:05:00"
+  },
+  {
+   "pedido_id": "PED-0105",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2025-12-02T15:05:00",
+   "respondido_en": "2025-12-02T15:31:00"
+  },
+  {
+   "pedido_id": "PED-0105",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2025-12-02T15:02:00",
+   "respondido_en": null
+  },
+  {
+   "pedido_id": "PED-0105",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "llamada",
+   "enviado_en": "2025-12-02T17:02:00",
+   "respondido_en": "2025-12-02T17:11:00"
+  },
+  {
+   "pedido_id": "PED-0105",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2025-12-02T15:02:00",
+   "respondido_en": "2025-12-02T16:37:00"
+  },
+  {
+   "pedido_id": "PED-0105",
+   "proveedor_id": "tecnoimport",
+   "canal": "llamada",
+   "enviado_en": "2025-12-02T15:03:00",
+   "respondido_en": "2025-12-02T15:15:00"
+  },
+  {
+   "pedido_id": "PED-0106",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2025-12-07T13:00:00",
+   "respondido_en": "2025-12-07T13:14:00"
+  },
+  {
+   "pedido_id": "PED-0106",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2025-12-07T13:01:00",
+   "respondido_en": null
+  },
+  {
+   "pedido_id": "PED-0106",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "llamada",
+   "enviado_en": "2025-12-07T15:01:00",
+   "respondido_en": "2025-12-07T15:12:00"
+  },
+  {
+   "pedido_id": "PED-0106",
+   "proveedor_id": "papelera_del_sur",
+   "canal": "whatsapp",
+   "enviado_en": "2025-12-07T12:59:00",
+   "respondido_en": "2025-12-07T14:57:00"
+  },
+  {
+   "pedido_id": "PED-0106",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2025-12-07T13:01:00",
+   "respondido_en": "2025-12-07T15:22:00"
+  },
+  {
+   "pedido_id": "PED-0107",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2025-12-14T16:57:00",
+   "respondido_en": "2025-12-14T17:17:00"
+  },
+  {
+   "pedido_id": "PED-0107",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2025-12-14T16:57:00",
+   "respondido_en": "2025-12-14T19:00:00"
+  },
+  {
+   "pedido_id": "PED-0108",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2025-12-20T10:12:00",
+   "respondido_en": "2025-12-20T10:44:00"
+  },
+  {
+   "pedido_id": "PED-0108",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2025-12-20T10:12:00",
+   "respondido_en": "2025-12-20T11:05:00"
+  },
+  {
+   "pedido_id": "PED-0108",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "llamada",
+   "enviado_en": "2025-12-20T10:12:00",
+   "respondido_en": "2025-12-20T10:21:00"
+  },
+  {
+   "pedido_id": "PED-0108",
+   "proveedor_id": "papelera_del_sur",
+   "canal": "whatsapp",
+   "enviado_en": "2025-12-20T10:11:00",
+   "respondido_en": "2025-12-20T14:22:00"
+  },
+  {
+   "pedido_id": "PED-0108",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2025-12-20T10:12:00",
+   "respondido_en": "2025-12-20T12:01:00"
+  },
+  {
+   "pedido_id": "PED-0109",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2025-12-24T16:29:00",
+   "respondido_en": "2025-12-24T17:19:00"
+  },
+  {
+   "pedido_id": "PED-0109",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "llamada",
+   "enviado_en": "2025-12-24T16:30:00",
+   "respondido_en": "2025-12-24T16:37:00"
+  },
+  {
+   "pedido_id": "PED-0109",
+   "proveedor_id": "muebleria_rivera",
+   "canal": "whatsapp",
+   "enviado_en": "2025-12-24T16:29:00",
+   "respondido_en": "2025-12-24T22:14:00"
+  },
+  {
+   "pedido_id": "PED-0109",
+   "proveedor_id": "ofisillas",
+   "canal": "whatsapp",
+   "enviado_en": "2025-12-24T16:28:00",
+   "respondido_en": "2025-12-24T17:06:00"
+  },
+  {
+   "pedido_id": "PED-0110",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2025-12-31T09:03:00",
+   "respondido_en": "2025-12-31T09:34:00"
+  },
+  {
+   "pedido_id": "PED-0110",
+   "proveedor_id": "papelera_del_sur",
+   "canal": "whatsapp",
+   "enviado_en": "2025-12-31T09:06:00",
+   "respondido_en": "2025-12-31T12:41:00"
+  },
+  {
+   "pedido_id": "PED-0111",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-01-07T15:26:00",
+   "respondido_en": "2026-01-07T16:16:00"
+  },
+  {
+   "pedido_id": "PED-0111",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "llamada",
+   "enviado_en": "2026-01-07T15:27:00",
+   "respondido_en": "2026-01-07T15:35:00"
+  },
+  {
+   "pedido_id": "PED-0111",
+   "proveedor_id": "muebleria_rivera",
+   "canal": "whatsapp",
+   "enviado_en": "2026-01-07T15:31:00",
+   "respondido_en": "2026-01-07T19:16:00"
+  },
+  {
+   "pedido_id": "PED-0111",
+   "proveedor_id": "ofisillas",
+   "canal": "whatsapp",
+   "enviado_en": "2026-01-07T15:29:00",
+   "respondido_en": "2026-01-07T16:08:00"
+  },
+  {
+   "pedido_id": "PED-0111",
+   "proveedor_id": "ofisillas",
+   "canal": "llamada",
+   "enviado_en": "2026-01-07T15:31:00",
+   "respondido_en": "2026-01-07T15:40:00"
+  },
+  {
+   "pedido_id": "PED-0112",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2026-01-12T08:29:00",
+   "respondido_en": "2026-01-12T08:52:00"
+  },
+  {
+   "pedido_id": "PED-0112",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-01-12T08:26:00",
+   "respondido_en": "2026-01-12T08:53:00"
+  },
+  {
+   "pedido_id": "PED-0112",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2026-01-12T08:26:00",
+   "respondido_en": "2026-01-12T10:22:00"
+  },
+  {
+   "pedido_id": "PED-0112",
+   "proveedor_id": "tecnoimport",
+   "canal": "llamada",
+   "enviado_en": "2026-01-12T08:27:00",
+   "respondido_en": "2026-01-12T08:38:00"
+  },
+  {
+   "pedido_id": "PED-0113",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2026-01-18T12:28:00",
+   "respondido_en": null
+  },
+  {
+   "pedido_id": "PED-0113",
+   "proveedor_id": "compuservice",
+   "canal": "llamada",
+   "enviado_en": "2026-01-18T14:28:00",
+   "respondido_en": null
+  },
+  {
+   "pedido_id": "PED-0113",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-01-18T12:28:00",
+   "respondido_en": "2026-01-18T13:23:00"
+  },
+  {
+   "pedido_id": "PED-0113",
+   "proveedor_id": "papelera_del_sur",
+   "canal": "whatsapp",
+   "enviado_en": "2026-01-18T12:26:00",
+   "respondido_en": "2026-01-18T14:35:00"
+  },
+  {
+   "pedido_id": "PED-0113",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2026-01-18T12:31:00",
+   "respondido_en": "2026-01-18T14:39:00"
+  },
+  {
+   "pedido_id": "PED-0114",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-01-26T12:01:00",
+   "respondido_en": "2026-01-26T12:41:00"
+  },
+  {
+   "pedido_id": "PED-0114",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "email",
+   "enviado_en": "2026-01-26T12:04:00",
+   "respondido_en": "2026-01-26T13:27:00"
+  },
+  {
+   "pedido_id": "PED-0114",
+   "proveedor_id": "muebleria_rivera",
+   "canal": "whatsapp",
+   "enviado_en": "2026-01-26T12:04:00",
+   "respondido_en": null
+  },
+  {
+   "pedido_id": "PED-0114",
+   "proveedor_id": "muebleria_rivera",
+   "canal": "llamada",
+   "enviado_en": "2026-01-26T14:04:00",
+   "respondido_en": "2026-01-26T14:40:00"
+  },
+  {
+   "pedido_id": "PED-0114",
+   "proveedor_id": "ofisillas",
+   "canal": "whatsapp",
+   "enviado_en": "2026-01-26T12:05:00",
+   "respondido_en": "2026-01-26T12:44:00"
+  },
+  {
+   "pedido_id": "PED-0115",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-01-30T15:01:00",
+   "respondido_en": "2026-01-30T15:37:00"
+  },
+  {
+   "pedido_id": "PED-0115",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "llamada",
+   "enviado_en": "2026-01-30T15:04:00",
+   "respondido_en": "2026-01-30T15:21:00"
+  },
+  {
+   "pedido_id": "PED-0115",
+   "proveedor_id": "muebleria_rivera",
+   "canal": "whatsapp",
+   "enviado_en": "2026-01-30T15:01:00",
+   "respondido_en": null
+  },
+  {
+   "pedido_id": "PED-0115",
+   "proveedor_id": "muebleria_rivera",
+   "canal": "llamada",
+   "enviado_en": "2026-01-30T17:01:00",
+   "respondido_en": "2026-01-30T17:24:00"
+  },
+  {
+   "pedido_id": "PED-0115",
+   "proveedor_id": "ofisillas",
+   "canal": "whatsapp",
+   "enviado_en": "2026-01-30T15:00:00",
+   "respondido_en": "2026-01-30T15:48:00"
+  },
+  {
+   "pedido_id": "PED-0116",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-02-03T11:14:00",
+   "respondido_en": "2026-02-03T11:52:00"
+  },
+  {
+   "pedido_id": "PED-0116",
+   "proveedor_id": "papelera_del_sur",
+   "canal": "whatsapp",
+   "enviado_en": "2026-02-03T11:16:00",
+   "respondido_en": "2026-02-03T15:29:00"
+  },
+  {
+   "pedido_id": "PED-0117",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2026-02-07T13:04:00",
+   "respondido_en": "2026-02-07T13:20:00"
+  },
+  {
+   "pedido_id": "PED-0117",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-02-07T13:03:00",
+   "respondido_en": "2026-02-07T13:46:00"
+  },
+  {
+   "pedido_id": "PED-0117",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2026-02-07T13:04:00",
+   "respondido_en": "2026-02-07T15:34:00"
+  },
+  {
+   "pedido_id": "PED-0117",
+   "proveedor_id": "tecnoimport",
+   "canal": "llamada",
+   "enviado_en": "2026-02-07T13:07:00",
+   "respondido_en": "2026-02-07T13:17:00"
+  },
+  {
+   "pedido_id": "PED-0118",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2026-02-15T13:13:00",
+   "respondido_en": "2026-02-15T13:44:00"
+  },
+  {
+   "pedido_id": "PED-0118",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-02-15T13:16:00",
+   "respondido_en": "2026-02-15T13:52:00"
+  },
+  {
+   "pedido_id": "PED-0118",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "email",
+   "enviado_en": "2026-02-15T13:19:00",
+   "respondido_en": "2026-02-15T16:28:00"
+  },
+  {
+   "pedido_id": "PED-0118",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2026-02-15T13:14:00",
+   "respondido_en": "2026-02-15T15:42:00"
+  },
+  {
+   "pedido_id": "PED-0119",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-02-22T11:31:00",
+   "respondido_en": "2026-02-22T12:14:00"
+  },
+  {
+   "pedido_id": "PED-0119",
+   "proveedor_id": "muebleria_rivera",
+   "canal": "whatsapp",
+   "enviado_en": "2026-02-22T11:31:00",
+   "respondido_en": "2026-02-22T16:20:00"
+  },
+  {
+   "pedido_id": "PED-0119",
+   "proveedor_id": "ofisillas",
+   "canal": "whatsapp",
+   "enviado_en": "2026-02-22T11:28:00",
+   "respondido_en": "2026-02-22T11:58:00"
+  },
+  {
+   "pedido_id": "PED-0120",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2026-02-27T12:30:00",
+   "respondido_en": "2026-02-27T12:58:00"
+  },
+  {
+   "pedido_id": "PED-0120",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-02-27T12:31:00",
+   "respondido_en": "2026-02-27T13:19:00"
+  },
+  {
+   "pedido_id": "PED-0120",
+   "proveedor_id": "papelera_del_sur",
+   "canal": "whatsapp",
+   "enviado_en": "2026-02-27T12:28:00",
+   "respondido_en": "2026-02-27T14:21:00"
+  },
+  {
+   "pedido_id": "PED-0120",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2026-02-27T12:28:00",
+   "respondido_en": "2026-02-27T14:04:00"
+  },
+  {
+   "pedido_id": "PED-0121",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2026-03-03T14:42:00",
+   "respondido_en": null
+  },
+  {
+   "pedido_id": "PED-0121",
+   "proveedor_id": "compuservice",
+   "canal": "llamada",
+   "enviado_en": "2026-03-03T16:42:00",
+   "respondido_en": "2026-03-03T16:58:00"
+  },
+  {
+   "pedido_id": "PED-0121",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-03-03T14:43:00",
+   "respondido_en": "2026-03-03T15:19:00"
+  },
+  {
+   "pedido_id": "PED-0121",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "llamada",
+   "enviado_en": "2026-03-03T14:44:00",
+   "respondido_en": "2026-03-03T14:59:00"
+  },
+  {
+   "pedido_id": "PED-0121",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2026-03-03T14:45:00",
+   "respondido_en": "2026-03-03T16:23:00"
+  },
+  {
+   "pedido_id": "PED-0121",
+   "proveedor_id": "tecnoimport",
+   "canal": "llamada",
+   "enviado_en": "2026-03-03T14:47:00",
+   "respondido_en": "2026-03-03T14:53:00"
+  },
+  {
+   "pedido_id": "PED-0122",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2026-03-08T15:02:00",
+   "respondido_en": "2026-03-08T15:34:00"
+  },
+  {
+   "pedido_id": "PED-0122",
+   "proveedor_id": "compuservice",
+   "canal": "llamada",
+   "enviado_en": "2026-03-08T15:05:00",
+   "respondido_en": "2026-03-08T15:15:00"
+  },
+  {
+   "pedido_id": "PED-0122",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-03-08T15:06:00",
+   "respondido_en": "2026-03-08T15:46:00"
+  },
+  {
+   "pedido_id": "PED-0122",
+   "proveedor_id": "papelera_del_sur",
+   "canal": "whatsapp",
+   "enviado_en": "2026-03-08T15:03:00",
+   "respondido_en": null
+  },
+  {
+   "pedido_id": "PED-0122",
+   "proveedor_id": "papelera_del_sur",
+   "canal": "llamada",
+   "enviado_en": "2026-03-08T17:03:00",
+   "respondido_en": "2026-03-08T17:06:00"
+  },
+  {
+   "pedido_id": "PED-0122",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2026-03-08T15:02:00",
+   "respondido_en": "2026-03-08T18:01:00"
+  },
+  {
+   "pedido_id": "PED-0122",
+   "proveedor_id": "tecnoimport",
+   "canal": "llamada",
+   "enviado_en": "2026-03-08T15:02:00",
+   "respondido_en": "2026-03-08T15:11:00"
+  },
+  {
+   "pedido_id": "PED-0123",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2026-03-15T08:41:00",
+   "respondido_en": "2026-03-15T08:58:00"
+  },
+  {
+   "pedido_id": "PED-0123",
+   "proveedor_id": "compuservice",
+   "canal": "llamada",
+   "enviado_en": "2026-03-15T08:44:00",
+   "respondido_en": "2026-03-15T09:02:00"
+  },
+  {
+   "pedido_id": "PED-0123",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2026-03-15T08:43:00",
+   "respondido_en": "2026-03-15T11:11:00"
+  },
+  {
+   "pedido_id": "PED-0123",
+   "proveedor_id": "tecnoimport",
+   "canal": "llamada",
+   "enviado_en": "2026-03-15T08:45:00",
+   "respondido_en": "2026-03-15T08:52:00"
+  },
+  {
+   "pedido_id": "PED-0124",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-03-20T09:46:00",
+   "respondido_en": "2026-03-20T10:22:00"
+  },
+  {
+   "pedido_id": "PED-0124",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "email",
+   "enviado_en": "2026-03-20T09:49:00",
+   "respondido_en": "2026-03-20T11:59:00"
+  },
+  {
+   "pedido_id": "PED-0124",
+   "proveedor_id": "muebleria_rivera",
+   "canal": "whatsapp",
+   "enviado_en": "2026-03-20T09:43:00",
+   "respondido_en": "2026-03-20T15:34:00"
+  },
+  {
+   "pedido_id": "PED-0124",
+   "proveedor_id": "ofisillas",
+   "canal": "whatsapp",
+   "enviado_en": "2026-03-20T09:45:00",
+   "respondido_en": "2026-03-20T10:21:00"
+  },
+  {
+   "pedido_id": "PED-0125",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-03-24T10:29:00",
+   "respondido_en": "2026-03-24T11:24:00"
+  },
+  {
+   "pedido_id": "PED-0125",
+   "proveedor_id": "papelera_del_sur",
+   "canal": "whatsapp",
+   "enviado_en": "2026-03-24T10:30:00",
+   "respondido_en": "2026-03-24T13:57:00"
+  },
+  {
+   "pedido_id": "PED-0126",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2026-03-28T11:06:00",
+   "respondido_en": "2026-03-28T11:32:00"
+  },
+  {
+   "pedido_id": "PED-0126",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2026-03-28T11:04:00",
+   "respondido_en": "2026-03-28T13:53:00"
+  },
+  {
+   "pedido_id": "PED-0127",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2026-04-01T13:31:00",
+   "respondido_en": "2026-04-01T13:50:00"
+  },
+  {
+   "pedido_id": "PED-0127",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-04-01T13:27:00",
+   "respondido_en": "2026-04-01T14:20:00"
+  },
+  {
+   "pedido_id": "PED-0127",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "email",
+   "enviado_en": "2026-04-01T13:30:00",
+   "respondido_en": "2026-04-01T15:57:00"
+  },
+  {
+   "pedido_id": "PED-0127",
+   "proveedor_id": "papelera_del_sur",
+   "canal": "whatsapp",
+   "enviado_en": "2026-04-01T13:28:00",
+   "respondido_en": "2026-04-01T16:52:00"
+  },
+  {
+   "pedido_id": "PED-0127",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2026-04-01T13:29:00",
+   "respondido_en": null
+  },
+  {
+   "pedido_id": "PED-0127",
+   "proveedor_id": "tecnoimport",
+   "canal": "llamada",
+   "enviado_en": "2026-04-01T15:29:00",
+   "respondido_en": null
+  },
+  {
+   "pedido_id": "PED-0128",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-04-05T12:13:00",
+   "respondido_en": "2026-04-05T12:40:00"
+  },
+  {
+   "pedido_id": "PED-0128",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "llamada",
+   "enviado_en": "2026-04-05T12:15:00",
+   "respondido_en": "2026-04-05T12:26:00"
+  },
+  {
+   "pedido_id": "PED-0128",
+   "proveedor_id": "papelera_del_sur",
+   "canal": "whatsapp",
+   "enviado_en": "2026-04-05T12:13:00",
+   "respondido_en": "2026-04-05T14:23:00"
+  },
+  {
+   "pedido_id": "PED-0128",
+   "proveedor_id": "papelera_del_sur",
+   "canal": "llamada",
+   "enviado_en": "2026-04-05T12:14:00",
+   "respondido_en": "2026-04-05T12:20:00"
+  },
+  {
+   "pedido_id": "PED-0129",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2026-04-10T10:00:00",
+   "respondido_en": "2026-04-10T10:29:00"
+  },
+  {
+   "pedido_id": "PED-0129",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-04-10T09:58:00",
+   "respondido_en": "2026-04-10T10:48:00"
+  },
+  {
+   "pedido_id": "PED-0129",
+   "proveedor_id": "papelera_del_sur",
+   "canal": "whatsapp",
+   "enviado_en": "2026-04-10T09:56:00",
+   "respondido_en": "2026-04-10T13:26:00"
+  },
+  {
+   "pedido_id": "PED-0129",
+   "proveedor_id": "papelera_del_sur",
+   "canal": "llamada",
+   "enviado_en": "2026-04-10T09:57:00",
+   "respondido_en": "2026-04-10T10:02:00"
+  },
+  {
+   "pedido_id": "PED-0129",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2026-04-10T09:56:00",
+   "respondido_en": "2026-04-10T11:35:00"
+  },
+  {
+   "pedido_id": "PED-0129",
+   "proveedor_id": "tecnoimport",
+   "canal": "llamada",
+   "enviado_en": "2026-04-10T09:59:00",
+   "respondido_en": "2026-04-10T10:06:00"
+  },
+  {
+   "pedido_id": "PED-0130",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2026-04-14T15:06:00",
+   "respondido_en": null
+  },
+  {
+   "pedido_id": "PED-0130",
+   "proveedor_id": "compuservice",
+   "canal": "llamada",
+   "enviado_en": "2026-04-14T17:06:00",
+   "respondido_en": "2026-04-14T17:21:00"
+  },
+  {
+   "pedido_id": "PED-0130",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-04-14T15:01:00",
+   "respondido_en": "2026-04-14T15:35:00"
+  },
+  {
+   "pedido_id": "PED-0130",
+   "proveedor_id": "papelera_del_sur",
+   "canal": "whatsapp",
+   "enviado_en": "2026-04-14T15:01:00",
+   "respondido_en": "2026-04-14T17:13:00"
+  },
+  {
+   "pedido_id": "PED-0130",
+   "proveedor_id": "papelera_del_sur",
+   "canal": "llamada",
+   "enviado_en": "2026-04-14T15:04:00",
+   "respondido_en": "2026-04-14T15:07:00"
+  },
+  {
+   "pedido_id": "PED-0130",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2026-04-14T15:02:00",
+   "respondido_en": null
+  },
+  {
+   "pedido_id": "PED-0130",
+   "proveedor_id": "tecnoimport",
+   "canal": "llamada",
+   "enviado_en": "2026-04-14T17:02:00",
+   "respondido_en": null
+  },
+  {
+   "pedido_id": "PED-0131",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2026-04-19T08:13:00",
+   "respondido_en": "2026-04-19T08:31:00"
+  },
+  {
+   "pedido_id": "PED-0131",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-04-19T08:11:00",
+   "respondido_en": "2026-04-19T08:43:00"
+  },
+  {
+   "pedido_id": "PED-0131",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2026-04-19T08:12:00",
+   "respondido_en": "2026-04-19T10:31:00"
+  },
+  {
+   "pedido_id": "PED-0131",
+   "proveedor_id": "tecnoimport",
+   "canal": "llamada",
+   "enviado_en": "2026-04-19T08:14:00",
+   "respondido_en": "2026-04-19T08:25:00"
+  },
+  {
+   "pedido_id": "PED-0132",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2026-04-24T16:04:00",
+   "respondido_en": "2026-04-24T16:33:00"
+  },
+  {
+   "pedido_id": "PED-0132",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-04-24T16:02:00",
+   "respondido_en": "2026-04-24T16:26:00"
+  },
+  {
+   "pedido_id": "PED-0132",
+   "proveedor_id": "papelera_del_sur",
+   "canal": "whatsapp",
+   "enviado_en": "2026-04-24T16:05:00",
+   "respondido_en": null
+  },
+  {
+   "pedido_id": "PED-0132",
+   "proveedor_id": "papelera_del_sur",
+   "canal": "llamada",
+   "enviado_en": "2026-04-24T18:05:00",
+   "respondido_en": "2026-04-24T18:10:00"
+  },
+  {
+   "pedido_id": "PED-0132",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2026-04-24T16:03:00",
+   "respondido_en": "2026-04-24T19:12:00"
+  },
+  {
+   "pedido_id": "PED-0133",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-05-02T15:41:00",
+   "respondido_en": "2026-05-02T16:06:00"
+  },
+  {
+   "pedido_id": "PED-0133",
+   "proveedor_id": "muebleria_rivera",
+   "canal": "whatsapp",
+   "enviado_en": "2026-05-02T15:44:00",
+   "respondido_en": "2026-05-02T21:59:00"
+  },
+  {
+   "pedido_id": "PED-0133",
+   "proveedor_id": "muebleria_rivera",
+   "canal": "email",
+   "enviado_en": "2026-05-02T15:44:00",
+   "respondido_en": "2026-05-03T22:56:00"
+  },
+  {
+   "pedido_id": "PED-0133",
+   "proveedor_id": "ofisillas",
+   "canal": "whatsapp",
+   "enviado_en": "2026-05-02T15:46:00",
+   "respondido_en": "2026-05-02T16:51:00"
+  },
+  {
+   "pedido_id": "PED-0134",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2026-05-09T10:13:00",
+   "respondido_en": "2026-05-09T10:33:00"
+  },
+  {
+   "pedido_id": "PED-0134",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-05-09T10:12:00",
+   "respondido_en": "2026-05-09T11:05:00"
+  },
+  {
+   "pedido_id": "PED-0134",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "email",
+   "enviado_en": "2026-05-09T10:15:00",
+   "respondido_en": "2026-05-09T12:03:00"
+  },
+  {
+   "pedido_id": "PED-0134",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2026-05-09T10:16:00",
+   "respondido_en": "2026-05-09T13:41:00"
+  },
+  {
+   "pedido_id": "PED-0135",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2026-05-15T14:11:00",
+   "respondido_en": "2026-05-15T14:31:00"
+  },
+  {
+   "pedido_id": "PED-0135",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-05-15T14:14:00",
+   "respondido_en": null
+  },
+  {
+   "pedido_id": "PED-0135",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "llamada",
+   "enviado_en": "2026-05-15T16:14:00",
+   "respondido_en": "2026-05-15T16:25:00"
+  },
+  {
+   "pedido_id": "PED-0135",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2026-05-15T14:15:00",
+   "respondido_en": "2026-05-15T16:37:00"
+  },
+  {
+   "pedido_id": "PED-0136",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2026-05-21T10:46:00",
+   "respondido_en": "2026-05-21T11:05:00"
+  },
+  {
+   "pedido_id": "PED-0136",
+   "proveedor_id": "compuservice",
+   "canal": "llamada",
+   "enviado_en": "2026-05-21T10:48:00",
+   "respondido_en": "2026-05-21T11:07:00"
+  },
+  {
+   "pedido_id": "PED-0136",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-05-21T10:45:00",
+   "respondido_en": "2026-05-21T11:38:00"
+  },
+  {
+   "pedido_id": "PED-0136",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2026-05-21T10:42:00",
+   "respondido_en": null
+  },
+  {
+   "pedido_id": "PED-0136",
+   "proveedor_id": "tecnoimport",
+   "canal": "llamada",
+   "enviado_en": "2026-05-21T12:42:00",
+   "respondido_en": "2026-05-21T12:51:00"
+  },
+  {
+   "pedido_id": "PED-0137",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2026-05-28T11:45:00",
+   "respondido_en": "2026-05-28T12:08:00"
+  },
+  {
+   "pedido_id": "PED-0137",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-05-28T11:43:00",
+   "respondido_en": "2026-05-28T12:25:00"
+  },
+  {
+   "pedido_id": "PED-0137",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "email",
+   "enviado_en": "2026-05-28T11:44:00",
+   "respondido_en": "2026-05-28T13:06:00"
+  },
+  {
+   "pedido_id": "PED-0137",
+   "proveedor_id": "papelera_del_sur",
+   "canal": "whatsapp",
+   "enviado_en": "2026-05-28T11:46:00",
+   "respondido_en": "2026-05-28T15:24:00"
+  },
+  {
+   "pedido_id": "PED-0137",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2026-05-28T11:43:00",
+   "respondido_en": "2026-05-28T13:58:00"
+  },
+  {
+   "pedido_id": "PED-0138",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2026-06-05T12:11:00",
+   "respondido_en": "2026-06-05T12:31:00"
+  },
+  {
+   "pedido_id": "PED-0138",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-06-05T12:12:00",
+   "respondido_en": "2026-06-05T13:01:00"
+  },
+  {
+   "pedido_id": "PED-0138",
+   "proveedor_id": "papelera_del_sur",
+   "canal": "whatsapp",
+   "enviado_en": "2026-06-05T12:13:00",
+   "respondido_en": "2026-06-05T15:22:00"
+  },
+  {
+   "pedido_id": "PED-0138",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2026-06-05T12:15:00",
+   "respondido_en": "2026-06-05T15:46:00"
+  },
+  {
+   "pedido_id": "PED-0138",
+   "proveedor_id": "tecnoimport",
+   "canal": "llamada",
+   "enviado_en": "2026-06-05T12:17:00",
+   "respondido_en": "2026-06-05T12:28:00"
+  },
+  {
+   "pedido_id": "PED-0139",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-06-11T09:26:00",
+   "respondido_en": "2026-06-11T09:51:00"
+  },
+  {
+   "pedido_id": "PED-0139",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "email",
+   "enviado_en": "2026-06-11T09:28:00",
+   "respondido_en": "2026-06-11T11:37:00"
+  },
+  {
+   "pedido_id": "PED-0139",
+   "proveedor_id": "papelera_del_sur",
+   "canal": "whatsapp",
+   "enviado_en": "2026-06-11T09:29:00",
+   "respondido_en": "2026-06-11T13:03:00"
+  },
+  {
+   "pedido_id": "PED-0140",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2026-06-18T09:14:00",
+   "respondido_en": "2026-06-18T09:42:00"
+  },
+  {
+   "pedido_id": "PED-0140",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-06-18T09:12:00",
+   "respondido_en": "2026-06-18T10:01:00"
+  },
+  {
+   "pedido_id": "PED-0140",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "llamada",
+   "enviado_en": "2026-06-18T09:12:00",
+   "respondido_en": "2026-06-18T09:30:00"
+  },
+  {
+   "pedido_id": "PED-0140",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2026-06-18T09:14:00",
+   "respondido_en": "2026-06-18T12:20:00"
+  },
+  {
+   "pedido_id": "PED-0141",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2026-06-24T10:04:00",
+   "respondido_en": null
+  },
+  {
+   "pedido_id": "PED-0141",
+   "proveedor_id": "compuservice",
+   "canal": "llamada",
+   "enviado_en": "2026-06-24T12:04:00",
+   "respondido_en": "2026-06-24T12:20:00"
+  },
+  {
+   "pedido_id": "PED-0141",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-06-24T10:03:00",
+   "respondido_en": "2026-06-24T10:49:00"
+  },
+  {
+   "pedido_id": "PED-0141",
+   "proveedor_id": "papelera_del_sur",
+   "canal": "whatsapp",
+   "enviado_en": "2026-06-24T10:06:00",
+   "respondido_en": "2026-06-24T13:05:00"
+  },
+  {
+   "pedido_id": "PED-0141",
+   "proveedor_id": "papelera_del_sur",
+   "canal": "llamada",
+   "enviado_en": "2026-06-24T10:07:00",
+   "respondido_en": "2026-06-24T10:11:00"
+  },
+  {
+   "pedido_id": "PED-0141",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2026-06-24T10:02:00",
+   "respondido_en": "2026-06-24T12:22:00"
+  },
+  {
+   "pedido_id": "PED-0141",
+   "proveedor_id": "tecnoimport",
+   "canal": "llamada",
+   "enviado_en": "2026-06-24T10:04:00",
+   "respondido_en": "2026-06-24T10:09:00"
+  },
+  {
+   "pedido_id": "PED-0142",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2026-07-02T15:16:00",
+   "respondido_en": "2026-07-02T15:36:00"
+  },
+  {
+   "pedido_id": "PED-0142",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-07-02T15:15:00",
+   "respondido_en": null
+  },
+  {
+   "pedido_id": "PED-0142",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "llamada",
+   "enviado_en": "2026-07-02T17:15:00",
+   "respondido_en": "2026-07-02T17:32:00"
+  },
+  {
+   "pedido_id": "PED-0142",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2026-07-02T15:11:00",
+   "respondido_en": "2026-07-02T17:22:00"
+  },
+  {
+   "pedido_id": "PED-0143",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2026-07-08T14:15:00",
+   "respondido_en": "2026-07-08T14:29:00"
+  },
+  {
+   "pedido_id": "PED-0143",
+   "proveedor_id": "compuservice",
+   "canal": "llamada",
+   "enviado_en": "2026-07-08T14:15:00",
+   "respondido_en": "2026-07-08T14:26:00"
+  },
+  {
+   "pedido_id": "PED-0143",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-07-08T14:14:00",
+   "respondido_en": "2026-07-08T15:01:00"
+  },
+  {
+   "pedido_id": "PED-0143",
+   "proveedor_id": "papelera_del_sur",
+   "canal": "whatsapp",
+   "enviado_en": "2026-07-08T14:15:00",
+   "respondido_en": "2026-07-08T16:38:00"
+  },
+  {
+   "pedido_id": "PED-0143",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2026-07-08T14:14:00",
+   "respondido_en": null
+  },
+  {
+   "pedido_id": "PED-0143",
+   "proveedor_id": "tecnoimport",
+   "canal": "llamada",
+   "enviado_en": "2026-07-08T16:14:00",
+   "respondido_en": "2026-07-08T16:24:00"
+  },
+  {
+   "pedido_id": "PED-0144",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-07-15T08:41:00",
+   "respondido_en": "2026-07-15T09:37:00"
+  },
+  {
+   "pedido_id": "PED-0144",
+   "proveedor_id": "papelera_del_sur",
+   "canal": "whatsapp",
+   "enviado_en": "2026-07-15T08:43:00",
+   "respondido_en": "2026-07-15T12:29:00"
+  },
+  {
+   "pedido_id": "PED-0145",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-07-21T11:01:00",
+   "respondido_en": "2026-07-21T11:28:00"
+  },
+  {
+   "pedido_id": "PED-0145",
+   "proveedor_id": "papelera_del_sur",
+   "canal": "whatsapp",
+   "enviado_en": "2026-07-21T11:03:00",
+   "respondido_en": "2026-07-21T13:23:00"
+  },
+  {
+   "pedido_id": "PED-0146",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2026-07-29T09:11:00",
+   "respondido_en": "2026-07-29T09:25:00"
+  },
+  {
+   "pedido_id": "PED-0146",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2026-07-29T09:11:00",
+   "respondido_en": "2026-07-29T12:27:00"
+  },
+  {
+   "pedido_id": "PED-0146",
+   "proveedor_id": "tecnoimport",
+   "canal": "llamada",
+   "enviado_en": "2026-07-29T09:12:00",
+   "respondido_en": "2026-07-29T09:18:00"
+  },
+  {
+   "pedido_id": "PED-0147",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2026-08-03T08:13:00",
+   "respondido_en": "2026-08-03T08:37:00"
+  },
+  {
+   "pedido_id": "PED-0147",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2026-08-03T08:13:00",
+   "respondido_en": "2026-08-03T10:26:00"
+  },
+  {
+   "pedido_id": "PED-0148",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2026-08-11T08:29:00",
+   "respondido_en": "2026-08-11T09:01:00"
+  },
+  {
+   "pedido_id": "PED-0148",
+   "proveedor_id": "compuservice",
+   "canal": "llamada",
+   "enviado_en": "2026-08-11T08:31:00",
+   "respondido_en": "2026-08-11T08:52:00"
+  },
+  {
+   "pedido_id": "PED-0148",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-08-11T08:31:00",
+   "respondido_en": "2026-08-11T09:23:00"
+  },
+  {
+   "pedido_id": "PED-0148",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "llamada",
+   "enviado_en": "2026-08-11T08:34:00",
+   "respondido_en": "2026-08-11T08:47:00"
+  },
+  {
+   "pedido_id": "PED-0148",
+   "proveedor_id": "papelera_del_sur",
+   "canal": "whatsapp",
+   "enviado_en": "2026-08-11T08:28:00",
+   "respondido_en": "2026-08-11T10:49:00"
+  },
+  {
+   "pedido_id": "PED-0148",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2026-08-11T08:28:00",
+   "respondido_en": "2026-08-11T10:38:00"
+  },
+  {
+   "pedido_id": "PED-0148",
+   "proveedor_id": "tecnoimport",
+   "canal": "llamada",
+   "enviado_en": "2026-08-11T08:28:00",
+   "respondido_en": "2026-08-11T08:36:00"
+  },
+  {
+   "pedido_id": "PED-0149",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-08-19T10:15:00",
+   "respondido_en": "2026-08-19T11:01:00"
+  },
+  {
+   "pedido_id": "PED-0149",
+   "proveedor_id": "papelera_del_sur",
+   "canal": "whatsapp",
+   "enviado_en": "2026-08-19T10:13:00",
+   "respondido_en": "2026-08-19T13:45:00"
+  },
+  {
+   "pedido_id": "PED-0150",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-08-25T14:00:00",
+   "respondido_en": "2026-08-25T14:46:00"
+  },
+  {
+   "pedido_id": "PED-0150",
+   "proveedor_id": "muebleria_rivera",
+   "canal": "whatsapp",
+   "enviado_en": "2026-08-25T13:56:00",
+   "respondido_en": "2026-08-25T18:03:00"
+  },
+  {
+   "pedido_id": "PED-0150",
+   "proveedor_id": "ofisillas",
+   "canal": "whatsapp",
+   "enviado_en": "2026-08-25T13:59:00",
+   "respondido_en": "2026-08-25T14:51:00"
+  },
+  {
+   "pedido_id": "PED-0151",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2026-09-01T12:42:00",
+   "respondido_en": "2026-09-01T13:04:00"
+  },
+  {
+   "pedido_id": "PED-0151",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-09-01T12:41:00",
+   "respondido_en": "2026-09-01T13:28:00"
+  },
+  {
+   "pedido_id": "PED-0151",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2026-09-01T12:43:00",
+   "respondido_en": null
+  },
+  {
+   "pedido_id": "PED-0151",
+   "proveedor_id": "tecnoimport",
+   "canal": "llamada",
+   "enviado_en": "2026-09-01T14:43:00",
+   "respondido_en": "2026-09-01T14:55:00"
+  },
+  {
+   "pedido_id": "PED-0152",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2026-09-08T09:58:00",
+   "respondido_en": null
+  },
+  {
+   "pedido_id": "PED-0152",
+   "proveedor_id": "compuservice",
+   "canal": "llamada",
+   "enviado_en": "2026-09-08T11:58:00",
+   "respondido_en": "2026-09-08T12:07:00"
+  },
+  {
+   "pedido_id": "PED-0152",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-09-08T10:00:00",
+   "respondido_en": "2026-09-08T10:43:00"
+  },
+  {
+   "pedido_id": "PED-0152",
+   "proveedor_id": "papelera_del_sur",
+   "canal": "whatsapp",
+   "enviado_en": "2026-09-08T09:56:00",
+   "respondido_en": "2026-09-08T13:27:00"
+  },
+  {
+   "pedido_id": "PED-0152",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2026-09-08T09:59:00",
+   "respondido_en": "2026-09-08T11:55:00"
+  },
+  {
+   "pedido_id": "PED-0152",
+   "proveedor_id": "tecnoimport",
+   "canal": "llamada",
+   "enviado_en": "2026-09-08T10:02:00",
+   "respondido_en": "2026-09-08T10:13:00"
+  },
+  {
+   "pedido_id": "PED-0153",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2026-09-16T13:00:00",
+   "respondido_en": null
+  },
+  {
+   "pedido_id": "PED-0153",
+   "proveedor_id": "compuservice",
+   "canal": "llamada",
+   "enviado_en": "2026-09-16T15:00:00",
+   "respondido_en": "2026-09-16T15:12:00"
+  },
+  {
+   "pedido_id": "PED-0153",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2026-09-16T12:57:00",
+   "respondido_en": "2026-09-16T16:32:00"
+  },
+  {
+   "pedido_id": "PED-0153",
+   "proveedor_id": "tecnoimport",
+   "canal": "llamada",
+   "enviado_en": "2026-09-16T12:57:00",
+   "respondido_en": "2026-09-16T13:04:00"
+  },
+  {
+   "pedido_id": "PED-0154",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2026-09-24T12:13:00",
+   "respondido_en": "2026-09-24T12:37:00"
+  },
+  {
+   "pedido_id": "PED-0154",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-09-24T12:12:00",
+   "respondido_en": "2026-09-24T12:47:00"
+  },
+  {
+   "pedido_id": "PED-0154",
+   "proveedor_id": "papelera_del_sur",
+   "canal": "whatsapp",
+   "enviado_en": "2026-09-24T12:11:00",
+   "respondido_en": "2026-09-24T14:31:00"
+  },
+  {
+   "pedido_id": "PED-0154",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2026-09-24T12:14:00",
+   "respondido_en": "2026-09-24T14:16:00"
+  },
+  {
+   "pedido_id": "PED-0154",
+   "proveedor_id": "tecnoimport",
+   "canal": "llamada",
+   "enviado_en": "2026-09-24T12:14:00",
+   "respondido_en": "2026-09-24T12:19:00"
+  },
+  {
+   "pedido_id": "PED-0155",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-09-29T15:45:00",
+   "respondido_en": "2026-09-29T16:20:00"
+  },
+  {
+   "pedido_id": "PED-0155",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "llamada",
+   "enviado_en": "2026-09-29T15:47:00",
+   "respondido_en": "2026-09-29T16:01:00"
+  },
+  {
+   "pedido_id": "PED-0155",
+   "proveedor_id": "papelera_del_sur",
+   "canal": "whatsapp",
+   "enviado_en": "2026-09-29T15:41:00",
+   "respondido_en": null
+  },
+  {
+   "pedido_id": "PED-0155",
+   "proveedor_id": "papelera_del_sur",
+   "canal": "llamada",
+   "enviado_en": "2026-09-29T17:41:00",
+   "respondido_en": "2026-09-29T17:46:00"
+  },
+  {
+   "pedido_id": "PED-0156",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-10-06T08:30:00",
+   "respondido_en": "2026-10-06T08:53:00"
+  },
+  {
+   "pedido_id": "PED-0156",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "email",
+   "enviado_en": "2026-10-06T08:30:00",
+   "respondido_en": "2026-10-06T09:49:00"
+  },
+  {
+   "pedido_id": "PED-0156",
+   "proveedor_id": "muebleria_rivera",
+   "canal": "whatsapp",
+   "enviado_en": "2026-10-06T08:27:00",
+   "respondido_en": "2026-10-06T14:15:00"
+  },
+  {
+   "pedido_id": "PED-0156",
+   "proveedor_id": "ofisillas",
+   "canal": "whatsapp",
+   "enviado_en": "2026-10-06T08:30:00",
+   "respondido_en": "2026-10-06T09:07:00"
+  },
+  {
+   "pedido_id": "PED-0157",
+   "proveedor_id": "compuservice",
+   "canal": "whatsapp",
+   "enviado_en": "2026-10-13T08:16:00",
+   "respondido_en": "2026-10-13T08:41:00"
+  },
+  {
+   "pedido_id": "PED-0157",
+   "proveedor_id": "distribuidora_oriental",
+   "canal": "whatsapp",
+   "enviado_en": "2026-10-13T08:14:00",
+   "respondido_en": "2026-10-13T08:52:00"
+  },
+  {
+   "pedido_id": "PED-0157",
+   "proveedor_id": "tecnoimport",
+   "canal": "email",
+   "enviado_en": "2026-10-13T08:11:00",
+   "respondido_en": "2026-10-13T10:31:00"
+  },
+  {
+   "pedido_id": "PED-0157",
+   "proveedor_id": "tecnoimport",
+   "canal": "llamada",
+   "enviado_en": "2026-10-13T08:13:00",
+   "respondido_en": "2026-10-13T08:20:00"
+  }
+ ]
+}
