@@ -397,6 +397,9 @@ async def llamar_para_cotizar(
     pedido_id: str,
     proveedor_id: str,
     simulada: bool = Query(False, description="Forzar llamada simulada (respaldo en vivo)"),
+    simular_no_atiende: bool = Query(
+        False, description="Solo simulada: nadie atiende (muestra la secuencia de contacto, RF-06)"
+    ),
 ) -> Llamada:
     """Llama al proveedor para pedirle la cotización (p. ej. el que no respondió)."""
     pedido = _pedido(pedido_id)
@@ -411,7 +414,8 @@ async def llamar_para_cotizar(
             proveedor_id=proveedor_id,
             tipo="cotizacion",
             variables=llamadas.instrucciones_cotizacion(pedido, proveedor_id),
-            simulada=simulada,
+            simulada=simulada or simular_no_atiende,
+            simular_no_atiende=simular_no_atiende,
         )
     except llamadas.LlamadaNoPosible as exc:
         raise ErrorAbasto(409, str(exc), {"config": llamadas.configuracion().model_dump()}) from exc
@@ -452,12 +456,12 @@ async def llamar_para_negociar(
     return llamada
 
 
-@app.get("/llamadas/{llamada_id}", response_model=Llamada)
-async def obtener_llamada(llamada_id: str) -> Llamada:
+@app.get("/llamadas/{llamada_id}", response_model=llamadas.LlamadaDetalle)
+async def obtener_llamada(llamada_id: str) -> llamadas.LlamadaDetalle:
     llamada = store.obtener("llamadas", llamada_id, Llamada)
     if llamada is None:
         raise ErrorAbasto(404, f"No existe la llamada '{llamada_id}'")
-    return llamada
+    return llamadas.detalle(llamada)  # campos de siempre + secuencia de contacto (opcionales)
 
 
 @app.get("/pedidos/{pedido_id}/llamadas", response_model=list[Llamada])
