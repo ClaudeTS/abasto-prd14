@@ -2,6 +2,7 @@
 import { useState, type FormEvent, type ReactNode } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { AlertCircleIcon } from "lucide-react";
+import Facetas from "@/components/Facetas";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
@@ -12,23 +13,26 @@ import { mensajeError } from "@/lib/errores";
 /** Columna oscura de presentación, compartida con el registro. */
 export function MarcoIngreso({ children }: { children: ReactNode }) {
   return (
-    <div className="flex min-h-svh flex-col bg-muted/30 md:flex-row">
+    <div className="flex min-h-svh flex-col bg-background md:flex-row">
       <section
         aria-label="Presentación"
-        className="flex flex-col justify-between gap-10 bg-primary p-8 text-primary-foreground md:min-h-svh md:flex-1 md:p-12"
+        className="relative isolate flex flex-col justify-between gap-10 overflow-hidden bg-negro p-8 text-white md:min-h-svh md:flex-1 md:p-12"
       >
-        <div className="flex items-center gap-2.5 text-base font-semibold">
-          <span className="flex size-7 items-center justify-center rounded-md bg-primary-foreground text-sm font-bold text-primary">A</span>
+        <Facetas className="-z-10 opacity-90" />
+        <div className="flex items-center gap-2.5 font-heading text-lg font-bold">
+          <span className="flex size-7 items-center justify-center rounded-md bg-celeste text-sm font-bold text-grafito">A</span>
           Abasto
         </div>
         <div className="max-w-md">
-          <p className="text-3xl leading-tight font-semibold tracking-tight">Tu director de compras con IA.</p>
-          <p className="mt-3 text-primary-foreground/75">
+          <p className="font-heading text-4xl leading-tight font-bold tracking-tight">
+            Tu director de compras <span className="text-celeste">con IA.</span>
+          </p>
+          <p className="mt-3 text-gris-oscuro">
             Recibe los pedidos, cotiza con tus proveedores, compara en una base común y negocia por vos. Vos aprobás lo que
             importa.
           </p>
         </div>
-        <p className="text-sm text-primary-foreground/60">Tecnova S.A. · build 101 AI Hackathon</p>
+        <p className="text-sm text-gris-oscuro">Tecnova S.A. · build 101 AI Hackathon</p>
       </section>
       <section aria-label="Ingreso" className="flex flex-1 items-center justify-center px-6 py-12">
         {children}

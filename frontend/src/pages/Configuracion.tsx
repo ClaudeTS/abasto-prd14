@@ -232,7 +232,7 @@ function Usuarios({ usuarios }: { usuarios: UsuarioListado[] | null }) {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          Usuarios y roles <Etiqueta tono="ambar">Datos de ejemplo</Etiqueta>
+          Usuarios y roles <Etiqueta tono="ejemplo">Datos de ejemplo</Etiqueta>
         </CardTitle>
         <CardDescription>Los roles solo limitan la edición de reglas y configuración.</CardDescription>
         <CardAction>

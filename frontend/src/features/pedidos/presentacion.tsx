@@ -47,28 +47,33 @@ export const ETIQUETA_ESTADO: Record<EstadoPedido, string> = {
 };
 
 const TONO = {
-  neutro: "border-border bg-background text-foreground",
+  neutro: "border-border bg-card text-foreground",
   gris: "border-transparent bg-muted text-muted-foreground",
-  verde:
-    "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300",
-  ambar: "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-300",
-  azul: "border-sky-200 bg-sky-50 text-sky-800 dark:border-sky-900 dark:bg-sky-950 dark:text-sky-300",
-  rojo: "border-red-200 bg-red-50 text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-300",
-  oscuro: "border-transparent bg-primary text-primary-foreground",
+  verde: "border-ok-borde bg-ok-bg text-celeste-ink",
+  ambar: "border-accion-borde bg-accion-bg text-accion",
+  azul: "border-ia-borde bg-ia-bg text-azul-profundo",
+  rojo: "border-alerta-borde bg-alerta-bg text-alerta",
+  oscuro: "border-transparent bg-grafito text-white",
+  ia: "border-transparent bg-azul-profundo text-white",
+  celeste: "border-transparent bg-celeste text-grafito",
+  ejemplo:
+    "border-gris-claro bg-[repeating-linear-gradient(135deg,#f7f7f7_0_5px,#dde2e1_5px_10px)] text-[#4a5053]",
 } as const;
 export type TonoPedido = keyof typeof TONO;
 
+// Estados §6.2 en familias (docs/DISENO.md): gris inactivo, azul la IA trabaja, celeste en marcha,
+// ámbar te necesita, rojo cancelado.
 const TONO_ESTADO: Record<EstadoPedido, TonoPedido> = {
-  nuevo: "neutro",
+  nuevo: "gris",
   datos_incompletos: "ambar",
-  cotizando: "gris",
+  cotizando: "azul",
   cotizado: "azul",
-  negociando: "azul",
+  negociando: "ia",
   pendiente_aprobacion: "ambar",
   aprobado: "verde",
-  pendiente_entrega: "neutro",
-  recibido: "verde",
-  cerrado: "oscuro",
+  pendiente_entrega: "verde",
+  recibido: "celeste",
+  cerrado: "gris",
   cancelado: "rojo",
 };
 
@@ -100,7 +105,7 @@ export function BadgeEstado({ estado, className }: { estado: EstadoPedido; class
 
 export function EtiquetaEjemplo({ className }: { className?: string }) {
   return (
-    <Marca tono="gris" className={className} title="Pedido de ejemplo: no es una compra real">
+    <Marca tono="ejemplo" className={className} title="Pedido de ejemplo: no es una compra real">
       Datos de ejemplo
     </Marca>
   );

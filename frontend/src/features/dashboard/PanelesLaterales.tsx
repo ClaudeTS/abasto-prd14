@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Etiqueta } from "@/components/comunes";
@@ -8,10 +9,11 @@ import type { Pendiente, TiempoCanal } from "./types";
 
 export function PanelPendientes({ pendientes }: { pendientes: Pendiente[] }) {
   return (
-    <Card size="sm" aria-label="Pendientes de aprobación">
-      <CardHeader>
-        <CardTitle>Pendientes de aprobación</CardTitle>
-        <CardDescription>Sin compra automática, por encima del tope o con una negociación para aprobar</CardDescription>
+    // Ámbar = te necesita (docs/DISENO.md)
+    <Card size="sm" aria-label="Pendientes de aprobación" className="pt-0 ring-accion-borde">
+      <CardHeader className="bg-accion-bg py-3 text-accion">
+        <CardTitle className="font-bold">Esperan tu aprobación</CardTitle>
+        <CardDescription className="text-accion/80">Sin compra automática, por encima del tope o con una negociación para aprobar</CardDescription>
         <CardAction>
           <Etiqueta tono={pendientes.length ? "ambar" : "neutro"}>{pendientes.length}</Etiqueta>
         </CardAction>
@@ -42,6 +44,8 @@ export function PanelPendientes({ pendientes }: { pendientes: Pendiente[] }) {
 export function PanelTiempoPorCanal({ canales, dias }: { canales: TiempoCanal[]; dias: number }) {
   const conDatos = canales.filter((c) => c.minutos !== null);
   const maximo = Math.max(...conDatos.map((c) => c.minutos ?? 0), 1);
+  // Una sola serie en celeste (la que importa: el canal más rápido); el resto es contexto en gris.
+  const masRapido = conDatos.reduce<TiempoCanal | null>((m, c) => (m === null || (c.minutos ?? 0) < (m.minutos ?? 0) ? c : m), null);
   const ejemplo = canales.some((c) => c.ejemplo);
   return (
     <Card size="sm" aria-label="Tiempo de respuesta por canal">
@@ -50,7 +54,7 @@ export function PanelTiempoPorCanal({ canales, dias }: { canales: TiempoCanal[];
         <CardDescription>Promedio de los proveedores, últimos {dias} días</CardDescription>
         {ejemplo && (
           <CardAction>
-            <Etiqueta tono="ambar">Datos de ejemplo</Etiqueta>
+            <Etiqueta tono="ejemplo">Datos de ejemplo</Etiqueta>
           </CardAction>
         )}
       </CardHeader>
@@ -72,7 +76,10 @@ export function PanelTiempoPorCanal({ canales, dias }: { canales: TiempoCanal[];
                 </span>
               </div>
               <Progress
-                className="mt-1.5"
+                className={cn(
+                  "mt-1.5 h-2.5 bg-fondo",
+                  c.canal !== masRapido?.canal && "[&_[data-slot=progress-indicator]]:bg-gris-claro",
+                )}
                 value={c.minutos === null ? 0 : Math.max(3, (c.minutos / maximo) * 100)}
                 aria-label={`${NOMBRE_CANAL[c.canal]}: ${c.minutos === null ? "sin datos" : duracion(c.minutos)}`}
               />

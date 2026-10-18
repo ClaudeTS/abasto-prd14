@@ -37,24 +37,24 @@ function Item({
   const tipo = TIPOS[r.tipo];
   const Icono = tipo.icono;
   return (
-    <li className="flex gap-3 border-b py-4 first:pt-0 last:border-b-0 last:pb-0" data-testid="recomendacion">
-      <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+    <li className="flex gap-3 border-b border-ia-borde/70 py-4 first:pt-0 last:border-b-0 last:pb-0" data-testid="recomendacion">
+      <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-ia-bg text-azul">
         <Icono className="size-4" aria-hidden />
       </span>
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-          <h3 className="font-medium text-pretty">{r.titulo}</h3>
+          <h3 className="font-sans font-bold text-pretty">{r.titulo}</h3>
           <Etiqueta tono={tipo.tono}>{tipo.etiqueta}</Etiqueta>
-          {r.ejemplo && <Etiqueta tono="ambar">Datos de ejemplo</Etiqueta>}
+          {r.ejemplo && <Etiqueta tono="ejemplo">Datos de ejemplo</Etiqueta>}
         </div>
         <p className="mt-1 text-sm text-pretty text-muted-foreground">{r.texto}</p>
-        <dl className="mt-2.5 grid gap-x-4 gap-y-1 rounded-lg bg-muted/50 px-3 py-2 text-xs sm:grid-cols-[minmax(0,auto)_1fr]">
+        <dl className="mt-2.5 grid gap-x-4 gap-y-1 rounded-lg bg-white px-3 py-2 ring-1 ring-ia-borde/60 text-xs sm:grid-cols-[minmax(0,auto)_1fr]">
           {r.datos.map((d) => (
             <div key={d.etiqueta} className="contents">
               <dt className="text-muted-foreground">{d.etiqueta}</dt>
               <dd className="font-medium tabular-nums">
                 {d.valor}
-                {d.ejemplo && <span className="ml-1.5 font-normal text-amber-700 dark:text-amber-400">(ejemplo)</span>}
+                {d.ejemplo && <span className="ml-1.5 font-normal text-gris-texto italic">(ejemplo)</span>}
               </dd>
             </div>
           ))}
@@ -102,17 +102,20 @@ export function PanelRecomendaciones({
     }
   };
   return (
-    <Card aria-label="Recomendaciones de la IA">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <SparklesIcon className="size-4" aria-hidden /> Recomendaciones de la IA
+    // Azul = lo hizo la IA (docs/DISENO.md): banda en azul profundo y fondo azul claro.
+    <Card aria-label="Recomendaciones de la IA" className="bg-[#f2fafd] pt-0 ring-ia-borde">
+      <CardHeader className="bg-azul-profundo py-4 text-white">
+        <CardTitle className="flex items-center gap-2 font-bold">
+          <SparklesIcon className="size-4 text-azul" aria-hidden /> Recomendaciones de la IA
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-white/75">
           Detectadas a partir de cotizaciones, compras y conversaciones. Cada una muestra los datos que la respaldan.
         </CardDescription>
         {datos && (
           <CardAction>
-            <Etiqueta>{lista.length === 1 ? "1 nueva" : `${lista.length} nuevas`}</Etiqueta>
+            <Etiqueta className="border-transparent bg-azul text-grafito">
+              {lista.length === 1 ? "1 nueva" : `${lista.length} nuevas`}
+            </Etiqueta>
           </CardAction>
         )}
       </CardHeader>

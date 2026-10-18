@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { cerrarPedido, detallePedido, recibirPedido } from "@/features/pedidos/api";
 import BarraEstados from "@/features/pedidos/BarraEstados";
+import Facetas from "@/components/Facetas";
 import Conversaciones from "@/features/pedidos/Conversaciones";
 import { BadgeEstado, CLIENTE, EtiquetaEjemplo, fechaHoraLarga, fechaLarga } from "@/features/pedidos/presentacion";
 import { Cotizaciones, Negociacion, Resumen } from "@/features/pedidos/Secciones";
@@ -98,44 +99,51 @@ export default function PedidoDetalle() {
     <div className="mx-auto max-w-7xl space-y-5">
       <Migas numero={pedido.numero} />
 
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="min-w-0 space-y-1.5">
-          <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-2xl font-semibold tracking-tight">
-              {pedido.numero} · {pedido.titulo}
-            </h1>
-            <BadgeEstado estado={pedido.estado} />
-            {pedido.ejemplo && <EtiquetaEjemplo />}
+      {/* Encabezado oscuro con las facetas de la plantilla institucional; la etapa actual va en celeste. */}
+      <section className="relative isolate space-y-5 overflow-hidden rounded-2xl bg-negro px-6 py-5 text-white">
+        <Facetas className="-z-10 w-2/5 opacity-60" />
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="min-w-0 space-y-1.5 [&_p]:text-gris-oscuro">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-2xl tracking-tight">
+                {pedido.numero} · {pedido.titulo}
+              </h1>
+              <BadgeEstado estado={pedido.estado} />
+              {pedido.ejemplo && <EtiquetaEjemplo />}
+            </div>
+            <Bajada p={pedido} />
           </div>
-          <Bajada p={pedido} />
+          <div className="flex flex-wrap gap-2">
+            {pedido.demo && (
+              <Button
+                variant="outline"
+                asChild
+                className="rounded-full border-[#4a5053] bg-transparent text-white hover:bg-white/10 hover:text-white"
+              >
+                <Link to="/feed">
+                  <PlayCircleIcon />
+                  Ver en la demo guiada
+                </Link>
+              </Button>
+            )}
+            {pedido.acciones.includes("recibir") && (
+              <Button className="rounded-full font-bold" onClick={() => marcar("recibir")} disabled={!!accion}>
+                {accion === "recibir" ? <Spinner /> : <PackageCheckIcon />}
+                Marcar como recibido
+              </Button>
+            )}
+            {pedido.acciones.includes("cerrar") && (
+              <Button className="rounded-full font-bold" onClick={() => marcar("cerrar")} disabled={!!accion}>
+                {accion === "cerrar" ? <Spinner /> : <CheckCheckIcon />}
+                Cerrar pedido
+              </Button>
+            )}
+          </div>
         </div>
-        <div className="flex flex-wrap gap-2">
-          {pedido.demo && (
-            <Button variant="outline" asChild>
-              <Link to="/feed">
-                <PlayCircleIcon />
-                Ver en la demo guiada
-              </Link>
-            </Button>
-          )}
-          {pedido.acciones.includes("recibir") && (
-            <Button onClick={() => marcar("recibir")} disabled={!!accion}>
-              {accion === "recibir" ? <Spinner /> : <PackageCheckIcon />}
-              Marcar como recibido
-            </Button>
-          )}
-          {pedido.acciones.includes("cerrar") && (
-            <Button onClick={() => marcar("cerrar")} disabled={!!accion}>
-              {accion === "cerrar" ? <Spinner /> : <CheckCheckIcon />}
-              Cerrar pedido
-            </Button>
-          )}
-        </div>
-      </div>
+        <BarraEstados estado={pedido.estado} historial={pedido.historial_estados} oscuro />
+      </section>
       {errorAccion && <ErrorBanner mensaje={errorAccion} />}
       {error && <ErrorBanner mensaje={error} onReintentar={cargar} />}
-
-      <BarraEstados estado={pedido.estado} historial={pedido.historial_estados} />
 
       {pedido.avisos.length > 0 && (
         <Alert>

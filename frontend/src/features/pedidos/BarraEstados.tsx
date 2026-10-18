@@ -25,7 +25,16 @@ function pasos(estado: EstadoPedido, historial: EventoEstado[]): Paso[] {
   });
 }
 
-export default function BarraEstados({ estado, historial }: { estado: EstadoPedido; historial: EventoEstado[] }) {
+export default function BarraEstados({
+  estado,
+  historial,
+  oscuro = false,
+}: {
+  estado: EstadoPedido;
+  historial: EventoEstado[];
+  /** Sobre el encabezado oscuro del detalle: píldoras grafito y la etapa actual en celeste (plantilla). */
+  oscuro?: boolean;
+}) {
   const lista = pasos(estado, historial);
   const ultimo = [...historial].reverse().find((h) => h.estado === estado);
   return (
@@ -44,13 +53,20 @@ export default function BarraEstados({ estado, historial }: { estado: EstadoPedi
             }
             className={cn(
               "inline-flex h-7 items-center gap-1 rounded-full px-2.5 text-xs font-medium whitespace-nowrap",
-              p.tipo === "hecho" && "bg-primary text-primary-foreground",
-              p.tipo === "actual" && "bg-background text-foreground ring-[1.5px] ring-foreground",
+              oscuro && "h-8 px-3.5",
+              p.tipo === "hecho" &&
+                (oscuro
+                  ? "border border-negro-3 bg-negro-2 text-gris-claro [&_svg]:text-celeste"
+                  : "bg-grafito text-white [&_svg]:text-celeste"),
+              p.tipo === "actual" && "bg-celeste font-bold text-grafito",
               p.tipo === "salteado" &&
-                "bg-muted/60 text-muted-foreground/70 line-through decoration-muted-foreground/50",
-              p.tipo === "pendiente" && "bg-muted text-muted-foreground",
+                (oscuro
+                  ? "border border-negro-3 text-gris-texto line-through"
+                  : "bg-muted/60 text-muted-foreground/70 line-through decoration-muted-foreground/50"),
+              p.tipo === "pendiente" &&
+                (oscuro ? "border border-negro-3 bg-negro-2/60 text-[#7a8084]" : "bg-muted text-muted-foreground"),
               p.tipo === "cancelado" &&
-                "bg-red-50 text-red-800 ring-1 ring-red-200 dark:bg-red-950 dark:text-red-300 dark:ring-red-900",
+                "bg-alerta-bg text-alerta ring-1 ring-alerta-borde",
             )}
           >
             {p.tipo === "hecho" && <CheckIcon className="size-3" aria-hidden />}
@@ -59,8 +75,8 @@ export default function BarraEstados({ estado, historial }: { estado: EstadoPedi
         ))}
       </ol>
       {ultimo?.detalle && (
-        <p className="text-sm text-muted-foreground">
-          <span className="font-medium text-foreground">{ETIQUETA_ESTADO[estado]}</span>
+        <p className={cn("text-sm", oscuro ? "text-gris-oscuro" : "text-muted-foreground")}>
+          <span className={cn("font-medium", oscuro ? "text-white" : "text-foreground")}>{ETIQUETA_ESTADO[estado]}</span>
           {ultimo.en ? ` · ${fechaHoraLarga(ultimo.en)}` : ""} · {ultimo.detalle}
         </p>
       )}

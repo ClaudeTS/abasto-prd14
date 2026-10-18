@@ -8,12 +8,17 @@ import { Button } from "@/components/ui/button";
 
 // Piezas propias de Abasto armadas sobre los componentes de shadcn/ui.
 
+// Familias de la paleta institucional (docs/DISENO.md): verde = en marcha/ok (celeste), azul = la IA trabaja,
+// ámbar = te necesita, rojo = cancelado o error.
 const TONOS = {
   neutro: "",
-  verde: "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300",
-  ambar: "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-300",
-  rojo: "border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300",
-  azul: "border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-900 dark:bg-sky-950 dark:text-sky-300",
+  verde: "border-ok-borde bg-ok-bg text-celeste-ink",
+  ambar: "border-accion-borde bg-accion-bg text-accion",
+  rojo: "border-alerta-borde bg-alerta-bg text-alerta",
+  azul: "border-ia-borde bg-ia-bg text-azul-profundo",
+  // Datos de ejemplo: rayado neutro, no compite con ningún estado.
+  ejemplo:
+    "border-gris-claro bg-[repeating-linear-gradient(135deg,#f7f7f7_0_5px,#dde2e1_5px_10px)] text-[#4a5053]",
 } as const;
 
 export type Tono = keyof typeof TONOS;

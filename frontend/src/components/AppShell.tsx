@@ -41,8 +41,8 @@ function Enlace({ item }: { item: Item }) {
       to={item.to}
       className={({ isActive }) =>
         cn(
-          "flex min-h-9 items-center gap-2.5 rounded-md px-2.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
-          isActive && "bg-muted font-medium text-foreground",
+          "flex min-h-9 items-center gap-2.5 rounded-full border border-transparent px-3 text-sm text-gris-oscuro transition-colors hover:bg-negro-2 hover:text-white",
+          isActive && "border-negro-3 bg-negro-2 font-medium text-white [&_svg]:text-celeste",
         )
       }
     >
@@ -55,55 +55,58 @@ function Enlace({ item }: { item: Item }) {
 export default function AppShell({ children }: { children: ReactNode }) {
   const { usuario, salir } = useAuth();
   return (
-    <div className="flex min-h-svh flex-col bg-muted/30 md:flex-row">
-      <aside className="flex shrink-0 flex-col gap-1 border-b bg-background p-3 md:sticky md:top-0 md:h-svh md:w-60 md:border-r md:border-b-0">
-        <NavLink to="/inicio" className="flex items-center gap-2 px-2 pt-1 pb-4">
-          <span className="flex size-7 items-center justify-center rounded-md bg-primary text-sm font-bold text-primary-foreground">
-            A
-          </span>
-          <span className="font-semibold tracking-tight">Abasto</span>
-          {MODO === "mock" && (
-            <Badge variant="outline" className="ml-auto">
-              Mock
-            </Badge>
-          )}
-        </NavLink>
-        <nav aria-label="Navegación principal" className="flex flex-col gap-0.5">
-          {PRINCIPAL.map((i) => (
-            <Enlace key={i.to} item={i} />
-          ))}
-          <div className="px-2.5 pt-4 pb-1 text-xs text-muted-foreground">Administración</div>
-          {ADMIN.map((i) => (
-            <Enlace key={i.to} item={i} />
-          ))}
-          <div className="px-2.5 pt-4 pb-1 text-xs text-muted-foreground">Pitch</div>
-          {DEMO.map((i) => (
-            <Enlace key={i.to} item={i} />
-          ))}
-        </nav>
-        {usuario && (
-          <div className="mt-auto flex items-center gap-2.5 border-t px-2 pt-3">
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold">
-              {usuario.nombre.slice(0, 2).toUpperCase()}
+    <div className="flex min-h-svh flex-col bg-background md:flex-row">
+      {/* Marco oscuro como las slides de sección de la plantilla; el contenido va sobre #F7F7F7. */}
+      <div className="shrink-0 bg-negro md:w-60">
+        <aside className="flex flex-col gap-1 bg-negro p-3 text-gris-oscuro md:sticky md:top-0 md:h-svh md:w-60">
+          <NavLink to="/inicio" className="flex items-center gap-2 px-2 pt-1 pb-4">
+            <span className="flex size-7 items-center justify-center rounded-md bg-celeste font-heading text-sm font-bold text-grafito">
+              A
             </span>
-            <div className="min-w-0 flex-1 text-sm leading-tight">
-              <div className="truncate font-medium">{usuario.nombre}</div>
-              <div className="truncate text-xs text-muted-foreground">
-                {usuario.rol === "administrador" ? "Administrador" : "Consulta"}
+            <span className="font-heading text-lg font-bold text-white">Abasto</span>
+            {MODO === "mock" && (
+              <Badge variant="outline" className="ml-auto border-negro-3 text-gris-oscuro">
+                Mock
+              </Badge>
+            )}
+          </NavLink>
+          <nav aria-label="Navegación principal" className="flex flex-col gap-0.5">
+            {PRINCIPAL.map((i) => (
+              <Enlace key={i.to} item={i} />
+            ))}
+            <div className="px-3 pt-4 pb-1 text-[11px] font-bold tracking-[0.12em] text-gris-texto uppercase">Administración</div>
+            {ADMIN.map((i) => (
+              <Enlace key={i.to} item={i} />
+            ))}
+            <div className="px-3 pt-4 pb-1 text-[11px] font-bold tracking-[0.12em] text-gris-texto uppercase">Pitch</div>
+            {DEMO.map((i) => (
+              <Enlace key={i.to} item={i} />
+            ))}
+          </nav>
+          {usuario && (
+            <div className="mt-auto flex items-center gap-2.5 border-t border-negro-2 px-2 pt-3">
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-celeste text-xs font-bold text-grafito">
+                {usuario.nombre.slice(0, 2).toUpperCase()}
+              </span>
+              <div className="min-w-0 flex-1 text-sm leading-tight">
+                <div className="truncate font-medium text-white">{usuario.nombre}</div>
+                <div className="truncate text-xs text-gris-oscuro">
+                  {usuario.rol === "administrador" ? "Administrador" : "Consulta"}
+                </div>
               </div>
+              <button
+                type="button"
+                onClick={salir}
+                className="rounded-md p-1.5 text-gris-oscuro hover:bg-negro-2 hover:text-white"
+                aria-label="Salir"
+                title="Salir"
+              >
+                <LogOutIcon className="size-4" />
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={salir}
-              className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
-              aria-label="Salir"
-              title="Salir"
-            >
-              <LogOutIcon className="size-4" />
-            </button>
-          </div>
-        )}
-      </aside>
+          )}
+        </aside>
+      </div>
       <main className="min-w-0 flex-1 px-4 py-6 sm:px-8 sm:py-8">{children}</main>
     </div>
   );
