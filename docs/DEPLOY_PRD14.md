@@ -9,22 +9,29 @@ La demo sigue en `hacktaon.vercel.app` + `abasto-backend.onrender.com` + su base
 | Frontend | Vercel `hacktaon` → https://hacktaon.vercel.app | Vercel `abasto-prd14` → URL: _a completar al crear_ |
 | Backend | Render `abasto-backend` (Blueprint `render.yaml`) | Render `abasto-prd14-backend`, creado a mano → URL: _a completar_ |
 | Base | Supabase, proyecto de la demo | Supabase, **otro proyecto** |
-| Código | `Namzug/hacktaon` (copia de `main` del equipo) | `Namzug/abasto-prd14-preview` (copia de `main` del fork) |
+| Código | `Namzug/hacktaon` (copia de `main` del equipo) | `Namzug/abasto-prd14-preview` (copia privada de `main` del fork) |
 
 Las URLs se completan acá cuando se crean los servicios; los valores de las variables, nunca.
 
 ## 1. De dónde sale el código: una copia en la cuenta Namzug
 
-El proyecto de Vercel está en el equipo HAIRBOX, plan Hobby: Vercel bloquea el deploy de un commit cuyo autor no es
-Namzug. Además, Render y Vercel solo ven los repos donde está instalada su app de GitHub, y en `ClaudeTS/abasto-prd14`
-no lo está. Por eso el preview hace lo mismo que la demo: lee una copia en la cuenta Namzug.
+Render y Vercel solo ven los repos donde está instalada su app de GitHub. La de Vercel (equipo HAIRBOX, plan Pro)
+está instalada solo en la cuenta Namzug y con acceso a repos elegidos; en `ClaudeTS/abasto-prd14` no está, y Namzug
+no puede instalarla ahí porque no es admin del fork. Por eso el preview hace lo mismo que la demo: lee una copia
+privada, **`Namzug/abasto-prd14-preview`** (creada el 18/10).
+
+Después de crearla hay que darle acceso a las dos apps, una vez. En GitHub → Settings → Applications → Vercel →
+Configure → Repository access: agregar `abasto-prd14-preview`. Lo mismo en la app de Render.
+
+Estado de la copia: `a47ff56`, commit vacío sobre `ed65284` (integración de los bloques 1 a 5). Todavía no incluye
+`prd/infra`, así que hasta la próxima integración el preview no tiene `vercel.json` ni el reinicio selectivo.
 
 Para actualizarla cuando Claude integra `main` del fork:
 
 ```bash
 git fetch https://github.com/ClaudeTS/abasto-prd14 main
 base=$(git rev-parse FETCH_HEAD)
-# commit vacío con autor Namzug encima de main (sin él, Vercel Hobby no publica)
+# commit vacío con autor Namzug encima de main (ver abajo por qué)
 vacio=$(GIT_AUTHOR_NAME=Namzug GIT_AUTHOR_EMAIL=63017782+Namzug@users.noreply.github.com \
         GIT_COMMITTER_NAME=Namzug GIT_COMMITTER_EMAIL=63017782+Namzug@users.noreply.github.com \
         git commit-tree "$base^{tree}" -p "$base" -m "deploy: preview del fork en $(git rev-parse --short $base)")
@@ -34,6 +41,10 @@ git push --force-with-lease=refs/heads/main:<sha actual de la copia> \
 
 El push es forzado porque el commit vacío anterior queda fuera de la historia nueva; `--force-with-lease` evita pisar
 algo que no sea ese commit. **Solo a la copia de preview, nunca al fork ni al repo del equipo.**
+
+El commit vacío con autor Namzug viene de la demo: en Hobby, Vercel no publicaba commits de autores que no fueran
+Namzug. Con Pro puede no hacer falta, pero en un repo privado Vercel pide que el autor sea miembro del equipo, así
+que se mantiene: no cuesta nada.
 
 Alternativa sin copia: `npx vercel deploy --prod` desde `frontend/` y, en Render, "Public Git repository" con el URL
 del fork. Funciona, pero los dos deploys pasan a ser manuales en cada integración.
@@ -80,9 +91,17 @@ Variables (las mismas de `render.yaml`; solo los nombres):
 | `LLAMADAS_MODO` | `simulada`; `real` solo para la prueba de llamadas del QA |
 | `ELEVENLABS_API_KEY`, `ELEVENLABS_AGENT_ID`, `ELEVENLABS_PHONE_NUMBER_ID` | secretos; los mismos que la demo (el agente "Abasto compras" no usa webhooks, ver `docs/LLAMADAS.md`) |
 | `TELEFONOS_PROVEEDORES` | `proveedor_id:+598…`, **solo celulares del equipo** |
-| Las que sumen los bloques al integrar | por ejemplo `LLAMADA_REINTENTO_MINUTOS` (bloque 5); revisar `config.py` después de cada integración |
+| `AUTH_SECRET` | **obligatoria**, secreto propio del preview (no el de la demo). Generarla con `python -c "import secrets; print(secrets.token_urlsafe(32))"` y pegarla directo en el panel |
+| `LLAMADA_REINTENTO_MINUTOS` | opcional (default 30). Para el QA de llamadas conviene `2`, así el reintento se ve sin esperar media hora |
+| `RECOMENDACION_UMBRAL_ALZA_PCT` | opcional (default 8) |
 
-`LLM_MODEL`, `SIM_DELAY_SECONDS` y `ENABLE_AUDIO` tienen default en `config.py`; cargarlas solo para cambiarlas.
+`LLM_MODEL`, `SIM_DELAY_SECONDS` y `ENABLE_AUDIO` tienen default; cargarlas solo para cambiarlas. Las variables nuevas
+de los bloques no están en `config.py`: después de cada integración, buscarlas con
+`git grep -hoE 'environ(\.get)?\(?"[A-Z_]+"' -- backend/app`.
+
+`AUTH_SECRET` firma los tokens de sesión (`app/auth.py`). Sin ella, `auth.py` usa un secreto fijo que está en el
+código, y como el fork es público cualquiera podría armar un token de admin. Además, mientras no cambie, la sesión
+sobrevive a un reinicio del servicio y al botón "Reiniciar demo". Si se cambia, se cierran todas las sesiones.
 
 El plan Free de Render reparte 750 horas por mes entre los servicios del workspace. Dos servicios que se duermen a
 los 15 minutos sin uso entran de sobra, pero el preview no conviene dejarlo despierto con un monitor.
@@ -125,10 +144,27 @@ rutas en el Vercel de preview.
 
 | Qué | Cómo | Qué borra |
 |---|---|---|
-| "Reiniciar demo" (botón de la UI) | `POST /reset` | lo operativo: pedidos, mensajes, cotizaciones, planes, negociaciones, llamadas, corridas del agente, inventario tocado, PDFs y fotos. Conserva las colecciones registradas con `store.registrar_persistente()` (reglas e historial, configuración, perfiles y altas de proveedores, sesiones) y el cache |
+| "Reiniciar demo" (botón de la UI) | `POST /reset` | lo operativo: pedidos, mensajes, cotizaciones, planes, negociaciones, llamadas, corridas del agente, inventario tocado, PDFs y fotos. Conserva las colecciones registradas con `store.registrar_persistente()` (reglas e historial, configuración, perfiles y altas de proveedores, sesiones cerradas) y el cache. La sesión en sí es un token firmado con `AUTH_SECRET`: sobrevive al reinicio aunque no se registre nada |
 | Reinicio con cache | `POST /reset?hard=true` | lo mismo más el cache de respuestas simuladas y extracciones (la próxima corrida vuelve a gastar LLM) |
 | Borrado total | hoy no tiene endpoint: `store.reset(total=True)` desde una consola del servicio, o en Supabase → SQL editor `delete from documentos; delete from archivos;` | todo, también las colecciones persistentes |
 | Reiniciar el proceso | Render → servicio → Manual Deploy → Restart service | nada: la base está en Supabase y los PDFs se vuelven a bajar de la tabla `archivos`; se pierden solo las tareas en memoria (simulaciones o llamadas en curso) |
+
+### Qué colecciones registrar como persistentes (propuesta para la integración)
+
+Salen de `main` del fork en `ed65284`. Cada bloque llama a `store.registrar_persistente()` al importar su módulo.
+Hasta que eso pase, `reset()` borra todo, igual que antes.
+
+| Persistente (sobrevive a "Reiniciar demo") | Módulo | Por qué |
+|---|---|---|
+| `reglas`, `historial_reglas`, `configuracion` | `reglas.py` | RF-13, RF-15, RF-20: configuración del administrador y su historial reversible |
+| `perfiles_proveedor`, `proveedores_alta` | `perfiles.py` | perfiles editados y altas por el agente (RF-16, RF-17) |
+| `sesiones_revocadas` | `auth.py` | si se borra, un token cerrado con "Salir" vuelve a valer hasta que vence (12 h) |
+| `ingresos` | `auth.py` | último ingreso de cada usuario; es dato de cuenta, no de un pedido |
+
+Operativas (se borran): `pedidos`, `mensajes`, `cotizaciones`, `extracciones`, `planes`, `negociaciones`,
+`llamadas`, `contactos`, `secuencias`, `estados_pedido`, `agentes`, `simulaciones`, `inventario` (ver el commit
+`1290df8`) y `recomendaciones_descartadas`. Esta última es dudosa: si se borra, las recomendaciones descartadas
+vuelven a aparecer después del reinicio, y para repetir la demo eso es lo que conviene.
 
 Si hace falta el borrado total desde la UI, se agrega `total` a `POST /reset` en `main.py` (no es archivo del
 bloque 6: lo coordina Claude).
