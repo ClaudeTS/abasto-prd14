@@ -375,7 +375,8 @@ def _kpi_automaticas(obs: list[_Obs]) -> tuple[float | None, str | None, list[_O
     usadas = list(ordenes.values())
     auto = sum(o.datos["auto"] for o in usadas)
     valor = _pct(auto, len(usadas))
-    return valor, (f"{auto} de {len(usadas)} órdenes" if usadas else None), usadas
+    n = len(usadas)
+    return valor, (f"{auto} de {n} {'orden' if n == 1 else 'órdenes'}" if usadas else None), usadas
 
 
 def _kpi_ahorro(obs: list[_Obs]) -> tuple[float | None, str | None, list[_Obs]]:
@@ -388,7 +389,8 @@ def _kpi_ahorro(obs: list[_Obs]) -> tuple[float | None, str | None, list[_Obs]]:
 def _kpi_tiempo_orden(obs: list[_Obs]) -> tuple[float | None, str | None, list[_Obs]]:
     usadas = [o for o in obs if o.datos["orden"] and o.datos["primera_linea"] and o.datos["horas"] is not None]
     valor = _prom([o.datos["horas"] for o in usadas])
-    return valor, (f"promedio de {len(usadas)} órdenes" if usadas else None), usadas
+    n = len(usadas)
+    return valor, (f"promedio de {n} {'orden' if n == 1 else 'órdenes'}" if usadas else None), usadas
 
 
 def _kpi_cotizaciones(obs: list[_Obs]) -> tuple[float | None, str | None, list[_Obs]]:
@@ -401,7 +403,8 @@ def _kpi_cotizaciones(obs: list[_Obs]) -> tuple[float | None, str | None, list[_
 def _kpi_gemelo(obs: list[_Obs]) -> tuple[float | None, str | None, list[_Obs]]:
     usadas = [o for o in obs if o.datos["cuenta_para_gemelo"] and o.datos["simulada"] is not None and o.datos["real"] is not None]
     valor = _prom([abs(o.datos["simulada"] - o.datos["real"]) for o in usadas])
-    return valor, (f"{len(usadas)} negociaciones comparadas" if usadas else None), usadas
+    n = len(usadas)
+    return valor, (f"{n} {'negociación comparada' if n == 1 else 'negociaciones comparadas'}" if usadas else None), usadas
 
 
 def _kpi_efectividad(obs: list[_Obs]) -> tuple[float | None, str | None, list[_Obs]]:
@@ -506,7 +509,8 @@ def pendientes(cliente: ClienteInterno | None = None) -> list[Pendiente]:
             if o.get("estado") != "esperando_aprobacion":
                 continue
             productos = ", ".join(l["nombre_corto"] for l in o.get("lineas", []))
-            motivo = "; ".join(o.get("motivos", [])) or "Requiere tu aprobación"
+            motivo = "; ".join(m.rstrip(". ") for m in o.get("motivos", [])) or "Requiere tu aprobación"
+            motivo += "."
             salida.append(Pendiente(
                 id=f"orden:{c['id']}:{o['id']}", tipo="orden",
                 titulo=f"{o['numero']} · {o['proveedor_nombre']} · {productos}",

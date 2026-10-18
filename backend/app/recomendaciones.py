@@ -330,8 +330,10 @@ def detectar_pendientes() -> list[Recomendacion]:
     return [Recomendacion(
         id=f"pendientes.{clave}", tipo="pendiente_aprobacion",
         titulo=f"{n} {'decisión espera' if n == 1 else 'decisiones esperan'} tu aprobación",
-        texto="Sin compra automática, por encima del tope o con una estrategia de negociación para aprobar: "
-        + "; ".join(p.titulo for p in pendientes) + ".",
+        texto=(
+            "No se emiten solas: no tienen compra automática, superan el tope o son una estrategia de "
+            "negociación para aprobar. Revisalas para que el pedido siga."
+        ),
         datos=[DatoRespaldo(etiqueta=p.titulo, valor=p.detalle) for p in pendientes],
         enlace=Enlace(ruta=pendientes[0].enlace, etiqueta="Revisar"),
         proveedor_id=pendientes[0].proveedor_id, ejemplo=False, fecha=datetime.now(), prioridad=1,
