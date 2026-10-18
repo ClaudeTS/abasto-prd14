@@ -1,5 +1,7 @@
 # Backend de Abasto en Render (Blueprint). Render → New → Blueprint → este repo.
 # Las variables con `sync: false` se cargan a mano en el dashboard (nunca en el repo).
+# Un solo servicio: el de la demo del pitch. El preview del fork se crea a mano en el panel
+# (docs/DEPLOY_PRD14.md); si estuviera acá, el Blueprint lo crearía en el repo del equipo.
 services:
   - type: web
     name: abasto-backend
